@@ -16,6 +16,7 @@ import {
   X,
   Volume2,
   VolumeX,
+  Lock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,6 +24,7 @@ import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
+import { hasAceAccess, planLabel, normalizePlan } from "@/lib/plan";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
