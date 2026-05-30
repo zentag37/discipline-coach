@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -14,11 +14,15 @@ import {
   ArrowDownRight,
   Quote,
   X,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
+import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
+import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -39,6 +43,9 @@ type Profile = {
   max_trades_per_day?: number | null;
   instruments?: any;
   session?: any;
+  voice_enabled?: boolean | null;
+  voice_style?: string | null;
+  voice_consent_decided?: boolean | null;
 };
 
 function getGreeting() {
@@ -87,6 +94,22 @@ function DashboardPage() {
   const fetchAceMessage = useServerFn(aceMessage);
   const fetchAceJournal = useServerFn(aceJournal);
 
+  // Voice state
+  const [voicePlaying, setVoicePlaying] = useState(false);
+  const [showConsent, setShowConsent] = useState(false);
+  const [lossOverlay, setLossOverlay] = useState<string | null>(null);
+  const [tradeLimitFlash, setTradeLimitFlash] = useState(false);
+  const greetedRef = useRef(false);
+  const tradeLimitSpokenRef = useRef(false);
+  const lossLimitSpokenRef = useRef(false);
+
+  useEffect(() => {
+    const unsub = subscribeVoice(setVoicePlaying);
+    return () => { unsub(); };
+  }, []);
+
+
+
   async function loadAceMessage() {
     setAceLoading(true);
     setAceError(false);
@@ -132,8 +155,10 @@ function DashboardPage() {
       }
       setUserId(user.id);
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-      if (data) setProfile(data as Profile);
-      else setProfile({ full_name: user.user_metadata?.full_name || user.email?.split("@")[0] });
+      const prof: Profile = data
+        ? (data as Profile)
+        : { full_name: user.user_metadata?.full_name || user.email?.split("@")[0] };
+      setProfile(prof);
       refreshTrades(user.id);
       // Persist a session row for today if none exists
       const today = todayStr();
@@ -143,11 +168,56 @@ function DashboardPage() {
         .eq("user_id", user.id)
         .eq("session_date", today)
         .maybeSingle();
-      if (!existing) {
+      const firstOfDay = !existing;
+      if (firstOfDay) {
         await supabase.from("sessions").insert({ user_id: user.id, session_date: today });
       }
+      // Voice consent gate (first time ever)
+      if (!prof.voice_consent_decided) {
+        setShowConsent(true);
+      } else if (firstOfDay && prof.voice_enabled && !greetedRef.current) {
+        greetedRef.current = true;
+        speakGreeting(prof);
+      }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
+
+  function speakGreeting(p: Profile) {
+    const fn = (p.full_name || "Trader").split(" ")[0];
+    const acct = Number(p.account_size) || 25000;
+    const rp = Number(p.risk_per_trade) || 1;
+    const maxRiskAmt = Math.round((acct * rp) / 100);
+    const sLabel = getSessionStatus(new Date()).label.replace(" Open", "").replace(" Session", "") || "London";
+    const greet = getGreeting();
+    speakAsACE(
+      `${greet} ${fn}. ${sLabel} session is now open. Your max risk today is $${maxRiskAmt} per trade. Stay disciplined and wait for your setup.`,
+      p.voice_style || "marcus",
+    ).catch(() => {});
+  }
+
+  async function handleConsent(enable: boolean) {
+    setShowConsent(false);
+    if (!userId) return;
+    await supabase
+      .from("profiles")
+      .update({ voice_enabled: enable, voice_consent_decided: true })
+      .eq("id", userId);
+    setProfile((p) => ({ ...p, voice_enabled: enable, voice_consent_decided: true }));
+    if (enable && !greetedRef.current) {
+      greetedRef.current = true;
+      speakGreeting({ ...profile, voice_enabled: true });
+    }
+  }
+
+  async function toggleVoiceFromSidebar() {
+    if (!userId) return;
+    const next = !profile.voice_enabled;
+    if (!next) stopVoice();
+    await supabase.from("profiles").update({ voice_enabled: next }).eq("id", userId);
+    setProfile((p) => ({ ...p, voice_enabled: next }));
+  }
+
 
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R")
@@ -177,6 +247,38 @@ function DashboardPage() {
   const allChecked = checkedCount === 5;
 
   const sessionPL = trades.reduce((a, t) => a + (Number(t.result_dollars) || 0), 0);
+
+  // Trigger 3: trade limit reached
+  useEffect(() => {
+    if (!profile.voice_enabled || !userId) return;
+    if (trades.length >= maxTrades && !tradeLimitSpokenRef.current) {
+      tradeLimitSpokenRef.current = true;
+      setTradeLimitFlash(true);
+      speakAsACE(
+        `${firstName}. You've reached your trade limit for today. ${maxTrades} trades is your maximum. Step away from the platform now. Come back tomorrow.`,
+        profile.voice_style || "marcus",
+      ).catch(() => {});
+      setTimeout(() => setTradeLimitFlash(false), 8000);
+    }
+  }, [trades.length, maxTrades, profile.voice_enabled, profile.voice_style, firstName, userId]);
+
+  // Trigger 4: daily loss limit
+  useEffect(() => {
+    if (!profile.voice_enabled || !userId) return;
+    if (sessionPL <= -dailyStop && dailyStop > 0 && !lossLimitSpokenRef.current) {
+      lossLimitSpokenRef.current = true;
+      const msg = `${firstName}. Daily stop loss reached. You're down $${Math.abs(sessionPL).toFixed(0)} today. This is your hard limit. Close everything and log off the platform. You fought well — come back tomorrow.`;
+      setLossOverlay(msg);
+      speakAsACE(msg, profile.voice_style || "marcus").catch(() => {});
+    }
+  }, [sessionPL, dailyStop, profile.voice_enabled, profile.voice_style, firstName, userId]);
+
+  function speakAceCardMessage() {
+    if (voicePlaying) { stopVoice(); return; }
+    if (!aceMsg) return;
+    speakAsACE(aceMsg, profile.voice_style || "marcus").catch(() => {});
+  }
+
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -223,6 +325,25 @@ function DashboardPage() {
             </span>
             <span style={{ color: "#9ca3af" }}>ACE is ready</span>
           </div>
+          <button
+            onClick={toggleVoiceFromSidebar}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs w-full transition-colors hover:bg-white/5"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+            title={profile.voice_enabled ? "Click to mute" : "Click to enable voice"}
+          >
+            {profile.voice_enabled ? (
+              <>
+                <Volume2 size={12} style={{ color: TEAL }} />
+                <span style={{ color: TEAL }}>Voice on</span>
+              </>
+            ) : (
+              <>
+                <VolumeX size={12} style={{ color: "#6b7280" }} />
+                <span style={{ color: "#6b7280" }}>Voice off</span>
+              </>
+            )}
+          </button>
+
           <div className="flex items-center gap-2 px-2">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
@@ -294,7 +415,12 @@ function DashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
             <StatCard label="MAX RISK PER TRADE" value={`$${maxRisk}`} sub={`${riskPct}% of $${acct.toLocaleString()}`} />
             <StatCard label="DAILY STOP LOSS" value={`$${dailyStop}`} sub={`${dailyPct}% of $${acct.toLocaleString()}`} />
-            <StatCard label="TRADES TODAY" value={`${trades.length} / ${maxTrades}`} sub={`${Math.max(0, maxTrades - trades.length)} remaining`} />
+            <StatCard
+              label="TRADES TODAY"
+              value={`${trades.length} / ${maxTrades}`}
+              sub={`${Math.max(0, maxTrades - trades.length)} remaining`}
+              flash={tradeLimitFlash}
+            />
             <StatCard
               label="TODAY'S P&L"
               value={`${sessionPL < 0 ? "-" : ""}$${Math.abs(sessionPL).toFixed(2)}`}
@@ -330,7 +456,7 @@ function DashboardPage() {
                   `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
                 )}
               </p>
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4 items-center">
                 <button
                   onClick={loadAceMessage}
                   disabled={aceLoading}
@@ -346,6 +472,19 @@ function DashboardPage() {
                 >
                   Ask ACE something
                 </button>
+                {profile.voice_enabled && aceMsg && (
+                  <button
+                    onClick={speakAceCardMessage}
+                    className={`ml-auto p-1.5 rounded transition-all ${voicePlaying ? "animate-pulse" : "hover:bg-white/5"}`}
+                    style={{
+                      color: voicePlaying ? TEAL : "#9ca3af",
+                      border: voicePlaying ? `1px solid ${TEAL}` : "1px solid transparent",
+                    }}
+                    title={voicePlaying ? "Stop" : "Speak"}
+                  >
+                    <Volume2 size={14} />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -568,6 +707,14 @@ function DashboardPage() {
               } catch {
                 setJournalStatus("ACE journal failed — saved trade only");
               }
+              // Trigger 5: after-trade voice reaction
+              if (profile.voice_enabled) {
+                const amt = Math.abs(t.pl || 0).toFixed(0);
+                const msg = (t.pl || 0) >= 0
+                  ? `Good trade ${firstName}. $${amt} banked. Stay level — one win doesn't change your process.`
+                  : `One loss. $${amt}. You managed the risk — that's what matters. Stay focused.`;
+                speakAsACE(msg, profile.voice_style || "marcus").catch(() => {});
+              }
               setTimeout(() => setJournalStatus(null), 3000);
             }
           }}
@@ -585,6 +732,44 @@ function DashboardPage() {
       )}
 
       <AceChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} firstName={firstName} />
+
+      {lossOverlay && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center p-6 animate-fade-in"
+          style={{ background: "rgba(239,68,68,0.18)", backdropFilter: "blur(6px)" }}
+        >
+          <div
+            className="max-w-lg w-full rounded-[14px] p-7 text-center"
+            style={{
+              background: "#141820",
+              border: "2px solid #ef4444",
+              boxShadow: "0 0 60px rgba(239,68,68,0.4)",
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+          >
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: "#ef4444" }}>
+              DAILY STOP LOSS REACHED
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: "#e6e8eb", fontFamily: "Inter, sans-serif" }}>
+              {lossOverlay}
+            </p>
+            <button
+              onClick={() => { stopVoice(); setLossOverlay(null); }}
+              className="mt-5 text-xs px-4 py-2 rounded"
+              style={{ border: "1px solid #ef4444", color: "#ef4444" }}
+            >
+              I understand — logging off
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showConsent && (
+        <VoiceConsentModal
+          onEnable={() => handleConsent(true)}
+          onDecline={() => handleConsent(false)}
+        />
+      )}
     </div>
   );
 }
@@ -605,11 +790,15 @@ function NavItem({ icon, label, active }: { icon: React.ReactNode; label: string
   );
 }
 
-function StatCard({ label, value, sub, valueColor }: { label: string; value: string; sub: string; valueColor?: string }) {
+function StatCard({ label, value, sub, valueColor, flash }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean }) {
   return (
     <div
-      className="p-4 px-5 rounded-[10px]"
-      style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}
+      className={`p-4 px-5 rounded-[10px] transition-all ${flash ? "animate-pulse" : ""}`}
+      style={{
+        background: "#141820",
+        border: `1px solid ${flash ? "#ef4444" : "rgba(255,255,255,0.08)"}`,
+        boxShadow: flash ? "0 0 0 1px #ef4444, 0 0 24px rgba(239,68,68,0.35)" : undefined,
+      }}
     >
       <div className="text-[10px] tracking-widest" style={{ color: "#6b7280" }}>{label}</div>
       <div className="text-2xl mt-2" style={{ color: valueColor || TEAL }}>{value}</div>

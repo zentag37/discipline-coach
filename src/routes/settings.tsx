@@ -2,10 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings as SettingsIcon,
-  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus,
+  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
@@ -83,6 +84,36 @@ function SettingsPage() {
   }, [navigate]);
 
   const set = (k: string, v: any) => { setForm((f: any) => ({ ...f, [k]: v })); setDirty(true); };
+
+  const [voicePlaying, setVoicePlaying] = useState(false);
+  const [previewing, setPreviewing] = useState<string | null>(null);
+  useEffect(() => {
+    const unsub = subscribeVoice((p) => {
+      setVoicePlaying(p);
+      if (!p) setPreviewing(null);
+    });
+    return () => { unsub(); };
+  }, []);
+
+  async function toggleVoiceEnabled(v: boolean) {
+    set("voice_enabled", v);
+    if (!v) stopVoice();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await supabase.from("profiles").update({ voice_enabled: v }).eq("id", user.id);
+  }
+
+  function previewVoice(name: string) {
+    if (previewing === name && voicePlaying) {
+      stopVoice();
+      return;
+    }
+    setPreviewing(name);
+    speakAsACE(
+      "Good morning. I'm ACE, your trading mentor. Stay disciplined today.",
+      name.toLowerCase(),
+      { rate: form.speaking_rate },
+    ).catch(() => setPreviewing(null));
+  }
 
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (form.full_name || profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
@@ -315,7 +346,7 @@ function SettingsPage() {
 
             {/* Voice */}
             <Section id="voice" title="Voice Assistant" refs={refs}>
-              <Toggle label="Enable voice assistant" value={form.voice_enabled} onChange={(v) => set("voice_enabled", v)} large />
+              <Toggle label="Enable voice assistant" value={form.voice_enabled} onChange={toggleVoiceEnabled} large />
               <div style={{ opacity: form.voice_enabled ? 1 : 0.4, pointerEvents: form.voice_enabled ? "auto" : "none" }} className="space-y-5">
                 <Field label="VOICE PERSONALITY">
                   <div className="grid grid-cols-2 gap-2">
@@ -324,7 +355,9 @@ function SettingsPage() {
                       { name: "Sophia", icon: "💫", desc: "Calm & analytical" },
                       { name: "Rex", icon: "⚡", desc: "High-energy coach" },
                       { name: "Aria", icon: "🧘", desc: "Mindful & steady" },
-                    ].map((v) => (
+                    ].map((v) => {
+                      const isPreviewing = previewing === v.name && voicePlaying;
+                      return (
                       <div key={v.name} onClick={() => set("voice_personality", v.name)}
                         className="p-3 rounded-[10px] cursor-pointer transition-all"
                         style={{
@@ -337,14 +370,18 @@ function SettingsPage() {
                             <div className="text-xs mt-1" style={{ fontFamily: FONT_SANS }}>{v.name}</div>
                             <div className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>{v.desc}</div>
                           </div>
-                          <button onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] px-2 py-1 rounded"
-                            style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#9ca3af" }}>
-                            Preview
+                          <button onClick={(e) => { e.stopPropagation(); previewVoice(v.name); }}
+                            className="text-[10px] px-2 py-1 rounded flex items-center gap-1"
+                            style={{
+                              border: `1px solid ${isPreviewing ? TEAL : "rgba(255,255,255,0.15)"}`,
+                              color: isPreviewing ? TEAL : "#9ca3af",
+                            }}>
+                            {isPreviewing ? <><Square size={9} /> Stop</> : <><Play size={9} /> Preview</>}
                           </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </Field>
                 <Field label="SPEAKING RATE">

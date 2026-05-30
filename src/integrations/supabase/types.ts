@@ -86,6 +86,7 @@ export type Database = {
           style: string | null
           timezone: string | null
           updated_at: string
+          voice_consent_decided: boolean
           voice_enabled: boolean | null
           voice_style: string | null
         }
@@ -112,6 +113,7 @@ export type Database = {
           style?: string | null
           timezone?: string | null
           updated_at?: string
+          voice_consent_decided?: boolean
           voice_enabled?: boolean | null
           voice_style?: string | null
         }
@@ -138,6 +140,7 @@ export type Database = {
           style?: string | null
           timezone?: string | null
           updated_at?: string
+          voice_consent_decided?: boolean
           voice_enabled?: boolean | null
           voice_style?: string | null
         }
