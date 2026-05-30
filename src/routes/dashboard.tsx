@@ -450,60 +450,76 @@ function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 animate-fade-in">
             {/* ACE card */}
             <div
-              className="lg:col-span-3 p-5 rounded-[10px]"
+              className="lg:col-span-3 p-5 rounded-[10px] relative overflow-hidden"
               style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}
             >
-              <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
-                ACE · AI MENTOR
-              </div>
-              <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
-                {aceLoading && !aceMsg ? (
-                  <span className="inline-flex gap-1 items-center">
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL }} />
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "150ms" }} />
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "300ms" }} />
-                  </span>
-                ) : aceError && !aceMsg ? (
-                  <button onClick={loadAceMessage} className="text-xs" style={{ color: TEAL }}>
-                    ACE is thinking... tap to retry
-                  </button>
-                ) : aceMsg ? (
-                  aceMsg
-                ) : (
-                  `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
-                )}
-              </p>
-              <div className="flex gap-2 mt-4 items-center">
-                <button
-                  onClick={loadAceMessage}
-                  disabled={aceLoading}
-                  className="text-xs px-3 py-1.5 rounded hover:bg-white/5 disabled:opacity-50"
-                  style={{ color: "#9ca3af" }}
-                >
-                  Next tip →
-                </button>
-                <button
-                  onClick={() => setChatOpen(true)}
-                  className="text-xs px-3 py-1.5 rounded"
-                  style={{ border: `1px solid ${TEAL}`, color: TEAL }}
-                >
-                  Ask ACE something
-                </button>
-                {profile.voice_enabled && aceMsg && (
+              <div style={{ filter: aceUnlocked ? "none" : "blur(6px)", pointerEvents: aceUnlocked ? "auto" : "none" }}>
+                <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
+                  ACE · AI MENTOR
+                </div>
+                <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
+                  {aceLoading && !aceMsg ? (
+                    <span className="inline-flex gap-1 items-center">
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "150ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "300ms" }} />
+                    </span>
+                  ) : aceError && !aceMsg ? (
+                    <button onClick={loadAceMessage} className="text-xs" style={{ color: TEAL }}>
+                      ACE is thinking... tap to retry
+                    </button>
+                  ) : aceMsg ? (
+                    aceMsg
+                  ) : (
+                    `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
+                  )}
+                </p>
+                <div className="flex gap-2 mt-4 items-center">
                   <button
-                    onClick={speakAceCardMessage}
-                    className={`ml-auto p-1.5 rounded transition-all ${voicePlaying ? "animate-pulse" : "hover:bg-white/5"}`}
-                    style={{
-                      color: voicePlaying ? TEAL : "#9ca3af",
-                      border: voicePlaying ? `1px solid ${TEAL}` : "1px solid transparent",
-                    }}
-                    title={voicePlaying ? "Stop" : "Speak"}
+                    onClick={loadAceMessage}
+                    disabled={aceLoading}
+                    className="text-xs px-3 py-1.5 rounded hover:bg-white/5 disabled:opacity-50"
+                    style={{ color: "#9ca3af" }}
                   >
-                    <Volume2 size={14} />
+                    Next tip →
                   </button>
-                )}
+                  <button
+                    onClick={() => setChatOpen(true)}
+                    className="text-xs px-3 py-1.5 rounded"
+                    style={{ border: `1px solid ${TEAL}`, color: TEAL }}
+                  >
+                    Ask ACE something
+                  </button>
+                  {profile.voice_enabled && aceMsg && (
+                    <button
+                      onClick={speakAceCardMessage}
+                      className={`ml-auto p-1.5 rounded transition-all ${voicePlaying ? "animate-pulse" : "hover:bg-white/5"}`}
+                      style={{
+                        color: voicePlaying ? TEAL : "#9ca3af",
+                        border: voicePlaying ? `1px solid ${TEAL}` : "1px solid transparent",
+                      }}
+                      title={voicePlaying ? "Stop" : "Speak"}
+                    >
+                      <Volume2 size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
+              {!aceUnlocked && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6"
+                  style={{ background: "rgba(13,15,18,0.55)" }}>
+                  <Lock size={22} style={{ color: TEAL }} />
+                  <div className="text-sm" style={{ color: "#e6e8eb", fontFamily: "Inter, sans-serif" }}>
+                    Upgrade to Pro to unlock ACE
+                  </div>
+                  <Link to="/pricing" className="text-xs px-4 py-1.5 rounded font-medium"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    Upgrade →
+                  </Link>
+                </div>
+              )}
             </div>
+
 
             {/* Pre-trade checklist */}
             <div
