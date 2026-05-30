@@ -155,8 +155,10 @@ function DashboardPage() {
       }
       setUserId(user.id);
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-      if (data) setProfile(data as Profile);
-      else setProfile({ full_name: user.user_metadata?.full_name || user.email?.split("@")[0] });
+      const prof: Profile = data
+        ? (data as Profile)
+        : { full_name: user.user_metadata?.full_name || user.email?.split("@")[0] };
+      setProfile(prof);
       refreshTrades(user.id);
       // Persist a session row for today if none exists
       const today = todayStr();
@@ -166,11 +168,56 @@ function DashboardPage() {
         .eq("user_id", user.id)
         .eq("session_date", today)
         .maybeSingle();
-      if (!existing) {
+      const firstOfDay = !existing;
+      if (firstOfDay) {
         await supabase.from("sessions").insert({ user_id: user.id, session_date: today });
       }
+      // Voice consent gate (first time ever)
+      if (!prof.voice_consent_decided) {
+        setShowConsent(true);
+      } else if (firstOfDay && prof.voice_enabled && !greetedRef.current) {
+        greetedRef.current = true;
+        speakGreeting(prof);
+      }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
+
+  function speakGreeting(p: Profile) {
+    const fn = (p.full_name || "Trader").split(" ")[0];
+    const acct = Number(p.account_size) || 25000;
+    const rp = Number(p.risk_per_trade) || 1;
+    const maxRiskAmt = Math.round((acct * rp) / 100);
+    const sLabel = getSessionStatus(new Date()).label.replace(" Open", "").replace(" Session", "") || "London";
+    const greet = getGreeting();
+    speakAsACE(
+      `${greet} ${fn}. ${sLabel} session is now open. Your max risk today is $${maxRiskAmt} per trade. Stay disciplined and wait for your setup.`,
+      p.voice_style || "marcus",
+    ).catch(() => {});
+  }
+
+  async function handleConsent(enable: boolean) {
+    setShowConsent(false);
+    if (!userId) return;
+    await supabase
+      .from("profiles")
+      .update({ voice_enabled: enable, voice_consent_decided: true })
+      .eq("id", userId);
+    setProfile((p) => ({ ...p, voice_enabled: enable, voice_consent_decided: true }));
+    if (enable && !greetedRef.current) {
+      greetedRef.current = true;
+      speakGreeting({ ...profile, voice_enabled: true });
+    }
+  }
+
+  async function toggleVoiceFromSidebar() {
+    if (!userId) return;
+    const next = !profile.voice_enabled;
+    if (!next) stopVoice();
+    await supabase.from("profiles").update({ voice_enabled: next }).eq("id", userId);
+    setProfile((p) => ({ ...p, voice_enabled: next }));
+  }
+
 
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R")
