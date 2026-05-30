@@ -7,6 +7,9 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
+import { useServerFn } from "@tanstack/react-start";
+import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
+import { normalizePlan, planLabel } from "@/lib/plan";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
