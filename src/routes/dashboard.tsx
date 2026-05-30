@@ -456,7 +456,7 @@ function DashboardPage() {
                   `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
                 )}
               </p>
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4 items-center">
                 <button
                   onClick={loadAceMessage}
                   disabled={aceLoading}
@@ -472,6 +472,19 @@ function DashboardPage() {
                 >
                   Ask ACE something
                 </button>
+                {profile.voice_enabled && aceMsg && (
+                  <button
+                    onClick={speakAceCardMessage}
+                    className={`ml-auto p-1.5 rounded transition-all ${voicePlaying ? "animate-pulse" : "hover:bg-white/5"}`}
+                    style={{
+                      color: voicePlaying ? TEAL : "#9ca3af",
+                      border: voicePlaying ? `1px solid ${TEAL}` : "1px solid transparent",
+                    }}
+                    title={voicePlaying ? "Stop" : "Speak"}
+                  >
+                    <Volume2 size={14} />
+                  </button>
+                )}
               </div>
             </div>
 
