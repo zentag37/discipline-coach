@@ -103,7 +103,11 @@ function DashboardPage() {
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
 
-  useEffect(() => subscribeVoice(setVoicePlaying), []);
+  useEffect(() => {
+    const unsub = subscribeVoice(setVoicePlaying);
+    return () => { unsub(); };
+  }, []);
+
 
 
   async function loadAceMessage() {
