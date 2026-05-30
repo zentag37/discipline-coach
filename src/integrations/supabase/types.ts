@@ -83,7 +83,10 @@ export type Database = {
           prop_firm_name: string | null
           risk_per_trade: number | null
           session: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           style: string | null
+          subscription_status: string | null
           timezone: string | null
           updated_at: string
           voice_consent_decided: boolean
@@ -110,7 +113,10 @@ export type Database = {
           prop_firm_name?: string | null
           risk_per_trade?: number | null
           session?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           style?: string | null
+          subscription_status?: string | null
           timezone?: string | null
           updated_at?: string
           voice_consent_decided?: boolean
@@ -137,7 +143,10 @@ export type Database = {
           prop_firm_name?: string | null
           risk_per_trade?: number | null
           session?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           style?: string | null
+          subscription_status?: string | null
           timezone?: string | null
           updated_at?: string
           voice_consent_decided?: boolean
