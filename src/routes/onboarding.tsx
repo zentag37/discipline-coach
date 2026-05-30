@@ -65,15 +65,79 @@ function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [p, setP] = useState<Profile>(initial);
   const [done, setDone] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  // Auth gate + prefill
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate({ to: "/auth" }); return; }
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      if (data) {
+        setP((s) => ({
+          ...s,
+          fullName: data.full_name ?? s.fullName,
+          country: data.country ?? s.country,
+          timezone: data.timezone ?? s.timezone,
+          experience: data.experience ?? s.experience,
+          broker: data.broker ?? s.broker,
+          platform: data.platform ?? s.platform,
+          session: data.session ?? s.session,
+          assets: data.assets ?? s.assets,
+          instruments: data.instruments ?? s.instruments,
+          style: data.style ?? s.style,
+          accountSize: data.account_size ?? s.accountSize,
+          riskPerTrade: data.risk_per_trade ?? s.riskPerTrade,
+          dailyLossLimit: data.daily_loss_limit ?? s.dailyLossLimit,
+          maxTrades: data.max_trades ?? s.maxTrades,
+          propFirm: data.prop_firm ?? s.propFirm,
+          propFirmName: data.prop_firm_name ?? s.propFirmName,
+          voiceEnabled: data.voice_enabled ?? s.voiceEnabled,
+          voiceStyle: data.voice_style ?? s.voiceStyle,
+          language: data.language ?? s.language,
+        }));
+      }
+    })();
+  }, [navigate]);
 
   const set = <K extends keyof Profile>(k: K, v: Profile[K]) => setP((s) => ({ ...s, [k]: v }));
 
   const next = () => (step < 4 ? setStep(step + 1) : finish());
   const back = () => step > 0 && setStep(step - 1);
-  const finish = () => {
-    if (typeof window !== "undefined") localStorage.setItem("tcp_profile", JSON.stringify(p));
+  const finish = async () => {
+    setErr(null);
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { navigate({ to: "/auth" }); return; }
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      full_name: p.fullName,
+      country: p.country,
+      timezone: p.timezone,
+      experience: p.experience,
+      broker: p.broker,
+      platform: p.platform,
+      session: p.session,
+      assets: p.assets,
+      instruments: p.instruments,
+      style: p.style,
+      account_size: p.accountSize,
+      risk_per_trade: p.riskPerTrade,
+      daily_loss_limit: p.dailyLossLimit,
+      max_trades: p.maxTrades,
+      prop_firm: p.propFirm,
+      prop_firm_name: p.propFirmName,
+      voice_enabled: p.voiceEnabled,
+      voice_style: p.voiceStyle,
+      language: p.language,
+      onboarded: true,
+    });
+    setSaving(false);
+    if (error) { setErr(error.message); return; }
     setDone(true);
   };
+
 
   if (done) {
     const first = p.fullName.trim().split(" ")[0] || "trader";
