@@ -4,6 +4,9 @@ import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings, Bell,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "@tanstack/react-router";
+import { Lock } from "lucide-react";
+import { hasAceAccess } from "@/lib/plan";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
