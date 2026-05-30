@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          account_size: string | null
+          assets: string[] | null
+          broker: string | null
+          country: string | null
+          created_at: string
+          daily_loss_limit: string | null
+          experience: string | null
+          full_name: string | null
+          id: string
+          instruments: string | null
+          language: string | null
+          max_trades: string | null
+          onboarded: boolean
+          platform: string | null
+          prop_firm: string | null
+          prop_firm_name: string | null
+          risk_per_trade: string | null
+          session: string | null
+          style: string | null
+          timezone: string | null
+          updated_at: string
+          voice_enabled: boolean | null
+          voice_style: string | null
+        }
+        Insert: {
+          account_size?: string | null
+          assets?: string[] | null
+          broker?: string | null
+          country?: string | null
+          created_at?: string
+          daily_loss_limit?: string | null
+          experience?: string | null
+          full_name?: string | null
+          id: string
+          instruments?: string | null
+          language?: string | null
+          max_trades?: string | null
+          onboarded?: boolean
+          platform?: string | null
+          prop_firm?: string | null
+          prop_firm_name?: string | null
+          risk_per_trade?: string | null
+          session?: string | null
+          style?: string | null
+          timezone?: string | null
+          updated_at?: string
+          voice_enabled?: boolean | null
+          voice_style?: string | null
+        }
+        Update: {
+          account_size?: string | null
+          assets?: string[] | null
+          broker?: string | null
+          country?: string | null
+          created_at?: string
+          daily_loss_limit?: string | null
+          experience?: string | null
+          full_name?: string | null
+          id?: string
+          instruments?: string | null
+          language?: string | null
+          max_trades?: string | null
+          onboarded?: boolean
+          platform?: string | null
+          prop_firm?: string | null
+          prop_firm_name?: string | null
+          risk_per_trade?: string | null
+          session?: string | null
+          style?: string | null
+          timezone?: string | null
+          updated_at?: string
+          voice_enabled?: boolean | null
+          voice_style?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
