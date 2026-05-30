@@ -2,10 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings as SettingsIcon,
-  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus,
+  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
