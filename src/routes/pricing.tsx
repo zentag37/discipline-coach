@@ -91,9 +91,29 @@ function Nav() {
 
 function Hero() {
   const [annual, setAnnual] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
+  const navigate = useNavigate();
+  const checkout = useServerFn(createCheckout);
+
+  const startCheckout = async (plan: PlanKey) => {
+    if (loadingPlan) return;
+    setLoadingPlan(plan);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        sessionStorage.setItem("pendingPlan", plan);
+        navigate({ to: "/register", search: { plan } as never });
+        return;
+      }
+      const { url } = await checkout({ data: { plan } });
+      if (url) window.location.href = url;
+    } catch (e) {
+      console.error(e);
+      setLoadingPlan(null);
+    }
+  };
+
   return (
-    <section>
-      <Container className="py-20 md:py-24">
         <div className="text-center max-w-3xl mx-auto">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             / pricing
