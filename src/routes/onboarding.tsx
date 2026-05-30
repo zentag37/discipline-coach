@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -63,15 +65,79 @@ function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [p, setP] = useState<Profile>(initial);
   const [done, setDone] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  // Auth gate + prefill
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate({ to: "/auth" }); return; }
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      if (data) {
+        setP((s) => ({
+          ...s,
+          fullName: data.full_name ?? s.fullName,
+          country: data.country ?? s.country,
+          timezone: data.timezone ?? s.timezone,
+          experience: data.experience ?? s.experience,
+          broker: data.broker ?? s.broker,
+          platform: data.platform ?? s.platform,
+          session: data.session ?? s.session,
+          assets: data.assets ?? s.assets,
+          instruments: data.instruments ?? s.instruments,
+          style: data.style ?? s.style,
+          accountSize: data.account_size ?? s.accountSize,
+          riskPerTrade: data.risk_per_trade ?? s.riskPerTrade,
+          dailyLossLimit: data.daily_loss_limit ?? s.dailyLossLimit,
+          maxTrades: data.max_trades ?? s.maxTrades,
+          propFirm: data.prop_firm ?? s.propFirm,
+          propFirmName: data.prop_firm_name ?? s.propFirmName,
+          voiceEnabled: data.voice_enabled ?? s.voiceEnabled,
+          voiceStyle: data.voice_style ?? s.voiceStyle,
+          language: data.language ?? s.language,
+        }));
+      }
+    })();
+  }, [navigate]);
 
   const set = <K extends keyof Profile>(k: K, v: Profile[K]) => setP((s) => ({ ...s, [k]: v }));
 
   const next = () => (step < 4 ? setStep(step + 1) : finish());
   const back = () => step > 0 && setStep(step - 1);
-  const finish = () => {
-    if (typeof window !== "undefined") localStorage.setItem("tcp_profile", JSON.stringify(p));
+  const finish = async () => {
+    setErr(null);
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { navigate({ to: "/auth" }); return; }
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      full_name: p.fullName,
+      country: p.country,
+      timezone: p.timezone,
+      experience: p.experience,
+      broker: p.broker,
+      platform: p.platform,
+      session: p.session,
+      assets: p.assets,
+      instruments: p.instruments,
+      style: p.style,
+      account_size: p.accountSize,
+      risk_per_trade: p.riskPerTrade,
+      daily_loss_limit: p.dailyLossLimit,
+      max_trades: p.maxTrades,
+      prop_firm: p.propFirm,
+      prop_firm_name: p.propFirmName,
+      voice_enabled: p.voiceEnabled,
+      voice_style: p.voiceStyle,
+      language: p.language,
+      onboarded: true,
+    });
+    setSaving(false);
+    if (error) { setErr(error.message); return; }
     setDone(true);
   };
+
 
   if (done) {
     const first = p.fullName.trim().split(" ")[0] || "trader";
@@ -121,21 +187,24 @@ function OnboardingPage() {
           {step === 3 && <Step4 p={p} set={set} />}
           {step === 4 && <Step5 p={p} set={set} />}
 
+          {err && <p className="mt-6 text-sm text-[var(--danger)]">{err}</p>}
           <div className="flex items-center justify-between mt-10 pt-6 border-t border-border">
             <button
               onClick={back}
-              disabled={step === 0}
+              disabled={step === 0 || saving}
               className="font-mono text-sm uppercase tracking-wider text-[var(--muted-foreground)] hover:text-[var(--foreground)] disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1"
             >
               <ChevronLeft className="w-4 h-4" /> Back
             </button>
             <button
               onClick={next}
-              className="font-mono text-sm uppercase tracking-wider bg-[var(--accent)] text-[var(--primary-foreground)] px-6 py-2.5 rounded hover:opacity-90 transition flex items-center gap-1"
+              disabled={saving}
+              className="font-mono text-sm uppercase tracking-wider bg-[var(--accent)] text-[var(--primary-foreground)] px-6 py-2.5 rounded hover:opacity-90 transition flex items-center gap-1 disabled:opacity-50"
             >
-              {step === 4 ? "Finish" : "Continue"} <ChevronRight className="w-4 h-4" />
+              {saving ? "Saving…" : step === 4 ? "Finish" : "Continue"} <ChevronRight className="w-4 h-4" />
             </button>
           </div>
+
         </div>
       </div>
     </div>
