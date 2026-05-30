@@ -707,6 +707,14 @@ function DashboardPage() {
               } catch {
                 setJournalStatus("ACE journal failed — saved trade only");
               }
+              // Trigger 5: after-trade voice reaction
+              if (profile.voice_enabled) {
+                const amt = Math.abs(t.pl || 0).toFixed(0);
+                const msg = (t.pl || 0) >= 0
+                  ? `Good trade ${firstName}. $${amt} banked. Stay level — one win doesn't change your process.`
+                  : `One loss. $${amt}. You managed the risk — that's what matters. Stay focused.`;
+                speakAsACE(msg, profile.voice_style || "marcus").catch(() => {});
+              }
               setTimeout(() => setJournalStatus(null), 3000);
             }
           }}
