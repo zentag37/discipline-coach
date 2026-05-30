@@ -328,12 +328,15 @@ function PlanCard({
         })}
       </ul>
 
-      <Link
-        to="/auth"
-        className={`mt-7 inline-flex items-center justify-center rounded-md px-4 py-2.5 text-sm font-mono font-medium transition ${ctaClass}`}
+      <button
+        type="button"
+        onClick={() => onStart(plan)}
+        disabled={disabled}
+        className={`mt-7 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-mono font-medium transition disabled:opacity-60 disabled:cursor-not-allowed ${ctaClass}`}
       >
-        {ctaLabel}
-      </Link>
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading ? "Loading…" : ctaLabel}
+      </button>
     </div>
   );
 }
