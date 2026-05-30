@@ -325,6 +325,23 @@ function DashboardPage() {
             </span>
             <span style={{ color: "#9ca3af" }}>ACE is ready</span>
           </div>
+          <button
+            onClick={toggleVoiceFromSidebar}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs w-full transition-colors hover:bg-white/5"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+            title={profile.voice_enabled ? "Click to mute" : "Click to enable voice"}
+          >
+            {profile.voice_enabled ? (
+              <>
+                <Volume2 size={12} style={{ color: TEAL }} />
+                <span style={{ color: TEAL }}>Voice on</span>
+              </>
+            ) : (
+              <>
+                <VolumeX size={12} style={{ color: "#6b7280" }} />
+                <span style={{ color: "#6b7280" }}>Voice off</span>
+              </>
+            )}
           <div className="flex items-center gap-2 px-2">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
