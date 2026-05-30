@@ -1,6 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, ChevronDown, Github } from "lucide-react";
+import { Check, ChevronDown, Github, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { createCheckout, type PlanKey } from "@/lib/checkout.functions";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
