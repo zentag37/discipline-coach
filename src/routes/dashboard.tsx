@@ -186,10 +186,11 @@ function DashboardPage() {
       if (firstOfDay) {
         await supabase.from("sessions").insert({ user_id: user.id, session_date: today });
       }
-      // Voice consent gate (first time ever)
-      if (!prof.voice_consent_decided) {
+      // Voice consent gate (first time ever) — Pro/Elite only
+      const planUnlocked = hasAceAccess(prof.plan);
+      if (planUnlocked && !prof.voice_consent_decided) {
         setShowConsent(true);
-      } else if (firstOfDay && prof.voice_enabled && !greetedRef.current) {
+      } else if (planUnlocked && firstOfDay && prof.voice_enabled && !greetedRef.current) {
         greetedRef.current = true;
         speakGreeting(prof);
       }
