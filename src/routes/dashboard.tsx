@@ -415,7 +415,12 @@ function DashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
             <StatCard label="MAX RISK PER TRADE" value={`$${maxRisk}`} sub={`${riskPct}% of $${acct.toLocaleString()}`} />
             <StatCard label="DAILY STOP LOSS" value={`$${dailyStop}`} sub={`${dailyPct}% of $${acct.toLocaleString()}`} />
-            <StatCard label="TRADES TODAY" value={`${trades.length} / ${maxTrades}`} sub={`${Math.max(0, maxTrades - trades.length)} remaining`} />
+            <StatCard
+              label="TRADES TODAY"
+              value={`${trades.length} / ${maxTrades}`}
+              sub={`${Math.max(0, maxTrades - trades.length)} remaining`}
+              flash={tradeLimitFlash}
+            />
             <StatCard
               label="TODAY'S P&L"
               value={`${sessionPL < 0 ? "-" : ""}$${Math.abs(sessionPL).toFixed(2)}`}
