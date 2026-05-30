@@ -141,6 +141,7 @@ function Hero() {
 
         <div className="mt-14 grid gap-5 md:grid-cols-3 items-stretch">
           <PlanCard
+            plan="solo"
             name="SOLO"
             price={annual ? 15 : 19}
             tagline="Build the habit. Learn the rules."
@@ -157,8 +158,12 @@ function Hero() {
             ctaLabel="Start Free Trial"
             ctaVariant="outline-teal"
             annual={annual}
+            onStart={startCheckout}
+            loading={loadingPlan === "solo"}
+            disabled={loadingPlan !== null}
           />
           <PlanCard
+            plan="pro"
             name="PRO"
             price={annual ? 39 : 49}
             tagline="Your AI mentor. In your ear. Every session."
@@ -178,8 +183,12 @@ function Hero() {
             ctaVariant="filled-teal"
             featured
             annual={annual}
+            onStart={startCheckout}
+            loading={loadingPlan === "pro"}
+            disabled={loadingPlan !== null}
           />
           <PlanCard
+            plan="elite"
             name="ELITE"
             price={annual ? 79 : 99}
             tagline="For funded traders and professionals."
@@ -198,6 +207,9 @@ function Hero() {
             ctaVariant="outline-amber"
             amber
             annual={annual}
+            onStart={startCheckout}
+            loading={loadingPlan === "elite"}
+            disabled={loadingPlan !== null}
           />
         </div>
       </Container>
