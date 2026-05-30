@@ -121,7 +121,12 @@ function DashboardPage() {
   const maxTrades = Number((profile as any).max_trades) || profile.max_trades_per_day || 3;
   const maxRisk = Math.round((acct * riskPct) / 100);
   const dailyStop = Math.round((acct * dailyPct) / 100);
-  const instruments = profile.instruments?.length ? profile.instruments : ["EURUSD", "NAS100", "GOLD"];
+  const rawIns = profile.instruments;
+  const instruments: string[] = Array.isArray(rawIns)
+    ? rawIns
+    : typeof rawIns === "string" && rawIns.length
+    ? rawIns.split(",").map((s: string) => s.trim()).filter(Boolean)
+    : ["EURUSD", "NAS100", "GOLD"];
 
   const session = getSessionStatus(now);
   const opensIn = !session.open ? nextLondonOpen(now) : null;
