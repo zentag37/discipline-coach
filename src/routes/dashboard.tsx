@@ -24,7 +24,7 @@ import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
-import { hasAceAccess, planLabel, normalizePlan } from "@/lib/plan";
+import { hasAceAccess, planLabel } from "@/lib/plan";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
