@@ -85,6 +85,7 @@ function JournalPage() {
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+  const unlocked = hasAceAccess(profile.plan);
 
   // Range filter
   const rangeStart = (() => {
