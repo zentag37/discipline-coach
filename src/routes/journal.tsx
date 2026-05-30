@@ -21,6 +21,7 @@ const RANGES = ["This week", "This month", "All time"];
 function JournalPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>({});
+  const [trades, setTrades] = useState<any[]>([]);
   const [now, setNow] = useState(new Date());
   const [calMonth, setCalMonth] = useState(new Date());
   const [filter, setFilter] = useState("All");
@@ -38,12 +39,60 @@ function JournalPage() {
       if (!user) { navigate({ to: "/login" }); return; }
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       setProfile(data || { full_name: user.email?.split("@")[0] });
+      const { data: tr } = await supabase
+        .from("trades")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setTrades(tr || []);
     })();
   }, [navigate]);
 
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+
+  // Range filter
+  const rangeStart = (() => {
+    const d = new Date();
+    if (range === "This week") { d.setDate(d.getDate() - 7); return d; }
+    if (range === "This month") { d.setMonth(d.getMonth() - 1); return d; }
+    return null;
+  })();
+
+  const filtered = trades.filter((t) => {
+    if (rangeStart && new Date(t.created_at) < rangeStart) return false;
+    const pl = Number(t.result_dollars) || 0;
+    if (filter === "Wins" && pl <= 0) return false;
+    if (filter === "Losses" && pl >= 0) return false;
+    if (filter === "High emotion" && !["😤", "😰"].includes(t.emotion)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const hay = `${t.instrument ?? ""} ${t.notes ?? ""} ${t.trade_date ?? ""}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Stats
+  const total = trades.length;
+  const wins = trades.filter((t) => (Number(t.result_dollars) || 0) > 0).length;
+  const losses = trades.filter((t) => (Number(t.result_dollars) || 0) < 0).length;
+  const winRate = total ? Math.round((wins / total) * 100) : 0;
+  const avgRR = (() => {
+    const vals = trades
+      .filter((t) => Number(t.risk_dollars) > 0)
+      .map((t) => Math.abs(Number(t.result_dollars) || 0) / Number(t.risk_dollars));
+    if (!vals.length) return 0;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  })();
+  const byDay = trades.reduce<Record<string, number>>((acc, t) => {
+    const k = t.trade_date;
+    if (!k) return acc;
+    acc[k] = (acc[k] || 0) + (Number(t.result_dollars) || 0);
+    return acc;
+  }, {});
+  const bestDay = Object.values(byDay).reduce((m, v) => (v > m ? v : m), 0);
 
   async function signOut() {
     await supabase.auth.signOut();
