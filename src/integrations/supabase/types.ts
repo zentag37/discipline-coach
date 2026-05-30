@@ -77,6 +77,7 @@ export type Database = {
           language: string | null
           max_trades: number | null
           onboarded: boolean
+          plan: string
           platform: string | null
           prop_firm: string | null
           prop_firm_name: string | null
@@ -102,6 +103,7 @@ export type Database = {
           language?: string | null
           max_trades?: number | null
           onboarded?: boolean
+          plan?: string
           platform?: string | null
           prop_firm?: string | null
           prop_firm_name?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           language?: string | null
           max_trades?: number | null
           onboarded?: boolean
+          plan?: string
           platform?: string | null
           prop_firm?: string | null
           prop_firm_name?: string | null
