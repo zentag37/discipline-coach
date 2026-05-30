@@ -16,6 +16,9 @@ import {
   X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { aceMessage, aceJournal } from "@/lib/ace.functions";
+import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -76,6 +79,34 @@ function DashboardPage() {
   const [checks, setChecks] = useState([false, false, false, false, false]);
   const [showLog, setShowLog] = useState(false);
   const [trades, setTrades] = useState<any[]>([]);
+  const [aceMsg, setAceMsg] = useState<string | null>(null);
+  const [aceLoading, setAceLoading] = useState(false);
+  const [aceError, setAceError] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [journalStatus, setJournalStatus] = useState<string | null>(null);
+  const fetchAceMessage = useServerFn(aceMessage);
+  const fetchAceJournal = useServerFn(aceJournal);
+
+  async function loadAceMessage() {
+    setAceLoading(true);
+    setAceError(false);
+    try {
+      const r = await fetchAceMessage();
+      setAceMsg(r.message);
+    } catch {
+      setAceError(true);
+    } finally {
+      setAceLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!userId) return;
+    loadAceMessage();
+    const t = setInterval(loadAceMessage, 30 * 60 * 1000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -282,14 +313,34 @@ function DashboardPage() {
               <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
                 ACE · AI MENTOR
               </div>
-              <p className="text-sm leading-relaxed" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
-                Good {getGreeting().split(" ")[1]} {firstName}. {session.open ? session.label : `London opens in ${opensIn}`}. {instruments[0]} is approaching yesterday's high — worth watching for a clean breakout or rejection. Your max risk today is ${maxRisk} per trade. Be patient. Wait for the trade to come to you.
+              <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
+                {aceLoading && !aceMsg ? (
+                  <span className="inline-flex gap-1 items-center">
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL }} />
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "300ms" }} />
+                  </span>
+                ) : aceError && !aceMsg ? (
+                  <button onClick={loadAceMessage} className="text-xs" style={{ color: TEAL }}>
+                    ACE is thinking... tap to retry
+                  </button>
+                ) : aceMsg ? (
+                  aceMsg
+                ) : (
+                  `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
+                )}
               </p>
               <div className="flex gap-2 mt-4">
-                <button className="text-xs px-3 py-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}>
+                <button
+                  onClick={loadAceMessage}
+                  disabled={aceLoading}
+                  className="text-xs px-3 py-1.5 rounded hover:bg-white/5 disabled:opacity-50"
+                  style={{ color: "#9ca3af" }}
+                >
                   Next tip →
                 </button>
                 <button
+                  onClick={() => setChatOpen(true)}
                   className="text-xs px-3 py-1.5 rounded"
                   style={{ border: `1px solid ${TEAL}`, color: TEAL }}
                 >
