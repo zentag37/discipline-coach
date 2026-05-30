@@ -241,6 +241,7 @@ function DashboardPage() {
     .join("")
     .toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+  const aceUnlocked = hasAceAccess(profile.plan);
   const acct = Number(profile.account_size) || 25000;
   const riskPct = Number(profile.risk_per_trade) || 1;
   const dailyPct = Number(profile.daily_loss_limit) || 3;
