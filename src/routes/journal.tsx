@@ -199,31 +199,19 @@ function JournalPage() {
                 </p>
                 <div className="mt-3">
                   <div className="flex justify-between text-[10px] mb-1" style={{ color: "#6b7280" }}>
-                    <span>0 / 5 trades logged</span><span>0%</span>
+                    <span>{Math.min(total, 5)} / 5 trades logged</span><span>{Math.round((Math.min(total, 5) / 5) * 100)}%</span>
                   </div>
                   <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <div className="h-full" style={{ width: "0%", background: TEAL }} />
+                    <div className="h-full" style={{ width: `${(Math.min(total, 5) / 5) * 100}%`, background: TEAL }} />
                   </div>
                 </div>
               </Card>
 
               <Card title="EMOTION TRACKER">
-                <div className="flex items-end gap-2 h-24 mt-3">
-                  {["😤", "😰", "😐", "😊", "🎯", "😴"].map((e) => (
-                    <div key={e} className="flex-1 flex flex-col items-center gap-1 justify-end">
-                      <div className="w-full rounded-t" style={{ height: "2px", background: "rgba(255,255,255,0.08)" }} />
-                      <span className="text-sm">{e}</span>
-                    </div>
-                  ))}
-                </div>
+                <EmotionBars trades={trades} />
                 <p className="text-[11px] mt-3" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                  Your emotional patterns will appear here as you log trades.
+                  {total ? "Your emotional patterns so far." : "Your emotional patterns will appear here as you log trades."}
                 </p>
-                <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                  <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
-                    ACE will identify your emotional patterns and tell you which emotions lead to your best and worst trades.
-                  </p>
-                </div>
               </Card>
             </div>
           </div>
@@ -242,7 +230,7 @@ function JournalPage() {
                 <ChevronRight size={16} />
               </button>
             </div>
-            <CalendarGrid month={calMonth} today={now} />
+            <CalendarGrid month={calMonth} today={now} byDay={byDay} />
           </Card>
         </main>
       </div>
