@@ -85,6 +85,36 @@ function SettingsPage() {
 
   const set = (k: string, v: any) => { setForm((f: any) => ({ ...f, [k]: v })); setDirty(true); };
 
+  const [voicePlaying, setVoicePlaying] = useState(false);
+  const [previewing, setPreviewing] = useState<string | null>(null);
+  useEffect(() => {
+    const unsub = subscribeVoice((p) => {
+      setVoicePlaying(p);
+      if (!p) setPreviewing(null);
+    });
+    return () => { unsub(); };
+  }, []);
+
+  async function toggleVoiceEnabled(v: boolean) {
+    set("voice_enabled", v);
+    if (!v) stopVoice();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await supabase.from("profiles").update({ voice_enabled: v }).eq("id", user.id);
+  }
+
+  function previewVoice(name: string) {
+    if (previewing === name && voicePlaying) {
+      stopVoice();
+      return;
+    }
+    setPreviewing(name);
+    speakAsACE(
+      "Good morning. I'm ACE, your trading mentor. Stay disciplined today.",
+      name.toLowerCase(),
+      { rate: form.speaking_rate },
+    ).catch(() => setPreviewing(null));
+  }
+
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (form.full_name || profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
