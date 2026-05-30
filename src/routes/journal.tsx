@@ -121,11 +121,11 @@ function JournalPage() {
 
         <main className="p-7 space-y-6 max-w-[1400px] w-full">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 animate-fade-in">
-            <Stat label="TOTAL TRADES" value="0" sub="All time" />
-            <Stat label="WIN RATE" value="0%" sub="0W · 0L" />
-            <Stat label="AVG R:R" value="0.00" sub="Target: 2.0" />
-            <Stat label="BEST DAY" value="$0" sub="No trades yet" />
-            <Stat label="CONSISTENCY" value="—" sub="ACE grades your discipline" />
+            <Stat label="TOTAL TRADES" value={String(total)} sub="All time" />
+            <Stat label="WIN RATE" value={`${winRate}%`} sub={`${wins}W · ${losses}L`} />
+            <Stat label="AVG R:R" value={avgRR.toFixed(2)} sub="Target: 2.0" />
+            <Stat label="BEST DAY" value={`$${Math.round(bestDay)}`} sub={total ? "Single-day best" : "No trades yet"} />
+            <Stat label="CONSISTENCY" value={total >= 5 ? `${winRate}%` : "—"} sub="ACE grades your discipline" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
@@ -168,20 +168,28 @@ function JournalPage() {
                 </div>
               </div>
 
-              <ExampleEntry />
+              {total === 0 && <ExampleEntry />}
 
-              <div className="rounded-[10px] flex flex-col items-center justify-center py-12 gap-3 text-center"
-                style={{ border: "1px dashed rgba(255,255,255,0.12)" }}>
-                <div className="text-3xl">📓</div>
-                <div className="text-sm" style={{ fontFamily: FONT_SANS }}>No journal entries yet.</div>
-                <div className="text-xs max-w-xs" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                  Log your first trade and ACE will write your journal entry automatically.
+              {filtered.length > 0 ? (
+                filtered.map((t) => <TradeEntry key={t.id} t={t} />)
+              ) : total > 0 ? (
+                <div className="rounded-[10px] py-8 text-center text-xs" style={{ color: "#6b7280", border: "1px dashed rgba(255,255,255,0.12)", fontFamily: FONT_SANS }}>
+                  No trades match these filters.
                 </div>
-                <button className="mt-2 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded"
-                  style={{ background: TEAL, color: "#0d0f12" }}>
-                  <Plus size={14} /> Log your first trade
-                </button>
-              </div>
+              ) : (
+                <div className="rounded-[10px] flex flex-col items-center justify-center py-12 gap-3 text-center"
+                  style={{ border: "1px dashed rgba(255,255,255,0.12)" }}>
+                  <div className="text-3xl">📓</div>
+                  <div className="text-sm" style={{ fontFamily: FONT_SANS }}>No journal entries yet.</div>
+                  <div className="text-xs max-w-xs" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                    Log your first trade and ACE will write your journal entry automatically.
+                  </div>
+                  <button onClick={() => navigate({ to: "/dashboard" })} className="mt-2 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    <Plus size={14} /> Log your first trade
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4 animate-fade-in">
