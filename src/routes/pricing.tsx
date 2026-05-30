@@ -241,6 +241,7 @@ function Toggle({ annual, setAnnual }: { annual: boolean; setAnnual: (v: boolean
 }
 
 function PlanCard({
+  plan,
   name,
   price,
   tagline,
@@ -250,7 +251,11 @@ function PlanCard({
   featured = false,
   amber = false,
   annual,
+  onStart,
+  loading,
+  disabled,
 }: {
+  plan: PlanKey;
   name: string;
   price: number;
   tagline: string;
@@ -260,6 +265,9 @@ function PlanCard({
   featured?: boolean;
   amber?: boolean;
   annual: boolean;
+  onStart: (plan: PlanKey) => void;
+  loading: boolean;
+  disabled: boolean;
 }) {
   const borderClass = featured
     ? "border-2 border-primary shadow-[0_0_30px_-10px_rgba(0,212,160,0.4)]"
