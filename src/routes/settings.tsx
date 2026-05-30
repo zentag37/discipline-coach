@@ -118,6 +118,34 @@ function SettingsPage() {
     ).catch(() => setPreviewing(null));
   }
 
+  type SubInfo = { plan: string; status: string; subscriptionId: string | null; currentPeriodEnd: number | null; cancelAtPeriodEnd: boolean };
+  const fetchSubInfo = useServerFn(getSubscriptionInfo);
+  const runCancel = useServerFn(cancelSubscription);
+  const [subInfo, setSubInfo] = useState<SubInfo | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try { setSubInfo(await fetchSubInfo()); } catch {/* noop */}
+    })();
+  }, [fetchSubInfo]);
+
+  async function handleCancel() {
+    setCancelling(true);
+    try {
+      await runCancel();
+      toast.success("Subscription cancelled");
+      setConfirmCancel(false);
+      setSubInfo((s) => s ? { ...s, status: "cancelled", plan: "solo" } : s);
+      setProfile((p: any) => ({ ...p, plan: "solo", subscription_status: "cancelled" }));
+    } catch (e: any) {
+      toast.error(e?.message || "Could not cancel");
+    } finally {
+      setCancelling(false);
+    }
+  }
+
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (form.full_name || profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
