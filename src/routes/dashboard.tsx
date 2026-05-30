@@ -803,6 +803,27 @@ function DashboardPage() {
           onDecline={() => handleConsent(false)}
         />
       )}
+
+      {welcomeOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <div className="max-w-md w-full rounded-[14px] p-7 text-center"
+            style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>WELCOME</div>
+            <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
+              You're in. Welcome to Trader Coach {planLabel(profile.plan)}.
+            </h2>
+            <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
+              ACE is ready. Your rules are set. Let's build a consistent trading career.
+            </p>
+            <button onClick={() => setWelcomeOpen(false)}
+              className="mt-6 text-sm px-5 py-2 rounded font-medium"
+              style={{ background: TEAL, color: "#0d0f12" }}>
+              Let's go →
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
