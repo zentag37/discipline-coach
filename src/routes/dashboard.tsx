@@ -94,6 +94,18 @@ function DashboardPage() {
   const fetchAceMessage = useServerFn(aceMessage);
   const fetchAceJournal = useServerFn(aceJournal);
 
+  // Voice state
+  const [voicePlaying, setVoicePlaying] = useState(false);
+  const [showConsent, setShowConsent] = useState(false);
+  const [lossOverlay, setLossOverlay] = useState<string | null>(null);
+  const [tradeLimitFlash, setTradeLimitFlash] = useState(false);
+  const greetedRef = useRef(false);
+  const tradeLimitSpokenRef = useRef(false);
+  const lossLimitSpokenRef = useRef(false);
+
+  useEffect(() => subscribeVoice(setVoicePlaying), []);
+
+
   async function loadAceMessage() {
     setAceLoading(true);
     setAceError(false);
