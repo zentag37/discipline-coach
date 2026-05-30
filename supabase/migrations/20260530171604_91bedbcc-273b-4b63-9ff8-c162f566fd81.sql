@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS voice_consent_decided BOOLEAN NOT NULL DEFAULT FALSE;
