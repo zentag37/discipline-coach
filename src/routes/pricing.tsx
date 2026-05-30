@@ -1,6 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, ChevronDown, Github } from "lucide-react";
+import { Check, ChevronDown, Github, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { createCheckout, type PlanKey } from "@/lib/checkout.functions";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -88,6 +91,28 @@ function Nav() {
 
 function Hero() {
   const [annual, setAnnual] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
+  const navigate = useNavigate();
+  const checkout = useServerFn(createCheckout);
+
+  const startCheckout = async (plan: PlanKey) => {
+    if (loadingPlan) return;
+    setLoadingPlan(plan);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        sessionStorage.setItem("pendingPlan", plan);
+        navigate({ to: "/register", search: { plan } as never });
+        return;
+      }
+      const { url } = await checkout({ data: { plan } });
+      if (url) window.location.href = url;
+    } catch (e) {
+      console.error(e);
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <section>
       <Container className="py-20 md:py-24">
@@ -116,6 +141,7 @@ function Hero() {
 
         <div className="mt-14 grid gap-5 md:grid-cols-3 items-stretch">
           <PlanCard
+            plan="solo"
             name="SOLO"
             price={annual ? 15 : 19}
             tagline="Build the habit. Learn the rules."
@@ -132,8 +158,12 @@ function Hero() {
             ctaLabel="Start Free Trial"
             ctaVariant="outline-teal"
             annual={annual}
+            onStart={startCheckout}
+            loading={loadingPlan === "solo"}
+            disabled={loadingPlan !== null}
           />
           <PlanCard
+            plan="pro"
             name="PRO"
             price={annual ? 39 : 49}
             tagline="Your AI mentor. In your ear. Every session."
@@ -153,8 +183,12 @@ function Hero() {
             ctaVariant="filled-teal"
             featured
             annual={annual}
+            onStart={startCheckout}
+            loading={loadingPlan === "pro"}
+            disabled={loadingPlan !== null}
           />
           <PlanCard
+            plan="elite"
             name="ELITE"
             price={annual ? 79 : 99}
             tagline="For funded traders and professionals."
@@ -173,6 +207,9 @@ function Hero() {
             ctaVariant="outline-amber"
             amber
             annual={annual}
+            onStart={startCheckout}
+            loading={loadingPlan === "elite"}
+            disabled={loadingPlan !== null}
           />
         </div>
       </Container>
@@ -204,6 +241,7 @@ function Toggle({ annual, setAnnual }: { annual: boolean; setAnnual: (v: boolean
 }
 
 function PlanCard({
+  plan,
   name,
   price,
   tagline,
@@ -213,7 +251,11 @@ function PlanCard({
   featured = false,
   amber = false,
   annual,
+  onStart,
+  loading,
+  disabled,
 }: {
+  plan: PlanKey;
   name: string;
   price: number;
   tagline: string;
@@ -223,6 +265,9 @@ function PlanCard({
   featured?: boolean;
   amber?: boolean;
   annual: boolean;
+  onStart: (plan: PlanKey) => void;
+  loading: boolean;
+  disabled: boolean;
 }) {
   const borderClass = featured
     ? "border-2 border-primary shadow-[0_0_30px_-10px_rgba(0,212,160,0.4)]"
@@ -283,12 +328,15 @@ function PlanCard({
         })}
       </ul>
 
-      <Link
-        to="/auth"
-        className={`mt-7 inline-flex items-center justify-center rounded-md px-4 py-2.5 text-sm font-mono font-medium transition ${ctaClass}`}
+      <button
+        type="button"
+        onClick={() => onStart(plan)}
+        disabled={disabled}
+        className={`mt-7 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-mono font-medium transition disabled:opacity-60 disabled:cursor-not-allowed ${ctaClass}`}
       >
-        {ctaLabel}
-      </Link>
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {loading ? "Loading…" : ctaLabel}
+      </button>
     </div>
   );
 }

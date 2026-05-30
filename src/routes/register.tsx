@@ -2,6 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { useServerFn } from "@tanstack/react-start";
+import { createCheckout, type PlanKey } from "@/lib/checkout.functions";
+import { z } from "zod";
 import {
   AuthShell,
   AuthHeading,
@@ -14,13 +17,18 @@ import {
   ErrorBanner,
 } from "@/components/auth/AuthShell";
 
+const planSchema = z.object({ plan: z.enum(["solo", "pro", "elite"]).optional() });
+
 export const Route = createFileRoute("/register")({
   head: () => ({ meta: [{ title: "Create account — Trader Coach Pro" }] }),
+  validateSearch: (s) => planSchema.parse(s),
   component: RegisterPage,
 });
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const checkout = useServerFn(createCheckout);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,11 +39,30 @@ function RegisterPage() {
   const [oauthLoading, setOauthLoading] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (s) navigate({ to: "/onboarding" });
+    if (search.plan) sessionStorage.setItem("pendingPlan", search.plan);
+  }, [search.plan]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_e, s) => {
+      if (!s) return;
+      const pending = sessionStorage.getItem("pendingPlan") as PlanKey | null;
+      if (pending) {
+        sessionStorage.removeItem("pendingPlan");
+        try {
+          const { url } = await checkout({ data: { plan: pending } });
+          if (url) {
+            window.location.href = url;
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      navigate({ to: "/onboarding" });
     });
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, checkout]);
+
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const nameValid = fullName.trim().length >= 2;

@@ -27,7 +27,7 @@ export const createCheckout = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
-    const email = claims.email as string | undefined;
+    const email = (claims as { email?: string }).email;
     const priceId = data.price_id ?? PLAN_PRICE_IDS[data.plan as PlanKey];
 
     const secret = process.env.STRIPE_SECRET_KEY;
