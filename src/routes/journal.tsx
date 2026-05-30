@@ -537,3 +537,16 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
     </aside>
   );
 }
+
+function ReviewSection({ label, text }: { label: string; text: string }) {
+  return (
+    <div>
+      <div className="text-[10px] tracking-widest mb-1" style={{ color: TEAL, fontFamily: FONT_MONO }}>
+        {label}
+      </div>
+      <p className="text-xs leading-relaxed" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>
+        {text}
+      </p>
+    </div>
+  );
+}
