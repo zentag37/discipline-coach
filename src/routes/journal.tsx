@@ -5,6 +5,8 @@ import {
   Bell, Plus, Search, Pencil, Trash2, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { aceWeeklyReview, getLatestWeeklyReview } from "@/lib/ace.functions";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({ meta: [{ title: "Journal — Trader Coach" }] }),
@@ -28,6 +30,33 @@ function JournalPage() {
   const [range, setRange] = useState(() => (typeof window !== "undefined" && localStorage.getItem("journal.range")) || "All time");
   useEffect(() => { localStorage.setItem("journal.filter", filter); }, [filter]);
   useEffect(() => { localStorage.setItem("journal.range", range); }, [range]);
+  const [review, setReview] = useState<{ what_went_well: string; what_needs_work: string; focus_next_week: string; encouragement: string } | null>(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState(false);
+  const runWeeklyReview = useServerFn(aceWeeklyReview);
+  const fetchLatestReview = useServerFn(getLatestWeeklyReview);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetchLatestReview();
+        if (r?.review) setReview(r.review);
+      } catch {/* noop */}
+    })();
+  }, [fetchLatestReview]);
+
+  async function generateReview() {
+    setReviewLoading(true);
+    setReviewError(false);
+    try {
+      const r = await runWeeklyReview();
+      setReview(r.review);
+    } catch {
+      setReviewError(true);
+    } finally {
+      setReviewLoading(false);
+    }
+  }
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -196,17 +225,40 @@ function JournalPage() {
 
             <div className="space-y-4 animate-fade-in">
               <Card title="ACE WEEKLY REVIEW" teal>
-                <p className="text-xs leading-relaxed mt-2" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
-                  ACE will write your weekly review after you log at least 5 trades. Keep going.
-                </p>
-                <div className="mt-3">
-                  <div className="flex justify-between text-[10px] mb-1" style={{ color: "#6b7280" }}>
-                    <span>{Math.min(total, 5)} / 5 trades logged</span><span>{Math.round((Math.min(total, 5) / 5) * 100)}%</span>
+                {review ? (
+                  <div className="mt-2 space-y-3">
+                    <ReviewSection label="WHAT WENT WELL" text={review.what_went_well} />
+                    <ReviewSection label="WHAT NEEDS WORK" text={review.what_needs_work} />
+                    <ReviewSection label="FOCUS NEXT WEEK" text={review.focus_next_week} />
+                    <ReviewSection label="ENCOURAGEMENT" text={review.encouragement} />
+                    <button
+                      onClick={generateReview}
+                      disabled={reviewLoading}
+                      className="text-[10px] tracking-widest disabled:opacity-50"
+                      style={{ color: TEAL, fontFamily: FONT_MONO }}
+                    >
+                      {reviewLoading ? "REGENERATING..." : "REGENERATE →"}
+                    </button>
                   </div>
-                  <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <div className="h-full" style={{ width: `${(Math.min(total, 5) / 5) * 100}%`, background: TEAL }} />
-                  </div>
-                </div>
+                ) : (
+                  <>
+                    <p className="text-xs leading-relaxed mt-2" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                      {reviewLoading
+                        ? "ACE is analyzing your week..."
+                        : reviewError
+                        ? "ACE is thinking... tap to retry."
+                        : "Click below to generate this week's review."}
+                    </p>
+                    <button
+                      onClick={generateReview}
+                      disabled={reviewLoading || total === 0}
+                      className="mt-3 text-xs px-3 py-1.5 rounded disabled:opacity-50"
+                      style={{ background: TEAL, color: "#0d0f12", fontFamily: FONT_MONO }}
+                    >
+                      {reviewLoading ? "..." : reviewError ? "Retry" : "Generate weekly review"}
+                    </button>
+                  </>
+                )}
               </Card>
 
               <Card title="EMOTION TRACKER">
