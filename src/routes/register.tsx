@@ -2,6 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { useServerFn } from "@tanstack/react-start";
+import { createCheckout, type PlanKey } from "@/lib/checkout.functions";
+import { z } from "zod";
 import {
   AuthShell,
   AuthHeading,
@@ -14,8 +17,11 @@ import {
   ErrorBanner,
 } from "@/components/auth/AuthShell";
 
+const planSchema = z.object({ plan: z.enum(["solo", "pro", "elite"]).optional() });
+
 export const Route = createFileRoute("/register")({
   head: () => ({ meta: [{ title: "Create account — Trader Coach Pro" }] }),
+  validateSearch: (s) => planSchema.parse(s),
   component: RegisterPage,
 });
 
