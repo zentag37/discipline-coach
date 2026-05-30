@@ -732,6 +732,44 @@ function DashboardPage() {
       )}
 
       <AceChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} firstName={firstName} />
+
+      {lossOverlay && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center p-6 animate-fade-in"
+          style={{ background: "rgba(239,68,68,0.18)", backdropFilter: "blur(6px)" }}
+        >
+          <div
+            className="max-w-lg w-full rounded-[14px] p-7 text-center"
+            style={{
+              background: "#141820",
+              border: "2px solid #ef4444",
+              boxShadow: "0 0 60px rgba(239,68,68,0.4)",
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+          >
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: "#ef4444" }}>
+              DAILY STOP LOSS REACHED
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: "#e6e8eb", fontFamily: "Inter, sans-serif" }}>
+              {lossOverlay}
+            </p>
+            <button
+              onClick={() => { stopVoice(); setLossOverlay(null); }}
+              className="mt-5 text-xs px-4 py-2 rounded"
+              style={{ border: "1px solid #ef4444", color: "#ef4444" }}
+            >
+              I understand — logging off
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showConsent && (
+        <VoiceConsentModal
+          onEnable={() => handleConsent(true)}
+          onDecline={() => handleConsent(false)}
+        />
+      )}
     </div>
   );
 }
