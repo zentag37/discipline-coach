@@ -69,18 +69,18 @@ export type Database = {
           broker: string | null
           country: string | null
           created_at: string
-          daily_loss_limit: string | null
+          daily_loss_limit: number | null
           experience: string | null
           full_name: string | null
           id: string
           instruments: string | null
           language: string | null
-          max_trades: string | null
+          max_trades: number | null
           onboarded: boolean
           platform: string | null
           prop_firm: string | null
           prop_firm_name: string | null
-          risk_per_trade: string | null
+          risk_per_trade: number | null
           session: string | null
           style: string | null
           timezone: string | null
@@ -94,18 +94,18 @@ export type Database = {
           broker?: string | null
           country?: string | null
           created_at?: string
-          daily_loss_limit?: string | null
+          daily_loss_limit?: number | null
           experience?: string | null
           full_name?: string | null
           id: string
           instruments?: string | null
           language?: string | null
-          max_trades?: string | null
+          max_trades?: number | null
           onboarded?: boolean
           platform?: string | null
           prop_firm?: string | null
           prop_firm_name?: string | null
-          risk_per_trade?: string | null
+          risk_per_trade?: number | null
           session?: string | null
           style?: string | null
           timezone?: string | null
@@ -119,18 +119,18 @@ export type Database = {
           broker?: string | null
           country?: string | null
           created_at?: string
-          daily_loss_limit?: string | null
+          daily_loss_limit?: number | null
           experience?: string | null
           full_name?: string | null
           id?: string
           instruments?: string | null
           language?: string | null
-          max_trades?: string | null
+          max_trades?: number | null
           onboarded?: boolean
           platform?: string | null
           prop_firm?: string | null
           prop_firm_name?: string | null
-          risk_per_trade?: string | null
+          risk_per_trade?: number | null
           session?: string | null
           style?: string | null
           timezone?: string | null

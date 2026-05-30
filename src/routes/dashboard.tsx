@@ -104,6 +104,17 @@ function DashboardPage() {
       if (data) setProfile(data as Profile);
       else setProfile({ full_name: user.user_metadata?.full_name || user.email?.split("@")[0] });
       refreshTrades(user.id);
+      // Persist a session row for today if none exists
+      const today = todayStr();
+      const { data: existing } = await supabase
+        .from("sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("session_date", today)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("sessions").insert({ user_id: user.id, session_date: today });
+      }
     })();
   }, [navigate]);
 

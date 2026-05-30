@@ -24,8 +24,10 @@ function JournalPage() {
   const [trades, setTrades] = useState<any[]>([]);
   const [now, setNow] = useState(new Date());
   const [calMonth, setCalMonth] = useState(new Date());
-  const [filter, setFilter] = useState("All");
-  const [range, setRange] = useState("All time");
+  const [filter, setFilter] = useState(() => (typeof window !== "undefined" && localStorage.getItem("journal.filter")) || "All");
+  const [range, setRange] = useState(() => (typeof window !== "undefined" && localStorage.getItem("journal.range")) || "All time");
+  useEffect(() => { localStorage.setItem("journal.filter", filter); }, [filter]);
+  useEffect(() => { localStorage.setItem("journal.range", range); }, [range]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
