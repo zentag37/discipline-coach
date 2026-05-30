@@ -63,9 +63,14 @@ function nextLondonOpen(now: Date) {
   return `${h}h ${m}m`;
 }
 
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 function DashboardPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile>({});
+  const [userId, setUserId] = useState<string | null>(null);
   const [now, setNow] = useState(new Date());
   const [checks, setChecks] = useState([false, false, false, false, false]);
   const [showLog, setShowLog] = useState(false);
@@ -76,6 +81,16 @@ function DashboardPage() {
     return () => clearInterval(t);
   }, []);
 
+  async function refreshTrades(uid: string) {
+    const { data } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("user_id", uid)
+      .eq("trade_date", todayStr())
+      .order("created_at", { ascending: true });
+    setTrades(data || []);
+  }
+
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -83,9 +98,11 @@ function DashboardPage() {
         navigate({ to: "/login" });
         return;
       }
+      setUserId(user.id);
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       if (data) setProfile(data as Profile);
       else setProfile({ full_name: user.user_metadata?.full_name || user.email?.split("@")[0] });
+      refreshTrades(user.id);
     })();
   }, [navigate]);
 
@@ -97,10 +114,10 @@ function DashboardPage() {
     .join("")
     .toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
-  const acct = profile.account_size ?? 25000;
-  const riskPct = profile.risk_per_trade ?? 1;
-  const dailyPct = profile.daily_loss_limit ?? 3;
-  const maxTrades = profile.max_trades_per_day ?? 3;
+  const acct = Number(profile.account_size) || 25000;
+  const riskPct = Number(profile.risk_per_trade) || 1;
+  const dailyPct = Number(profile.daily_loss_limit) || 3;
+  const maxTrades = Number((profile as any).max_trades) || profile.max_trades_per_day || 3;
   const maxRisk = Math.round((acct * riskPct) / 100);
   const dailyStop = Math.round((acct * dailyPct) / 100);
   const instruments = profile.instruments?.length ? profile.instruments : ["EURUSD", "NAS100", "GOLD"];
@@ -111,7 +128,7 @@ function DashboardPage() {
   const checkedCount = checks.filter(Boolean).length;
   const allChecked = checkedCount === 5;
 
-  const sessionPL = trades.reduce((a, t) => a + (t.pl || 0), 0);
+  const sessionPL = trades.reduce((a, t) => a + (Number(t.result_dollars) || 0), 0);
 
   async function signOut() {
     await supabase.auth.signOut();
