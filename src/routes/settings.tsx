@@ -7,6 +7,9 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
+import { useServerFn } from "@tanstack/react-start";
+import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
+import { normalizePlan, planLabel } from "@/lib/plan";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
@@ -113,6 +116,34 @@ function SettingsPage() {
       name.toLowerCase(),
       { rate: form.speaking_rate },
     ).catch(() => setPreviewing(null));
+  }
+
+  type SubInfo = { plan: string; status: string; subscriptionId: string | null; currentPeriodEnd: number | null; cancelAtPeriodEnd: boolean };
+  const fetchSubInfo = useServerFn(getSubscriptionInfo);
+  const runCancel = useServerFn(cancelSubscription);
+  const [subInfo, setSubInfo] = useState<SubInfo | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try { setSubInfo(await fetchSubInfo()); } catch {/* noop */}
+    })();
+  }, [fetchSubInfo]);
+
+  async function handleCancel() {
+    setCancelling(true);
+    try {
+      await runCancel();
+      toast.success("Subscription cancelled");
+      setConfirmCancel(false);
+      setSubInfo((s) => s ? { ...s, status: "cancelled", plan: "solo" } : s);
+      setProfile((p: any) => ({ ...p, plan: "solo", subscription_status: "cancelled" }));
+    } catch (e: any) {
+      toast.error(e?.message || "Could not cancel");
+    } finally {
+      setCancelling(false);
+    }
   }
 
   const firstName = (profile.full_name || "Trader").split(" ")[0];
@@ -429,53 +460,79 @@ function SettingsPage() {
 
             {/* Subscription */}
             <Section id="subscription" title="Subscription" refs={refs}>
-              <div className="p-5 rounded-[10px]"
-                style={{ background: "#141820", border: `2px solid ${TEAL}` }}>
-                <div className="flex items-start justify-between flex-wrap gap-3">
-                  <div>
-                    <div className="text-2xl tracking-tight" style={{ color: TEAL }}>{plan}</div>
-                    <div className="text-xs mt-1" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>$49 / month</div>
-                    <div className="text-[11px] mt-1" style={{ color: "#6b7280" }}>Renews June 30, 2026</div>
+              {(() => {
+                const tier = normalizePlan(subInfo?.plan ?? profile.plan);
+                const status = subInfo?.status ?? profile.subscription_status ?? "inactive";
+                const statusCfg =
+                  status === "active" ? { label: "Active", color: GREEN }
+                  : status === "past_due" ? { label: "Past due", color: AMBER }
+                  : status === "cancelled" ? { label: "Cancelled", color: RED }
+                  : { label: "Inactive", color: "#6b7280" };
+                const renewal = subInfo?.currentPeriodEnd
+                  ? new Date(subInfo.currentPeriodEnd * 1000).toLocaleDateString([], { year: "numeric", month: "short", day: "2-digit" })
+                  : null;
+                return (
+                  <div className="p-5 rounded-[10px]"
+                    style={{ background: "#141820", border: `2px solid ${TEAL}` }}>
+                    <div className="flex items-start justify-between flex-wrap gap-3">
+                      <div>
+                        <div className="text-3xl tracking-tight uppercase" style={{ color: TEAL, fontFamily: FONT_MONO }}>
+                          {planLabel(tier)}
+                        </div>
+                        <div className="mt-2">
+                          <span className="text-[11px] px-2 py-0.5 rounded-full"
+                            style={{ background: `${statusCfg.color}22`, color: statusCfg.color, border: `1px solid ${statusCfg.color}55` }}>
+                            {statusCfg.label}
+                          </span>
+                        </div>
+                        {status === "active" && renewal && (
+                          <div className="text-[11px] mt-2" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                            {subInfo?.cancelAtPeriodEnd ? `Ends ${renewal}` : `Renews ${renewal}`}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-5 pt-4 gap-2 flex-wrap" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                      {tier === "pro" && (
+                        <a href="/pricing" className="text-xs px-4 py-1.5 rounded"
+                          style={{ border: `1px solid ${TEAL}`, color: TEAL }}>
+                          Upgrade to Elite →
+                        </a>
+                      )}
+                      {tier === "solo" && (
+                        <a href="/pricing" className="text-xs px-4 py-1.5 rounded font-medium"
+                          style={{ background: TEAL, color: "#0d0f12" }}>
+                          Upgrade to Pro →
+                        </a>
+                      )}
+                      {subInfo?.subscriptionId && status === "active" && !confirmCancel && (
+                        <button onClick={() => setConfirmCancel(true)} className="text-xs hover:underline" style={{ color: RED }}>
+                          Cancel subscription
+                        </button>
+                      )}
+                    </div>
+                    {confirmCancel && (
+                      <div className="mt-4 p-4 rounded-[10px]" style={{ background: "rgba(239,68,68,0.08)", border: `1px solid ${RED}55` }}>
+                        <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
+                          Cancel your subscription? You'll lose access to {planLabel(tier)} features at the end of the period.
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <button onClick={handleCancel} disabled={cancelling}
+                            className="text-xs px-3 py-1.5 rounded disabled:opacity-50"
+                            style={{ background: RED, color: "#0d0f12" }}>
+                            {cancelling ? "Cancelling..." : "Yes, cancel"}
+                          </button>
+                          <button onClick={() => setConfirmCancel(false)} disabled={cancelling}
+                            className="text-xs px-3 py-1.5 rounded"
+                            style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#9ca3af" }}>
+                            Keep subscription
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="text-[11px] space-y-0.5" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>
-                    <div>✓ Unlimited journal entries</div>
-                    <div>✓ ACE AI mentor</div>
-                    <div>✓ Voice assistant</div>
-                    <div>✓ Market intel feed</div>
-                    <div>✓ Economic calendar alerts</div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-4 pt-4 gap-2 flex-wrap" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                  <button className="text-xs px-4 py-1.5 rounded"
-                    style={{ border: `1px solid ${TEAL}`, color: TEAL }}>
-                    Upgrade to Elite →
-                  </button>
-                  <button className="text-xs hover:underline" style={{ color: RED }}>Cancel subscription</button>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <div className="text-[10px] tracking-widest mb-2" style={{ color: "#6b7280" }}>BILLING HISTORY</div>
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr style={{ color: "#6b7280" }}>
-                      {["Date", "Amount", "Status", "Invoice"].map((h) => (
-                        <th key={h} className="text-left py-2 font-normal text-[10px] tracking-widest">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[{ d: "May 30, 2026", a: "$49.00" }, { d: "Apr 30, 2026", a: "$49.00" }].map((r) => (
-                      <tr key={r.d} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                        <td className="py-2">{r.d}</td>
-                        <td>{r.a}</td>
-                        <td><span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(34,197,94,0.15)", color: GREEN }}>Paid</span></td>
-                        <td><a href="#" className="hover:underline" style={{ color: TEAL }}>Download →</a></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                );
+              })()}
             </Section>
 
             {/* Security */}

@@ -4,6 +4,9 @@ import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings, Bell,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "@tanstack/react-router";
+import { Lock } from "lucide-react";
+import { hasAceAccess } from "@/lib/plan";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
@@ -117,6 +120,8 @@ function MarketIntelPage() {
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+  const unlocked = hasAceAccess(profile.plan);
+  const visibleInstruments = unlocked ? INSTRUMENTS : INSTRUMENTS.slice(0, 1);
 
   const session = getSessionStatus(now);
   const nyIn = timeUntilUTC(now, 13);
@@ -160,9 +165,22 @@ function MarketIntelPage() {
           </DemoCard>
 
           {/* Instrument cards */}
-          {INSTRUMENTS.map((ins) => (
+          {visibleInstruments.map((ins) => (
             <InstrumentCard key={ins.symbol} ins={ins} />
           ))}
+          {!unlocked && (
+            <div className="p-6 rounded-[12px] flex flex-col items-center justify-center gap-3 text-center"
+              style={{ background: "#141820", border: `1px dashed ${TEAL}60` }}>
+              <Lock size={22} style={{ color: TEAL }} />
+              <div className="text-sm" style={{ fontFamily: FONT_SANS }}>
+                Solo plan tracks 1 instrument. Upgrade to Pro for the full watchlist + ACE intel.
+              </div>
+              <Link to="/pricing" className="text-xs px-4 py-1.5 rounded font-medium"
+                style={{ background: TEAL, color: "#0d0f12" }}>
+                Upgrade to Pro →
+              </Link>
+            </div>
+          )}
 
           {/* Economic calendar */}
           <DemoCard title="ECONOMIC CALENDAR" subtitle="Events affecting your instruments today and tomorrow">

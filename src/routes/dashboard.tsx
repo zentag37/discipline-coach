@@ -16,6 +16,7 @@ import {
   X,
   Volume2,
   VolumeX,
+  Lock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,6 +24,7 @@ import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
+import { hasAceAccess, planLabel } from "@/lib/plan";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -102,6 +104,18 @@ function DashboardPage() {
   const greetedRef = useRef(false);
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("subscribed") === "true") {
+      setWelcomeOpen(true);
+      params.delete("subscribed");
+      const qs = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    }
+  }, []);
 
   useEffect(() => {
     const unsub = subscribeVoice(setVoicePlaying);
@@ -172,10 +186,11 @@ function DashboardPage() {
       if (firstOfDay) {
         await supabase.from("sessions").insert({ user_id: user.id, session_date: today });
       }
-      // Voice consent gate (first time ever)
-      if (!prof.voice_consent_decided) {
+      // Voice consent gate (first time ever) — Pro/Elite only
+      const planUnlocked = hasAceAccess(prof.plan);
+      if (planUnlocked && !prof.voice_consent_decided) {
         setShowConsent(true);
-      } else if (firstOfDay && prof.voice_enabled && !greetedRef.current) {
+      } else if (planUnlocked && firstOfDay && prof.voice_enabled && !greetedRef.current) {
         greetedRef.current = true;
         speakGreeting(prof);
       }
@@ -212,6 +227,7 @@ function DashboardPage() {
 
   async function toggleVoiceFromSidebar() {
     if (!userId) return;
+    if (!hasAceAccess(profile.plan)) { navigate({ to: "/pricing" }); return; }
     const next = !profile.voice_enabled;
     if (!next) stopVoice();
     await supabase.from("profiles").update({ voice_enabled: next }).eq("id", userId);
@@ -227,6 +243,7 @@ function DashboardPage() {
     .join("")
     .toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+  const aceUnlocked = hasAceAccess(profile.plan);
   const acct = Number(profile.account_size) || 25000;
   const riskPct = Number(profile.risk_per_trade) || 1;
   const dailyPct = Number(profile.daily_loss_limit) || 3;
@@ -433,60 +450,76 @@ function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 animate-fade-in">
             {/* ACE card */}
             <div
-              className="lg:col-span-3 p-5 rounded-[10px]"
+              className="lg:col-span-3 p-5 rounded-[10px] relative overflow-hidden"
               style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}
             >
-              <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
-                ACE · AI MENTOR
-              </div>
-              <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
-                {aceLoading && !aceMsg ? (
-                  <span className="inline-flex gap-1 items-center">
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL }} />
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "150ms" }} />
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "300ms" }} />
-                  </span>
-                ) : aceError && !aceMsg ? (
-                  <button onClick={loadAceMessage} className="text-xs" style={{ color: TEAL }}>
-                    ACE is thinking... tap to retry
-                  </button>
-                ) : aceMsg ? (
-                  aceMsg
-                ) : (
-                  `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
-                )}
-              </p>
-              <div className="flex gap-2 mt-4 items-center">
-                <button
-                  onClick={loadAceMessage}
-                  disabled={aceLoading}
-                  className="text-xs px-3 py-1.5 rounded hover:bg-white/5 disabled:opacity-50"
-                  style={{ color: "#9ca3af" }}
-                >
-                  Next tip →
-                </button>
-                <button
-                  onClick={() => setChatOpen(true)}
-                  className="text-xs px-3 py-1.5 rounded"
-                  style={{ border: `1px solid ${TEAL}`, color: TEAL }}
-                >
-                  Ask ACE something
-                </button>
-                {profile.voice_enabled && aceMsg && (
+              <div style={{ filter: aceUnlocked ? "none" : "blur(6px)", pointerEvents: aceUnlocked ? "auto" : "none" }}>
+                <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
+                  ACE · AI MENTOR
+                </div>
+                <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
+                  {aceLoading && !aceMsg ? (
+                    <span className="inline-flex gap-1 items-center">
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "150ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: TEAL, animationDelay: "300ms" }} />
+                    </span>
+                  ) : aceError && !aceMsg ? (
+                    <button onClick={loadAceMessage} className="text-xs" style={{ color: TEAL }}>
+                      ACE is thinking... tap to retry
+                    </button>
+                  ) : aceMsg ? (
+                    aceMsg
+                  ) : (
+                    `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
+                  )}
+                </p>
+                <div className="flex gap-2 mt-4 items-center">
                   <button
-                    onClick={speakAceCardMessage}
-                    className={`ml-auto p-1.5 rounded transition-all ${voicePlaying ? "animate-pulse" : "hover:bg-white/5"}`}
-                    style={{
-                      color: voicePlaying ? TEAL : "#9ca3af",
-                      border: voicePlaying ? `1px solid ${TEAL}` : "1px solid transparent",
-                    }}
-                    title={voicePlaying ? "Stop" : "Speak"}
+                    onClick={loadAceMessage}
+                    disabled={aceLoading}
+                    className="text-xs px-3 py-1.5 rounded hover:bg-white/5 disabled:opacity-50"
+                    style={{ color: "#9ca3af" }}
                   >
-                    <Volume2 size={14} />
+                    Next tip →
                   </button>
-                )}
+                  <button
+                    onClick={() => setChatOpen(true)}
+                    className="text-xs px-3 py-1.5 rounded"
+                    style={{ border: `1px solid ${TEAL}`, color: TEAL }}
+                  >
+                    Ask ACE something
+                  </button>
+                  {profile.voice_enabled && aceMsg && (
+                    <button
+                      onClick={speakAceCardMessage}
+                      className={`ml-auto p-1.5 rounded transition-all ${voicePlaying ? "animate-pulse" : "hover:bg-white/5"}`}
+                      style={{
+                        color: voicePlaying ? TEAL : "#9ca3af",
+                        border: voicePlaying ? `1px solid ${TEAL}` : "1px solid transparent",
+                      }}
+                      title={voicePlaying ? "Stop" : "Speak"}
+                    >
+                      <Volume2 size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
+              {!aceUnlocked && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6"
+                  style={{ background: "rgba(13,15,18,0.55)" }}>
+                  <Lock size={22} style={{ color: TEAL }} />
+                  <div className="text-sm" style={{ color: "#e6e8eb", fontFamily: "Inter, sans-serif" }}>
+                    Upgrade to Pro to unlock ACE
+                  </div>
+                  <Link to="/pricing" className="text-xs px-4 py-1.5 rounded font-medium"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    Upgrade →
+                  </Link>
+                </div>
+              )}
             </div>
+
 
             {/* Pre-trade checklist */}
             <div
@@ -769,6 +802,27 @@ function DashboardPage() {
           onEnable={() => handleConsent(true)}
           onDecline={() => handleConsent(false)}
         />
+      )}
+
+      {welcomeOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <div className="max-w-md w-full rounded-[14px] p-7 text-center"
+            style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>WELCOME</div>
+            <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
+              You're in. Welcome to Trader Coach {planLabel(profile.plan)}.
+            </h2>
+            <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
+              ACE is ready. Your rules are set. Let's build a consistent trading career.
+            </p>
+            <button onClick={() => setWelcomeOpen(false)}
+              className="mt-6 text-sm px-5 py-2 rounded font-medium"
+              style={{ background: TEAL, color: "#0d0f12" }}>
+              Let's go →
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

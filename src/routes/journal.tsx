@@ -7,6 +7,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { aceWeeklyReview, getLatestWeeklyReview } from "@/lib/ace.functions";
+import { Link } from "@tanstack/react-router";
+import { Lock } from "lucide-react";
+import { hasAceAccess } from "@/lib/plan";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({ meta: [{ title: "Journal — Trader Coach" }] }),
@@ -82,6 +85,7 @@ function JournalPage() {
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+  const unlocked = hasAceAccess(profile.plan);
 
   // Range filter
   const rangeStart = (() => {
@@ -225,7 +229,18 @@ function JournalPage() {
 
             <div className="space-y-4 animate-fade-in">
               <Card title="ACE WEEKLY REVIEW" teal>
-                {review ? (
+                {!unlocked ? (
+                  <div className="mt-2 flex flex-col items-center text-center gap-3 py-4">
+                    <Lock size={20} style={{ color: TEAL }} />
+                    <p className="text-xs" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                      Upgrade to Pro for AI weekly reviews and journal writing.
+                    </p>
+                    <Link to="/pricing" className="text-xs px-4 py-1.5 rounded font-medium"
+                      style={{ background: TEAL, color: "#0d0f12", fontFamily: FONT_MONO }}>
+                      Upgrade →
+                    </Link>
+                  </div>
+                ) : review ? (
                   <div className="mt-2 space-y-3">
                     <ReviewSection label="WHAT WENT WELL" text={review.what_went_well} />
                     <ReviewSection label="WHAT NEEDS WORK" text={review.what_needs_work} />
