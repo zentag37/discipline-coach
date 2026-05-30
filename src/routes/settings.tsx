@@ -346,7 +346,7 @@ function SettingsPage() {
 
             {/* Voice */}
             <Section id="voice" title="Voice Assistant" refs={refs}>
-              <Toggle label="Enable voice assistant" value={form.voice_enabled} onChange={(v) => set("voice_enabled", v)} large />
+              <Toggle label="Enable voice assistant" value={form.voice_enabled} onChange={toggleVoiceEnabled} large />
               <div style={{ opacity: form.voice_enabled ? 1 : 0.4, pointerEvents: form.voice_enabled ? "auto" : "none" }} className="space-y-5">
                 <Field label="VOICE PERSONALITY">
                   <div className="grid grid-cols-2 gap-2">
@@ -355,7 +355,9 @@ function SettingsPage() {
                       { name: "Sophia", icon: "💫", desc: "Calm & analytical" },
                       { name: "Rex", icon: "⚡", desc: "High-energy coach" },
                       { name: "Aria", icon: "🧘", desc: "Mindful & steady" },
-                    ].map((v) => (
+                    ].map((v) => {
+                      const isPreviewing = previewing === v.name && voicePlaying;
+                      return (
                       <div key={v.name} onClick={() => set("voice_personality", v.name)}
                         className="p-3 rounded-[10px] cursor-pointer transition-all"
                         style={{
@@ -368,14 +370,18 @@ function SettingsPage() {
                             <div className="text-xs mt-1" style={{ fontFamily: FONT_SANS }}>{v.name}</div>
                             <div className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>{v.desc}</div>
                           </div>
-                          <button onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] px-2 py-1 rounded"
-                            style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#9ca3af" }}>
-                            Preview
+                          <button onClick={(e) => { e.stopPropagation(); previewVoice(v.name); }}
+                            className="text-[10px] px-2 py-1 rounded flex items-center gap-1"
+                            style={{
+                              border: `1px solid ${isPreviewing ? TEAL : "rgba(255,255,255,0.15)"}`,
+                              color: isPreviewing ? TEAL : "#9ca3af",
+                            }}>
+                            {isPreviewing ? <><Square size={9} /> Stop</> : <><Play size={9} /> Preview</>}
                           </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </Field>
                 <Field label="SPEAKING RATE">
