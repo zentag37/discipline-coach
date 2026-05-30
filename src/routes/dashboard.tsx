@@ -542,25 +542,49 @@ function DashboardPage() {
           onSave={async (t) => {
             if (!userId) return;
             const session = getSessionStatus(new Date()).label;
-            const { error } = await supabase.from("trades").insert({
-              user_id: userId,
-              instrument: t.instrument,
-              direction: t.direction,
-              entry_price: t.entry ? Number(t.entry) : null,
-              exit_price: t.exit ? Number(t.exit) : null,
-              result_dollars: t.pl,
-              emotion: t.emotion,
-              notes: t.notes,
-              session,
-            });
-            if (!error) {
+            const { data: inserted, error } = await supabase
+              .from("trades")
+              .insert({
+                user_id: userId,
+                instrument: t.instrument,
+                direction: t.direction,
+                entry_price: t.entry ? Number(t.entry) : null,
+                exit_price: t.exit ? Number(t.exit) : null,
+                result_dollars: t.pl,
+                emotion: t.emotion,
+                notes: t.notes,
+                session,
+              })
+              .select()
+              .single();
+            if (!error && inserted) {
               setShowLog(false);
               refreshTrades(userId);
+              setJournalStatus("ACE is writing your journal...");
+              try {
+                await fetchAceJournal({ data: { tradeId: inserted.id } });
+                setJournalStatus("Journal entry saved ✓");
+                refreshTrades(userId);
+              } catch {
+                setJournalStatus("ACE journal failed — saved trade only");
+              }
+              setTimeout(() => setJournalStatus(null), 3000);
             }
           }}
           instruments={instruments}
         />
       )}
+
+      {journalStatus && (
+        <div
+          className="fixed bottom-6 right-6 z-50 px-4 py-2 rounded-md text-xs animate-fade-in"
+          style={{ background: "#141820", border: `1px solid ${TEAL}`, color: TEAL, fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          {journalStatus}
+        </div>
+      )}
+
+      <AceChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} firstName={firstName} />
     </div>
   );
 }
