@@ -187,21 +187,24 @@ function OnboardingPage() {
           {step === 3 && <Step4 p={p} set={set} />}
           {step === 4 && <Step5 p={p} set={set} />}
 
+          {err && <p className="mt-6 text-sm text-[var(--danger)]">{err}</p>}
           <div className="flex items-center justify-between mt-10 pt-6 border-t border-border">
             <button
               onClick={back}
-              disabled={step === 0}
+              disabled={step === 0 || saving}
               className="font-mono text-sm uppercase tracking-wider text-[var(--muted-foreground)] hover:text-[var(--foreground)] disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1"
             >
               <ChevronLeft className="w-4 h-4" /> Back
             </button>
             <button
               onClick={next}
-              className="font-mono text-sm uppercase tracking-wider bg-[var(--accent)] text-[var(--primary-foreground)] px-6 py-2.5 rounded hover:opacity-90 transition flex items-center gap-1"
+              disabled={saving}
+              className="font-mono text-sm uppercase tracking-wider bg-[var(--accent)] text-[var(--primary-foreground)] px-6 py-2.5 rounded hover:opacity-90 transition flex items-center gap-1 disabled:opacity-50"
             >
-              {step === 4 ? "Finish" : "Continue"} <ChevronRight className="w-4 h-4" />
+              {saving ? "Saving…" : step === 4 ? "Finish" : "Continue"} <ChevronRight className="w-4 h-4" />
             </button>
           </div>
+
         </div>
       </div>
     </div>
