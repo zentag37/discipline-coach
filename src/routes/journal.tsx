@@ -281,7 +281,7 @@ function ExampleEntry() {
   );
 }
 
-function CalendarGrid({ month, today }: { month: Date; today: Date }) {
+function CalendarGrid({ month, today, byDay }: { month: Date; today: Date; byDay: Record<string, number> }) {
   const year = month.getFullYear();
   const m = month.getMonth();
   const firstDay = new Date(year, m, 1).getDay();
@@ -294,6 +294,9 @@ function CalendarGrid({ month, today }: { month: Date; today: Date }) {
   const isToday = (d: number) =>
     d === today.getDate() && m === today.getMonth() && year === today.getFullYear();
 
+  const keyFor = (d: number) =>
+    `${year}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
   return (
     <div>
       <div className="grid grid-cols-7 gap-1 mb-1">
@@ -302,17 +305,93 @@ function CalendarGrid({ month, today }: { month: Date; today: Date }) {
         ))}
       </div>
       <div className="grid grid-cols-7 gap-1">
-        {cells.map((d, i) => (
-          <div key={i} className="aspect-square rounded p-1.5 text-[11px]"
-            style={{
-              background: d ? "rgba(255,255,255,0.02)" : "transparent",
-              border: d && isToday(d) ? `1px solid ${TEAL}` : "1px solid rgba(255,255,255,0.04)",
-              color: d ? "#9ca3af" : "transparent",
-            }}>
-            {d}
-          </div>
-        ))}
+        {cells.map((d, i) => {
+          const pnl = d ? byDay[keyFor(d)] : undefined;
+          const positive = pnl !== undefined && pnl > 0;
+          const negative = pnl !== undefined && pnl < 0;
+          const bg = positive
+            ? "rgba(0,212,160,0.15)"
+            : negative
+            ? "rgba(239,68,68,0.15)"
+            : d ? "rgba(255,255,255,0.02)" : "transparent";
+          return (
+            <div key={i} className="aspect-square rounded p-1.5 text-[11px] flex flex-col"
+              style={{
+                background: bg,
+                border: d && isToday(d) ? `1px solid ${TEAL}` : "1px solid rgba(255,255,255,0.04)",
+                color: d ? "#9ca3af" : "transparent",
+              }}>
+              <span>{d}</span>
+              {pnl !== undefined && (
+                <span className="text-[9px] mt-auto" style={{ color: positive ? TEAL : "#ef4444" }}>
+                  {positive ? "+" : "-"}${Math.abs(Math.round(pnl))}
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+function TradeEntry({ t }: { t: any }) {
+  const pl = Number(t.result_dollars) || 0;
+  const isWin = pl > 0;
+  const dt = new Date(t.created_at);
+  return (
+    <div className="relative p-5 rounded-[10px] animate-fade-in"
+      style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>{t.instrument || "—"}</span>
+        {t.direction && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded"
+            style={{ background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: t.direction === "BUY" ? "#22c55e" : "#ef4444" }}>
+            {t.direction}
+          </span>
+        )}
+        <span className="text-[10px] px-1.5 py-0.5 rounded"
+          style={{ background: isWin ? "rgba(0,212,160,0.15)" : "rgba(239,68,68,0.15)", color: isWin ? TEAL : "#ef4444" }}>
+          {isWin ? "+" : pl < 0 ? "-" : ""}${Math.abs(pl).toFixed(2)}
+        </span>
+        <span className="ml-auto text-[11px]" style={{ color: "#6b7280" }}>
+          {dt.toLocaleDateString([], { weekday: "short", day: "2-digit", month: "short" })} · {(t.trade_time || "").slice(0, 5)}
+        </span>
+      </div>
+      {t.notes && (
+        <div>
+          <div className="text-[10px] tracking-widest mb-1.5" style={{ color: "#6b7280" }}>TRADE NOTES</div>
+          <p className="text-xs leading-relaxed" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>{t.notes}</p>
+        </div>
+      )}
+      {t.ace_note && (
+        <div className="mt-3">
+          <div className="text-[10px] tracking-widest mb-1.5" style={{ color: TEAL }}>ACE'S NOTE</div>
+          <p className="text-xs leading-relaxed" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>{t.ace_note}</p>
+        </div>
+      )}
+      <div className="flex items-center gap-3 mt-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        {t.emotion && <span className="text-[11px]" style={{ color: "#d1d5db" }}>{t.emotion}</span>}
+        {t.entry_price && t.exit_price && (
+          <span className="text-[11px]" style={{ color: "#6b7280" }}>Entry {t.entry_price} → Exit {t.exit_price}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EmotionBars({ trades }: { trades: any[] }) {
+  const emojis = ["😤", "😰", "😐", "😊", "🎯", "😴"];
+  const counts = emojis.map((e) => trades.filter((t) => t.emotion === e).length);
+  const max = Math.max(1, ...counts);
+  return (
+    <div className="flex items-end gap-2 h-24 mt-3">
+      {emojis.map((e, i) => (
+        <div key={e} className="flex-1 flex flex-col items-center gap-1 justify-end">
+          <div className="w-full rounded-t" style={{ height: `${Math.max(2, (counts[i] / max) * 80)}px`, background: counts[i] ? TEAL : "rgba(255,255,255,0.08)" }} />
+          <span className="text-sm">{e}</span>
+        </div>
+      ))}
     </div>
   );
 }
