@@ -731,11 +731,15 @@ function NavItem({ icon, label, active }: { icon: React.ReactNode; label: string
   );
 }
 
-function StatCard({ label, value, sub, valueColor }: { label: string; value: string; sub: string; valueColor?: string }) {
+function StatCard({ label, value, sub, valueColor, flash }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean }) {
   return (
     <div
-      className="p-4 px-5 rounded-[10px]"
-      style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}
+      className={`p-4 px-5 rounded-[10px] transition-all ${flash ? "animate-pulse" : ""}`}
+      style={{
+        background: "#141820",
+        border: `1px solid ${flash ? "#ef4444" : "rgba(255,255,255,0.08)"}`,
+        boxShadow: flash ? "0 0 0 1px #ef4444, 0 0 24px rgba(239,68,68,0.35)" : undefined,
+      }}
     >
       <div className="text-[10px] tracking-widest" style={{ color: "#6b7280" }}>{label}</div>
       <div className="text-2xl mt-2" style={{ color: valueColor || TEAL }}>{value}</div>
