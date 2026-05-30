@@ -29,12 +29,13 @@ const TEAL = "#00d4a0";
 type Profile = {
   full_name?: string | null;
   plan?: string | null;
-  account_size?: number | null;
-  risk_per_trade?: number | null;
-  daily_loss_limit?: number | null;
+  account_size?: number | string | null;
+  risk_per_trade?: number | string | null;
+  daily_loss_limit?: number | string | null;
+  max_trades?: number | string | null;
   max_trades_per_day?: number | null;
-  instruments?: string[] | null;
-  session?: string[] | null;
+  instruments?: any;
+  session?: any;
 };
 
 function getGreeting() {
@@ -63,9 +64,14 @@ function nextLondonOpen(now: Date) {
   return `${h}h ${m}m`;
 }
 
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 function DashboardPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile>({});
+  const [userId, setUserId] = useState<string | null>(null);
   const [now, setNow] = useState(new Date());
   const [checks, setChecks] = useState([false, false, false, false, false]);
   const [showLog, setShowLog] = useState(false);
@@ -76,6 +82,16 @@ function DashboardPage() {
     return () => clearInterval(t);
   }, []);
 
+  async function refreshTrades(uid: string) {
+    const { data } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("user_id", uid)
+      .eq("trade_date", todayStr())
+      .order("created_at", { ascending: true });
+    setTrades(data || []);
+  }
+
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -83,9 +99,11 @@ function DashboardPage() {
         navigate({ to: "/login" });
         return;
       }
+      setUserId(user.id);
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       if (data) setProfile(data as Profile);
       else setProfile({ full_name: user.user_metadata?.full_name || user.email?.split("@")[0] });
+      refreshTrades(user.id);
     })();
   }, [navigate]);
 
@@ -97,13 +115,18 @@ function DashboardPage() {
     .join("")
     .toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
-  const acct = profile.account_size ?? 25000;
-  const riskPct = profile.risk_per_trade ?? 1;
-  const dailyPct = profile.daily_loss_limit ?? 3;
-  const maxTrades = profile.max_trades_per_day ?? 3;
+  const acct = Number(profile.account_size) || 25000;
+  const riskPct = Number(profile.risk_per_trade) || 1;
+  const dailyPct = Number(profile.daily_loss_limit) || 3;
+  const maxTrades = Number((profile as any).max_trades) || profile.max_trades_per_day || 3;
   const maxRisk = Math.round((acct * riskPct) / 100);
   const dailyStop = Math.round((acct * dailyPct) / 100);
-  const instruments = profile.instruments?.length ? profile.instruments : ["EURUSD", "NAS100", "GOLD"];
+  const rawIns = profile.instruments;
+  const instruments: string[] = Array.isArray(rawIns)
+    ? rawIns
+    : typeof rawIns === "string" && rawIns.length
+    ? rawIns.split(",").map((s: string) => s.trim()).filter(Boolean)
+    : ["EURUSD", "NAS100", "GOLD"];
 
   const session = getSessionStatus(now);
   const opensIn = !session.open ? nextLondonOpen(now) : null;
@@ -111,7 +134,7 @@ function DashboardPage() {
   const checkedCount = checks.filter(Boolean).length;
   const allChecked = checkedCount === 5;
 
-  const sessionPL = trades.reduce((a, t) => a + (t.pl || 0), 0);
+  const sessionPL = trades.reduce((a, t) => a + (Number(t.result_dollars) || 0), 0);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -350,29 +373,33 @@ function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {trades.map((t, i) => (
-                          <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                            <td className="py-2">{t.time}</td>
-                            <td>{t.instrument}</td>
-                            <td>
-                              <span
-                                className="px-1.5 py-0.5 rounded text-[10px]"
-                                style={{
-                                  background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
-                                  color: t.direction === "BUY" ? "#22c55e" : "#ef4444",
-                                }}
-                              >
-                                {t.direction}
-                              </span>
-                            </td>
-                            <td>{t.entry}</td>
-                            <td>{t.exit}</td>
-                            <td style={{ color: t.pl >= 0 ? TEAL : "#ef4444" }}>
-                              {t.pl >= 0 ? "+" : "-"}${Math.abs(t.pl).toFixed(2)}
-                            </td>
-                            <td>{t.emotion}</td>
-                          </tr>
-                        ))}
+                        {trades.map((t, i) => {
+                          const pl = Number(t.result_dollars) || 0;
+                          const timeStr = (t.trade_time || "").slice(0, 5);
+                          return (
+                            <tr key={t.id ?? i} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                              <td className="py-2">{timeStr}</td>
+                              <td>{t.instrument}</td>
+                              <td>
+                                <span
+                                  className="px-1.5 py-0.5 rounded text-[10px]"
+                                  style={{
+                                    background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
+                                    color: t.direction === "BUY" ? "#22c55e" : "#ef4444",
+                                  }}
+                                >
+                                  {t.direction}
+                                </span>
+                              </td>
+                              <td>{t.entry_price}</td>
+                              <td>{t.exit_price}</td>
+                              <td style={{ color: pl >= 0 ? TEAL : "#ef4444" }}>
+                                {pl >= 0 ? "+" : "-"}${Math.abs(pl).toFixed(2)}
+                              </td>
+                              <td>{t.emotion}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -447,7 +474,31 @@ function DashboardPage() {
         ))}
       </nav>
 
-      {showLog && <TradeLogModal onClose={() => setShowLog(false)} onSave={(t) => { setTrades((arr) => [...arr, t]); setShowLog(false); }} instruments={instruments} />}
+      {showLog && (
+        <TradeLogModal
+          onClose={() => setShowLog(false)}
+          onSave={async (t) => {
+            if (!userId) return;
+            const session = getSessionStatus(new Date()).label;
+            const { error } = await supabase.from("trades").insert({
+              user_id: userId,
+              instrument: t.instrument,
+              direction: t.direction,
+              entry_price: t.entry ? Number(t.entry) : null,
+              exit_price: t.exit ? Number(t.exit) : null,
+              result_dollars: t.pl,
+              emotion: t.emotion,
+              notes: t.notes,
+              session,
+            });
+            if (!error) {
+              setShowLog(false);
+              refreshTrades(userId);
+            }
+          }}
+          instruments={instruments}
+        />
+      )}
     </div>
   );
 }

@@ -21,6 +21,7 @@ const RANGES = ["This week", "This month", "All time"];
 function JournalPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>({});
+  const [trades, setTrades] = useState<any[]>([]);
   const [now, setNow] = useState(new Date());
   const [calMonth, setCalMonth] = useState(new Date());
   const [filter, setFilter] = useState("All");
@@ -38,12 +39,60 @@ function JournalPage() {
       if (!user) { navigate({ to: "/login" }); return; }
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       setProfile(data || { full_name: user.email?.split("@")[0] });
+      const { data: tr } = await supabase
+        .from("trades")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setTrades(tr || []);
     })();
   }, [navigate]);
 
   const firstName = (profile.full_name || "Trader").split(" ")[0];
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
+
+  // Range filter
+  const rangeStart = (() => {
+    const d = new Date();
+    if (range === "This week") { d.setDate(d.getDate() - 7); return d; }
+    if (range === "This month") { d.setMonth(d.getMonth() - 1); return d; }
+    return null;
+  })();
+
+  const filtered = trades.filter((t) => {
+    if (rangeStart && new Date(t.created_at) < rangeStart) return false;
+    const pl = Number(t.result_dollars) || 0;
+    if (filter === "Wins" && pl <= 0) return false;
+    if (filter === "Losses" && pl >= 0) return false;
+    if (filter === "High emotion" && !["😤", "😰"].includes(t.emotion)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const hay = `${t.instrument ?? ""} ${t.notes ?? ""} ${t.trade_date ?? ""}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Stats
+  const total = trades.length;
+  const wins = trades.filter((t) => (Number(t.result_dollars) || 0) > 0).length;
+  const losses = trades.filter((t) => (Number(t.result_dollars) || 0) < 0).length;
+  const winRate = total ? Math.round((wins / total) * 100) : 0;
+  const avgRR = (() => {
+    const vals = trades
+      .filter((t) => Number(t.risk_dollars) > 0)
+      .map((t) => Math.abs(Number(t.result_dollars) || 0) / Number(t.risk_dollars));
+    if (!vals.length) return 0;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  })();
+  const byDay = trades.reduce<Record<string, number>>((acc, t) => {
+    const k = t.trade_date;
+    if (!k) return acc;
+    acc[k] = (acc[k] || 0) + (Number(t.result_dollars) || 0);
+    return acc;
+  }, {});
+  const bestDay = Object.values(byDay).reduce((m, v) => (v > m ? v : m), 0);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -72,11 +121,11 @@ function JournalPage() {
 
         <main className="p-7 space-y-6 max-w-[1400px] w-full">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 animate-fade-in">
-            <Stat label="TOTAL TRADES" value="0" sub="All time" />
-            <Stat label="WIN RATE" value="0%" sub="0W · 0L" />
-            <Stat label="AVG R:R" value="0.00" sub="Target: 2.0" />
-            <Stat label="BEST DAY" value="$0" sub="No trades yet" />
-            <Stat label="CONSISTENCY" value="—" sub="ACE grades your discipline" />
+            <Stat label="TOTAL TRADES" value={String(total)} sub="All time" />
+            <Stat label="WIN RATE" value={`${winRate}%`} sub={`${wins}W · ${losses}L`} />
+            <Stat label="AVG R:R" value={avgRR.toFixed(2)} sub="Target: 2.0" />
+            <Stat label="BEST DAY" value={`$${Math.round(bestDay)}`} sub={total ? "Single-day best" : "No trades yet"} />
+            <Stat label="CONSISTENCY" value={total >= 5 ? `${winRate}%` : "—"} sub="ACE grades your discipline" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
@@ -119,20 +168,28 @@ function JournalPage() {
                 </div>
               </div>
 
-              <ExampleEntry />
+              {total === 0 && <ExampleEntry />}
 
-              <div className="rounded-[10px] flex flex-col items-center justify-center py-12 gap-3 text-center"
-                style={{ border: "1px dashed rgba(255,255,255,0.12)" }}>
-                <div className="text-3xl">📓</div>
-                <div className="text-sm" style={{ fontFamily: FONT_SANS }}>No journal entries yet.</div>
-                <div className="text-xs max-w-xs" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                  Log your first trade and ACE will write your journal entry automatically.
+              {filtered.length > 0 ? (
+                filtered.map((t) => <TradeEntry key={t.id} t={t} />)
+              ) : total > 0 ? (
+                <div className="rounded-[10px] py-8 text-center text-xs" style={{ color: "#6b7280", border: "1px dashed rgba(255,255,255,0.12)", fontFamily: FONT_SANS }}>
+                  No trades match these filters.
                 </div>
-                <button className="mt-2 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded"
-                  style={{ background: TEAL, color: "#0d0f12" }}>
-                  <Plus size={14} /> Log your first trade
-                </button>
-              </div>
+              ) : (
+                <div className="rounded-[10px] flex flex-col items-center justify-center py-12 gap-3 text-center"
+                  style={{ border: "1px dashed rgba(255,255,255,0.12)" }}>
+                  <div className="text-3xl">📓</div>
+                  <div className="text-sm" style={{ fontFamily: FONT_SANS }}>No journal entries yet.</div>
+                  <div className="text-xs max-w-xs" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                    Log your first trade and ACE will write your journal entry automatically.
+                  </div>
+                  <button onClick={() => navigate({ to: "/dashboard" })} className="mt-2 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    <Plus size={14} /> Log your first trade
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4 animate-fade-in">
@@ -142,31 +199,19 @@ function JournalPage() {
                 </p>
                 <div className="mt-3">
                   <div className="flex justify-between text-[10px] mb-1" style={{ color: "#6b7280" }}>
-                    <span>0 / 5 trades logged</span><span>0%</span>
+                    <span>{Math.min(total, 5)} / 5 trades logged</span><span>{Math.round((Math.min(total, 5) / 5) * 100)}%</span>
                   </div>
                   <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <div className="h-full" style={{ width: "0%", background: TEAL }} />
+                    <div className="h-full" style={{ width: `${(Math.min(total, 5) / 5) * 100}%`, background: TEAL }} />
                   </div>
                 </div>
               </Card>
 
               <Card title="EMOTION TRACKER">
-                <div className="flex items-end gap-2 h-24 mt-3">
-                  {["😤", "😰", "😐", "😊", "🎯", "😴"].map((e) => (
-                    <div key={e} className="flex-1 flex flex-col items-center gap-1 justify-end">
-                      <div className="w-full rounded-t" style={{ height: "2px", background: "rgba(255,255,255,0.08)" }} />
-                      <span className="text-sm">{e}</span>
-                    </div>
-                  ))}
-                </div>
+                <EmotionBars trades={trades} />
                 <p className="text-[11px] mt-3" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                  Your emotional patterns will appear here as you log trades.
+                  {total ? "Your emotional patterns so far." : "Your emotional patterns will appear here as you log trades."}
                 </p>
-                <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                  <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
-                    ACE will identify your emotional patterns and tell you which emotions lead to your best and worst trades.
-                  </p>
-                </div>
               </Card>
             </div>
           </div>
@@ -185,7 +230,7 @@ function JournalPage() {
                 <ChevronRight size={16} />
               </button>
             </div>
-            <CalendarGrid month={calMonth} today={now} />
+            <CalendarGrid month={calMonth} today={now} byDay={byDay} />
           </Card>
         </main>
       </div>
@@ -236,7 +281,7 @@ function ExampleEntry() {
   );
 }
 
-function CalendarGrid({ month, today }: { month: Date; today: Date }) {
+function CalendarGrid({ month, today, byDay }: { month: Date; today: Date; byDay: Record<string, number> }) {
   const year = month.getFullYear();
   const m = month.getMonth();
   const firstDay = new Date(year, m, 1).getDay();
@@ -249,6 +294,9 @@ function CalendarGrid({ month, today }: { month: Date; today: Date }) {
   const isToday = (d: number) =>
     d === today.getDate() && m === today.getMonth() && year === today.getFullYear();
 
+  const keyFor = (d: number) =>
+    `${year}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
   return (
     <div>
       <div className="grid grid-cols-7 gap-1 mb-1">
@@ -257,17 +305,93 @@ function CalendarGrid({ month, today }: { month: Date; today: Date }) {
         ))}
       </div>
       <div className="grid grid-cols-7 gap-1">
-        {cells.map((d, i) => (
-          <div key={i} className="aspect-square rounded p-1.5 text-[11px]"
-            style={{
-              background: d ? "rgba(255,255,255,0.02)" : "transparent",
-              border: d && isToday(d) ? `1px solid ${TEAL}` : "1px solid rgba(255,255,255,0.04)",
-              color: d ? "#9ca3af" : "transparent",
-            }}>
-            {d}
-          </div>
-        ))}
+        {cells.map((d, i) => {
+          const pnl = d ? byDay[keyFor(d)] : undefined;
+          const positive = pnl !== undefined && pnl > 0;
+          const negative = pnl !== undefined && pnl < 0;
+          const bg = positive
+            ? "rgba(0,212,160,0.15)"
+            : negative
+            ? "rgba(239,68,68,0.15)"
+            : d ? "rgba(255,255,255,0.02)" : "transparent";
+          return (
+            <div key={i} className="aspect-square rounded p-1.5 text-[11px] flex flex-col"
+              style={{
+                background: bg,
+                border: d && isToday(d) ? `1px solid ${TEAL}` : "1px solid rgba(255,255,255,0.04)",
+                color: d ? "#9ca3af" : "transparent",
+              }}>
+              <span>{d}</span>
+              {pnl !== undefined && (
+                <span className="text-[9px] mt-auto" style={{ color: positive ? TEAL : "#ef4444" }}>
+                  {positive ? "+" : "-"}${Math.abs(Math.round(pnl))}
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+function TradeEntry({ t }: { t: any }) {
+  const pl = Number(t.result_dollars) || 0;
+  const isWin = pl > 0;
+  const dt = new Date(t.created_at);
+  return (
+    <div className="relative p-5 rounded-[10px] animate-fade-in"
+      style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>{t.instrument || "—"}</span>
+        {t.direction && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded"
+            style={{ background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: t.direction === "BUY" ? "#22c55e" : "#ef4444" }}>
+            {t.direction}
+          </span>
+        )}
+        <span className="text-[10px] px-1.5 py-0.5 rounded"
+          style={{ background: isWin ? "rgba(0,212,160,0.15)" : "rgba(239,68,68,0.15)", color: isWin ? TEAL : "#ef4444" }}>
+          {isWin ? "+" : pl < 0 ? "-" : ""}${Math.abs(pl).toFixed(2)}
+        </span>
+        <span className="ml-auto text-[11px]" style={{ color: "#6b7280" }}>
+          {dt.toLocaleDateString([], { weekday: "short", day: "2-digit", month: "short" })} · {(t.trade_time || "").slice(0, 5)}
+        </span>
+      </div>
+      {t.notes && (
+        <div>
+          <div className="text-[10px] tracking-widest mb-1.5" style={{ color: "#6b7280" }}>TRADE NOTES</div>
+          <p className="text-xs leading-relaxed" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>{t.notes}</p>
+        </div>
+      )}
+      {t.ace_note && (
+        <div className="mt-3">
+          <div className="text-[10px] tracking-widest mb-1.5" style={{ color: TEAL }}>ACE'S NOTE</div>
+          <p className="text-xs leading-relaxed" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>{t.ace_note}</p>
+        </div>
+      )}
+      <div className="flex items-center gap-3 mt-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        {t.emotion && <span className="text-[11px]" style={{ color: "#d1d5db" }}>{t.emotion}</span>}
+        {t.entry_price && t.exit_price && (
+          <span className="text-[11px]" style={{ color: "#6b7280" }}>Entry {t.entry_price} → Exit {t.exit_price}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EmotionBars({ trades }: { trades: any[] }) {
+  const emojis = ["😤", "😰", "😐", "😊", "🎯", "😴"];
+  const counts = emojis.map((e) => trades.filter((t) => t.emotion === e).length);
+  const max = Math.max(1, ...counts);
+  return (
+    <div className="flex items-end gap-2 h-24 mt-3">
+      {emojis.map((e, i) => (
+        <div key={e} className="flex-1 flex flex-col items-center gap-1 justify-end">
+          <div className="w-full rounded-t" style={{ height: `${Math.max(2, (counts[i] / max) * 80)}px`, background: counts[i] ? TEAL : "rgba(255,255,255,0.08)" }} />
+          <span className="text-sm">{e}</span>
+        </div>
+      ))}
     </div>
   );
 }

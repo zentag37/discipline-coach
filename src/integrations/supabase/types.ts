@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      journal_reviews: {
+        Row: {
+          ace_review: string | null
+          avg_rr: number | null
+          created_at: string
+          focus_next_week: string | null
+          id: string
+          losses: number | null
+          net_pnl: number | null
+          total_trades: number | null
+          user_id: string
+          week_end: string | null
+          week_start: string | null
+          win_rate: number | null
+          wins: number | null
+        }
+        Insert: {
+          ace_review?: string | null
+          avg_rr?: number | null
+          created_at?: string
+          focus_next_week?: string | null
+          id?: string
+          losses?: number | null
+          net_pnl?: number | null
+          total_trades?: number | null
+          user_id: string
+          week_end?: string | null
+          week_start?: string | null
+          win_rate?: number | null
+          wins?: number | null
+        }
+        Update: {
+          ace_review?: string | null
+          avg_rr?: number | null
+          created_at?: string
+          focus_next_week?: string | null
+          id?: string
+          losses?: number | null
+          net_pnl?: number | null
+          total_trades?: number | null
+          user_id?: string
+          week_end?: string | null
+          week_start?: string | null
+          win_rate?: number | null
+          wins?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           account_size: string | null
@@ -89,6 +137,102 @@ export type Database = {
           updated_at?: string
           voice_enabled?: boolean | null
           voice_style?: string | null
+        }
+        Relationships: []
+      }
+      sessions: {
+        Row: {
+          checklist_done: boolean
+          closed_at: string | null
+          daily_pnl: number
+          id: string
+          limit_hit: boolean
+          opened_at: string
+          session_date: string
+          session_type: string | null
+          trades_taken: number
+          user_id: string
+        }
+        Insert: {
+          checklist_done?: boolean
+          closed_at?: string | null
+          daily_pnl?: number
+          id?: string
+          limit_hit?: boolean
+          opened_at?: string
+          session_date?: string
+          session_type?: string | null
+          trades_taken?: number
+          user_id: string
+        }
+        Update: {
+          checklist_done?: boolean
+          closed_at?: string | null
+          daily_pnl?: number
+          id?: string
+          limit_hit?: boolean
+          opened_at?: string
+          session_date?: string
+          session_type?: string | null
+          trades_taken?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          ace_note: string | null
+          created_at: string
+          direction: string | null
+          emotion: string | null
+          entry_price: number | null
+          exit_price: number | null
+          id: string
+          instrument: string | null
+          journal_entry: string | null
+          notes: string | null
+          result_dollars: number | null
+          risk_dollars: number | null
+          session: string | null
+          trade_date: string
+          trade_time: string
+          user_id: string
+        }
+        Insert: {
+          ace_note?: string | null
+          created_at?: string
+          direction?: string | null
+          emotion?: string | null
+          entry_price?: number | null
+          exit_price?: number | null
+          id?: string
+          instrument?: string | null
+          journal_entry?: string | null
+          notes?: string | null
+          result_dollars?: number | null
+          risk_dollars?: number | null
+          session?: string | null
+          trade_date?: string
+          trade_time?: string
+          user_id: string
+        }
+        Update: {
+          ace_note?: string | null
+          created_at?: string
+          direction?: string | null
+          emotion?: string | null
+          entry_price?: number | null
+          exit_price?: number | null
+          id?: string
+          instrument?: string | null
+          journal_entry?: string | null
+          notes?: string | null
+          result_dollars?: number | null
+          risk_dollars?: number | null
+          session?: string | null
+          trade_date?: string
+          trade_time?: string
+          user_id?: string
         }
         Relationships: []
       }
