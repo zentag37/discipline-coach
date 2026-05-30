@@ -474,7 +474,31 @@ function DashboardPage() {
         ))}
       </nav>
 
-      {showLog && <TradeLogModal onClose={() => setShowLog(false)} onSave={(t) => { setTrades((arr) => [...arr, t]); setShowLog(false); }} instruments={instruments} />}
+      {showLog && (
+        <TradeLogModal
+          onClose={() => setShowLog(false)}
+          onSave={async (t) => {
+            if (!userId) return;
+            const session = getSessionStatus(new Date()).label;
+            const { error } = await supabase.from("trades").insert({
+              user_id: userId,
+              instrument: t.instrument,
+              direction: t.direction,
+              entry_price: t.entry ? Number(t.entry) : null,
+              exit_price: t.exit ? Number(t.exit) : null,
+              result_dollars: t.pl,
+              emotion: t.emotion,
+              notes: t.notes,
+              session,
+            });
+            if (!error) {
+              setShowLog(false);
+              refreshTrades(userId);
+            }
+          }}
+          instruments={instruments}
+        />
+      )}
     </div>
   );
 }
