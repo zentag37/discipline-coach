@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MarketIntelRouteImport } from './routes/market-intel'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -38,6 +39,11 @@ const PricingRoute = PricingRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketIntelRoute = MarketIntelRouteImport.update({
+  id: '/market-intel',
+  path: '/market-intel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
+  '/market-intel': typeof MarketIntelRoute
   '/onboarding': typeof OnboardingRoute
   '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
+  '/market-intel': typeof MarketIntelRoute
   '/onboarding': typeof OnboardingRoute
   '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
+  '/market-intel': typeof MarketIntelRoute
   '/onboarding': typeof OnboardingRoute
   '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/journal'
     | '/login'
+    | '/market-intel'
     | '/onboarding'
     | '/pricing'
     | '/register'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/journal'
     | '/login'
+    | '/market-intel'
     | '/onboarding'
     | '/pricing'
     | '/register'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/journal'
     | '/login'
+    | '/market-intel'
     | '/onboarding'
     | '/pricing'
     | '/register'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   JournalRoute: typeof JournalRoute
   LoginRoute: typeof LoginRoute
+  MarketIntelRoute: typeof MarketIntelRoute
   OnboardingRoute: typeof OnboardingRoute
   PricingRoute: typeof PricingRoute
   RegisterRoute: typeof RegisterRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market-intel': {
+      id: '/market-intel'
+      path: '/market-intel'
+      fullPath: '/market-intel'
+      preLoaderRoute: typeof MarketIntelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   JournalRoute: JournalRoute,
   LoginRoute: LoginRoute,
+  MarketIntelRoute: MarketIntelRoute,
   OnboardingRoute: OnboardingRoute,
   PricingRoute: PricingRoute,
   RegisterRoute: RegisterRoute,
@@ -250,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
