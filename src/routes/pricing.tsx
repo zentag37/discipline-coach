@@ -114,6 +114,8 @@ function Hero() {
   };
 
   return (
+    <section>
+      <Container className="py-20 md:py-24">
         <div className="text-center max-w-3xl mx-auto">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
             / pricing
