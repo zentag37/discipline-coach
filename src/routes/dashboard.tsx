@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -14,11 +14,15 @@ import {
   ArrowDownRight,
   Quote,
   X,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
+import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
+import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -39,6 +43,9 @@ type Profile = {
   max_trades_per_day?: number | null;
   instruments?: any;
   session?: any;
+  voice_enabled?: boolean | null;
+  voice_style?: string | null;
+  voice_consent_decided?: boolean | null;
 };
 
 function getGreeting() {
