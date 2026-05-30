@@ -373,29 +373,33 @@ function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {trades.map((t, i) => (
-                          <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                            <td className="py-2">{t.time}</td>
-                            <td>{t.instrument}</td>
-                            <td>
-                              <span
-                                className="px-1.5 py-0.5 rounded text-[10px]"
-                                style={{
-                                  background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
-                                  color: t.direction === "BUY" ? "#22c55e" : "#ef4444",
-                                }}
-                              >
-                                {t.direction}
-                              </span>
-                            </td>
-                            <td>{t.entry}</td>
-                            <td>{t.exit}</td>
-                            <td style={{ color: t.pl >= 0 ? TEAL : "#ef4444" }}>
-                              {t.pl >= 0 ? "+" : "-"}${Math.abs(t.pl).toFixed(2)}
-                            </td>
-                            <td>{t.emotion}</td>
-                          </tr>
-                        ))}
+                        {trades.map((t, i) => {
+                          const pl = Number(t.result_dollars) || 0;
+                          const timeStr = (t.trade_time || "").slice(0, 5);
+                          return (
+                            <tr key={t.id ?? i} style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                              <td className="py-2">{timeStr}</td>
+                              <td>{t.instrument}</td>
+                              <td>
+                                <span
+                                  className="px-1.5 py-0.5 rounded text-[10px]"
+                                  style={{
+                                    background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
+                                    color: t.direction === "BUY" ? "#22c55e" : "#ef4444",
+                                  }}
+                                >
+                                  {t.direction}
+                                </span>
+                              </td>
+                              <td>{t.entry_price}</td>
+                              <td>{t.exit_price}</td>
+                              <td style={{ color: pl >= 0 ? TEAL : "#ef4444" }}>
+                                {pl >= 0 ? "+" : "-"}${Math.abs(pl).toFixed(2)}
+                              </td>
+                              <td>{t.emotion}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
