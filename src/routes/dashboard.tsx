@@ -104,6 +104,18 @@ function DashboardPage() {
   const greetedRef = useRef(false);
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("subscribed") === "true") {
+      setWelcomeOpen(true);
+      params.delete("subscribed");
+      const qs = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
+    }
+  }, []);
 
   useEffect(() => {
     const unsub = subscribeVoice(setVoicePlaying);
