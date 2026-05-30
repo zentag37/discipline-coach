@@ -227,6 +227,7 @@ function DashboardPage() {
 
   async function toggleVoiceFromSidebar() {
     if (!userId) return;
+    if (!hasAceAccess(profile.plan)) { navigate({ to: "/pricing" }); return; }
     const next = !profile.voice_enabled;
     if (!next) stopVoice();
     await supabase.from("profiles").update({ voice_enabled: next }).eq("id", userId);
