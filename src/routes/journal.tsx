@@ -229,7 +229,18 @@ function JournalPage() {
 
             <div className="space-y-4 animate-fade-in">
               <Card title="ACE WEEKLY REVIEW" teal>
-                {review ? (
+                {!unlocked ? (
+                  <div className="mt-2 flex flex-col items-center text-center gap-3 py-4">
+                    <Lock size={20} style={{ color: TEAL }} />
+                    <p className="text-xs" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                      Upgrade to Pro for AI weekly reviews and journal writing.
+                    </p>
+                    <Link to="/pricing" className="text-xs px-4 py-1.5 rounded font-medium"
+                      style={{ background: TEAL, color: "#0d0f12", fontFamily: FONT_MONO }}>
+                      Upgrade →
+                    </Link>
+                  </div>
+                ) : review ? (
                   <div className="mt-2 space-y-3">
                     <ReviewSection label="WHAT WENT WELL" text={review.what_went_well} />
                     <ReviewSection label="WHAT NEEDS WORK" text={review.what_needs_work} />
