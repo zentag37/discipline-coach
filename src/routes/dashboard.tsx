@@ -29,12 +29,13 @@ const TEAL = "#00d4a0";
 type Profile = {
   full_name?: string | null;
   plan?: string | null;
-  account_size?: number | null;
-  risk_per_trade?: number | null;
-  daily_loss_limit?: number | null;
+  account_size?: number | string | null;
+  risk_per_trade?: number | string | null;
+  daily_loss_limit?: number | string | null;
+  max_trades?: number | string | null;
   max_trades_per_day?: number | null;
-  instruments?: string[] | null;
-  session?: string[] | null;
+  instruments?: any;
+  session?: any;
 };
 
 function getGreeting() {
