@@ -248,6 +248,38 @@ function DashboardPage() {
 
   const sessionPL = trades.reduce((a, t) => a + (Number(t.result_dollars) || 0), 0);
 
+  // Trigger 3: trade limit reached
+  useEffect(() => {
+    if (!profile.voice_enabled || !userId) return;
+    if (trades.length >= maxTrades && !tradeLimitSpokenRef.current) {
+      tradeLimitSpokenRef.current = true;
+      setTradeLimitFlash(true);
+      speakAsACE(
+        `${firstName}. You've reached your trade limit for today. ${maxTrades} trades is your maximum. Step away from the platform now. Come back tomorrow.`,
+        profile.voice_style || "marcus",
+      ).catch(() => {});
+      setTimeout(() => setTradeLimitFlash(false), 8000);
+    }
+  }, [trades.length, maxTrades, profile.voice_enabled, profile.voice_style, firstName, userId]);
+
+  // Trigger 4: daily loss limit
+  useEffect(() => {
+    if (!profile.voice_enabled || !userId) return;
+    if (sessionPL <= -dailyStop && dailyStop > 0 && !lossLimitSpokenRef.current) {
+      lossLimitSpokenRef.current = true;
+      const msg = `${firstName}. Daily stop loss reached. You're down $${Math.abs(sessionPL).toFixed(0)} today. This is your hard limit. Close everything and log off the platform. You fought well — come back tomorrow.`;
+      setLossOverlay(msg);
+      speakAsACE(msg, profile.voice_style || "marcus").catch(() => {});
+    }
+  }, [sessionPL, dailyStop, profile.voice_enabled, profile.voice_style, firstName, userId]);
+
+  function speakAceCardMessage() {
+    if (voicePlaying) { stopVoice(); return; }
+    if (!aceMsg) return;
+    speakAsACE(aceMsg, profile.voice_style || "marcus").catch(() => {});
+  }
+
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
