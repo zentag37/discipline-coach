@@ -43,7 +43,7 @@ function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate({ to: "/login" }); return; }
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-      const base = data || { full_name: user.user_metadata?.full_name || user.email?.split("@")[0], email: user.email };
+      const base: any = data || { full_name: user.user_metadata?.full_name || user.email?.split("@")[0], email: user.email };
       setProfile(base);
       setForm({
         full_name: base.full_name || "",
