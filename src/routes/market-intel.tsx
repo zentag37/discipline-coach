@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings, Bell,
 } from "lucide-react";
@@ -7,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
+import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
@@ -20,83 +23,61 @@ const GREEN = "#22c55e";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
-type Instrument = {
+type InstrumentMeta = {
   symbol: string;
   fullName: string;
   assetClass: string;
-  price: number;
-  change: number;
-  trend: { tf: string; dir: "Bullish" | "Bearish" | "Neutral"; strength: number }[];
-  pivots: { label: string; price: number; type: "R" | "S" | "PP" }[];
   intel: string;
   events: { label: string; impact: "high" | "med" | "low" }[];
 };
 
-const INSTRUMENTS: Instrument[] = [
+type Instrument = InstrumentMeta & {
+  price: number;
+  change: number;
+  trend: { tf: string; dir: "Bullish" | "Bearish" | "Neutral"; strength: number }[];
+  pivots: { label: string; price: number; type: "R" | "S" | "PP" }[];
+  live: boolean;
+  error?: string;
+};
+
+const INSTRUMENT_META: InstrumentMeta[] = [
   {
     symbol: "EURUSD", fullName: "Euro / US Dollar", assetClass: "FOREX",
-    price: 1.0842, change: 0.12,
-    trend: [
-      { tf: "1H", dir: "Bullish", strength: 65 },
-      { tf: "4H", dir: "Bullish", strength: 72 },
-      { tf: "D1", dir: "Neutral", strength: 50 },
-    ],
-    pivots: [
-      { label: "R3", price: 1.0920, type: "R" },
-      { label: "R2", price: 1.0895, type: "R" },
-      { label: "R1", price: 1.0868, type: "R" },
-      { label: "PP", price: 1.0842, type: "PP" },
-      { label: "S1", price: 1.0815, type: "S" },
-      { label: "S2", price: 1.0788, type: "S" },
-      { label: "S3", price: 1.0762, type: "S" },
-    ],
-    intel: "EURUSD is holding above the daily pivot at 1.0842. The 4H shows bullish momentum but RSI is approaching overbought. Watch for a pullback to 1.0815 (S1) for a cleaner long entry. Avoid trading 30 minutes before NFP tomorrow at 13:30 UTC.",
+    intel: "Watch the daily pivot for bias. Wait for a pullback to S1 for cleaner long entries. Avoid trading 30 minutes before high-impact USD events.",
     events: [
       { label: "📅 EUR CPI · 10:00 UTC", impact: "med" },
       { label: "📅 USD NFP Tomorrow", impact: "high" },
     ],
   },
   {
-    symbol: "NAS100", fullName: "Nasdaq 100 Index", assetClass: "INDEX",
-    price: 18432.5, change: -0.18,
-    trend: [
-      { tf: "1H", dir: "Bearish", strength: 58 },
-      { tf: "4H", dir: "Neutral", strength: 50 },
-      { tf: "D1", dir: "Bullish", strength: 68 },
-    ],
-    pivots: [
-      { label: "R3", price: 18620, type: "R" },
-      { label: "R2", price: 18545, type: "R" },
-      { label: "R1", price: 18490, type: "R" },
-      { label: "PP", price: 18432.5, type: "PP" },
-      { label: "S1", price: 18375, type: "S" },
-      { label: "S2", price: 18320, type: "S" },
-      { label: "S3", price: 18245, type: "S" },
-    ],
-    intel: "NAS100 is pulling back from yesterday's highs. The 1H is bearish but the daily trend remains intact. Watch S1 at 18,375 — a clean reclaim of 18,490 would suggest the dip is over.",
+    symbol: "NAS100", fullName: "Nasdaq 100 (via QQQ)", assetClass: "INDEX",
+    intel: "Reclaim of R1 with volume confirms continuation. Below PP, expect a test of S1. Respect the daily trend on pullbacks.",
     events: [{ label: "📅 USD NFP Tomorrow", impact: "high" }],
   },
   {
     symbol: "GOLD", fullName: "Spot Gold (XAUUSD)", assetClass: "COMMODITY",
-    price: 2384.6, change: 0.91,
-    trend: [
-      { tf: "1H", dir: "Bullish", strength: 78 },
-      { tf: "4H", dir: "Bullish", strength: 81 },
-      { tf: "D1", dir: "Bullish", strength: 70 },
-    ],
-    pivots: [
-      { label: "R3", price: 2412, type: "R" },
-      { label: "R2", price: 2402, type: "R" },
-      { label: "R1", price: 2394, type: "R" },
-      { label: "PP", price: 2384.6, type: "PP" },
-      { label: "S1", price: 2376, type: "S" },
-      { label: "S2", price: 2368, type: "S" },
-      { label: "S3", price: 2358, type: "S" },
-    ],
-    intel: "Gold is in a clean uptrend across all timeframes — the strongest setup on your watchlist. Pullbacks to PP (2384.6) or S1 (2376) are the highest-probability long entries. Don't chase highs.",
+    intel: "Pullbacks to PP or S1 are the highest-probability long entries when daily trend is bullish. Don't chase extensions above R2.",
     events: [{ label: "📅 USD NFP Tomorrow", impact: "high" }],
   },
 ];
+
+function mergeInstrument(meta: InstrumentMeta, quote: LiveQuote | undefined): Instrument {
+  return {
+    ...meta,
+    price: quote?.price ?? 0,
+    change: quote?.change ?? 0,
+    trend: quote?.trend?.length
+      ? quote.trend
+      : [
+          { tf: "1H", dir: "Neutral", strength: 50 },
+          { tf: "4H", dir: "Neutral", strength: 50 },
+          { tf: "D1", dir: "Neutral", strength: 50 },
+        ],
+    pivots: quote?.pivots ?? [],
+    live: !!quote && !quote.error && quote.price > 0,
+    error: quote?.error,
+  };
+}
 
 function MarketIntelPage() {
   const navigate = useNavigate();
@@ -121,7 +102,28 @@ function MarketIntelPage() {
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
   const unlocked = hasAceAccess(profile.plan);
-  const visibleInstruments = unlocked ? INSTRUMENTS : INSTRUMENTS.slice(0, 1);
+  const visibleMeta = useMemo(
+    () => (unlocked ? INSTRUMENT_META : INSTRUMENT_META.slice(0, 1)),
+    [unlocked],
+  );
+  const symbols = useMemo(() => visibleMeta.map((m) => m.symbol), [visibleMeta]);
+
+  const fetchQuotes = useServerFn(getLiveQuotes);
+  const { data: quotesData } = useQuery({
+    queryKey: ["live-quotes", symbols],
+    queryFn: () => fetchQuotes({ data: { symbols } }),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+    enabled: symbols.length > 0,
+  });
+  const quotesBySymbol = useMemo(() => {
+    const map = new Map<string, LiveQuote>();
+    quotesData?.quotes?.forEach((q) => map.set(q.symbol, q));
+    return map;
+  }, [quotesData]);
+  const visibleInstruments: Instrument[] = visibleMeta.map((m) =>
+    mergeInstrument(m, quotesBySymbol.get(m.symbol)),
+  );
 
   const session = getSessionStatus(now);
   const nyIn = timeUntilUTC(now, 13);
@@ -279,19 +281,23 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
   return (
     <div className="p-5 rounded-[12px] animate-fade-in relative"
       style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}>
-      <DemoPill />
+      <LivePill live={ins.live} error={ins.error} />
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-4 pr-20">
+      <div className="flex flex-wrap items-center gap-4 pr-24">
         <div>
           <div className="text-2xl tracking-tight">{ins.symbol}</div>
           <div className="text-[11px]" style={{ color: "#6b7280" }}>{ins.fullName}</div>
         </div>
         <div className="md:ml-auto flex items-center gap-3">
-          <div className="text-2xl" style={{ color: TEAL }}>{ins.price.toLocaleString()}</div>
-          <span className="text-xs px-2 py-1 rounded"
-            style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
-            {up ? "▲" : "▼"} {up ? "+" : ""}{ins.change.toFixed(2)}%
-          </span>
+          <div className="text-2xl" style={{ color: TEAL }}>
+            {ins.price > 0 ? ins.price.toLocaleString(undefined, { maximumFractionDigits: 4 }) : "—"}
+          </div>
+          {ins.price > 0 && (
+            <span className="text-xs px-2 py-1 rounded"
+              style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
+              {up ? "▲" : "▼"} {up ? "+" : ""}{ins.change.toFixed(2)}%
+            </span>
+          )}
         </div>
         <span className="text-[10px] px-2 py-0.5 rounded-full"
           style={{ background: "rgba(255,255,255,0.05)", color: "#9ca3af" }}>{ins.assetClass}</span>
@@ -432,6 +438,36 @@ function DemoPill() {
     <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10"
       style={{ background: "rgba(245,158,11,0.12)", color: AMBER, border: "1px solid rgba(245,158,11,0.3)" }}>
       DEMO DATA
+    </span>
+  );
+}
+
+function LivePill({ live, error }: { live: boolean; error?: string }) {
+  if (error) {
+    return (
+      <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10"
+        title={error}
+        style={{ background: "rgba(239,68,68,0.12)", color: RED, border: "1px solid rgba(239,68,68,0.3)" }}>
+        OFFLINE
+      </span>
+    );
+  }
+  if (!live) {
+    return (
+      <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10"
+        style={{ background: "rgba(156,163,175,0.12)", color: "#9ca3af", border: "1px solid rgba(156,163,175,0.3)" }}>
+        LOADING…
+      </span>
+    );
+  }
+  return (
+    <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10 flex items-center gap-1"
+      style={{ background: "rgba(34,197,94,0.12)", color: GREEN, border: "1px solid rgba(34,197,94,0.3)" }}>
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: GREEN }} />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: GREEN }} />
+      </span>
+      LIVE
     </span>
   );
 }
