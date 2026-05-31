@@ -835,6 +835,42 @@ function DashboardPage() {
           </div>
         </div>
       )}
+
+      {downloadOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <div className="max-w-md w-full rounded-[14px] p-7 text-center relative"
+            style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <button
+              onClick={() => { setDownloadOpen(false); setNotifyDone(false); }}
+              className="absolute top-3 right-3 text-[#6b7280] hover:text-white cursor-pointer"
+              aria-label="Close"
+            >
+              <X size={16} />
+            </button>
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>DESKTOP APP</div>
+            <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
+              Desktop app coming soon.
+            </h2>
+            <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
+              You can use Trader Coach fully in your browser right now. We'll email you when the Mac and Windows app is ready.
+            </p>
+            {notifyDone ? (
+              <div className="mt-6 text-sm" style={{ color: TEAL, fontFamily: "Inter, sans-serif" }}>
+                ✓ You're on the list. We'll email you when it's ready.
+              </div>
+            ) : (
+              <button
+                onClick={() => setNotifyDone(true)}
+                className="mt-6 text-sm px-5 py-2 rounded font-medium cursor-pointer"
+                style={{ background: TEAL, color: "#0d0f12" }}
+              >
+                Notify me when it's ready
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
