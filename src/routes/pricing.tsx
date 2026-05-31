@@ -139,14 +139,18 @@ function Hero() {
           </div>
         </div>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3 items-stretch">
+        <div className="mt-10 rounded-lg border border-primary/40 bg-primary/10 px-5 py-3 text-center font-mono text-xs md:text-sm text-foreground">
+          <span className="text-primary">🚀 Early Access</span> — Some features are rolling out over the next 30 days. Early subscribers lock in this price forever.
+        </div>
+
+        <div className="mt-8 grid gap-5 md:grid-cols-3 items-stretch">
           <PlanCard
             plan="solo"
             name="SOLO"
             price={annual ? 15 : 19}
             tagline="Build the habit. Learn the rules."
             features={[
-              "Floating window (Windows & Mac)",
+              "Floating window (Windows & Mac)::soon",
               "Personalised greeting by name",
               "Daily risk calculator",
               "Pre-trade checklist",
@@ -196,11 +200,11 @@ function Hero() {
               "Everything in Pro, plus:",
               "Unlimited instruments",
               "Custom mentor voice and name",
-              "Real-time macro news alerts in floating window",
+              "Real-time macro news alerts in floating window::soon",
               "Multi-account support",
-              "Prop firm team dashboard",
-              "Monthly AI performance report (PDF)",
-              "API access",
+              "Prop firm team dashboard::soon",
+              "Monthly AI performance report (PDF)::soon",
+              "API access::soon",
               "Priority onboarding call",
             ]}
             ctaLabel="Start Free Trial"
@@ -319,10 +323,19 @@ function PlanCard({
               </li>
             );
           }
+          const soon = f.endsWith("::soon");
+          const label = soon ? f.slice(0, -"::soon".length) : f;
           return (
             <li key={i} className="flex items-start gap-2.5">
               <Check className={`h-4 w-4 mt-0.5 shrink-0 ${accent}`} />
-              <span className="text-foreground/90 leading-relaxed">{f}</span>
+              <span className="text-foreground/90 leading-relaxed">
+                {label}
+                {soon && (
+                  <span className="ml-2 inline-flex items-center rounded-full border border-warning/50 bg-warning/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-warning align-middle">
+                    Coming soon
+                  </span>
+                )}
+              </span>
             </li>
           );
         })}
