@@ -52,8 +52,8 @@ type Profile = {
   voice_consent_decided?: boolean | null;
 };
 
-function getGreeting() {
-  const h = new Date().getHours();
+function getGreeting(date = new Date()) {
+  const h = date.getUTCHours();
   if (h < 12) return "Good morning";
   if (h < 18) return "Good afternoon";
   return "Good evening";
@@ -452,7 +452,7 @@ function DashboardPage() {
           <div className="flex flex-wrap items-start justify-between gap-4 animate-fade-in">
             <div>
               <h2 className="text-2xl tracking-tight" style={{ fontFamily: "Inter, sans-serif" }}>
-                {getGreeting()}, {firstName}.
+                {getGreeting(displayNow)}, {firstName}.
               </h2>
               <p className="text-sm mt-1" style={{ color: "#9ca3af" }}>
                 {session.open
