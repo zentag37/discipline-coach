@@ -150,7 +150,7 @@ function Hero() {
             price={annual ? 15 : 19}
             tagline="Build the habit. Learn the rules."
             features={[
-              "Floating window (Windows & Mac)",
+              "Floating window (Windows & Mac)::soon",
               "Personalised greeting by name",
               "Daily risk calculator",
               "Pre-trade checklist",
