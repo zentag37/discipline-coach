@@ -105,13 +105,24 @@ function DashboardPage() {
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
+  const [notifyDone, setNotifyDone] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    let changed = false;
     if (params.get("subscribed") === "true") {
       setWelcomeOpen(true);
       params.delete("subscribed");
+      changed = true;
+    }
+    if (params.get("download") === "1") {
+      setDownloadOpen(true);
+      params.delete("download");
+      changed = true;
+    }
+    if (changed) {
       const qs = params.toString();
       window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
     }
