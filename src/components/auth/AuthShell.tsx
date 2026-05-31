@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Eye, EyeOff, Check } from "lucide-react";
+import { Eye, EyeOff, Check, Loader2 } from "lucide-react";
 
 export function AuthShell({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
