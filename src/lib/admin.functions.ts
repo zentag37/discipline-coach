@@ -355,3 +355,87 @@ export const updateAppSettings = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const listFeedback = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .inputValidator((d) =>
+    z
+      .object({
+        status: z.enum(["all", "new", "in_progress", "resolved", "archived"]).optional(),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data }) => {
+    let q = supabaseAdmin
+      .from("feedback" as any)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    const ids = Array.from(new Set((rows || []).map((r: any) => r.user_id)));
+    let profiles: Record<string, { full_name: string | null }> = {};
+    if (ids.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", ids);
+      profiles = Object.fromEntries((profs || []).map((p: any) => [p.id, { full_name: p.full_name }]));
+    }
+    const counts = {
+      total: rows?.length || 0,
+      new: rows?.filter((r: any) => r.status === "new").length || 0,
+      in_progress: rows?.filter((r: any) => r.status === "in_progress").length || 0,
+      resolved: rows?.filter((r: any) => r.status === "resolved").length || 0,
+    };
+    return {
+      items: (rows || []).map((r: any) => ({ ...r, user_name: profiles[r.user_id]?.full_name || null })),
+      counts,
+    };
+  });
+
+export const updateFeedback = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((d) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["new", "in_progress", "resolved", "archived"]).optional(),
+        admin_response: z.string().max(5000).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const adminId = (context as any).adminId as string;
+    const patch: Record<string, any> = {};
+    if (data.status) patch.status = data.status;
+    if (typeof data.admin_response === "string") {
+      patch.admin_response = data.admin_response;
+      patch.responded_by = adminId;
+      patch.responded_at = new Date().toISOString();
+    }
+    const { error } = await supabaseAdmin.from("feedback" as any).update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await supabaseAdmin.from("admin_logs" as any).insert({
+      admin_id: adminId,
+      action: "update_feedback",
+      target_user_id: null,
+      details: { feedback_id: data.id, ...patch },
+    });
+    return { ok: true };
+  });
+
+export const deleteFeedback = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await supabaseAdmin.from("feedback" as any).delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await supabaseAdmin.from("admin_logs" as any).insert({
+      admin_id: (context as any).adminId,
+      action: "delete_feedback",
+      details: { feedback_id: data.id },
+    });
+    return { ok: true };
+  });
