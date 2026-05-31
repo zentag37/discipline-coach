@@ -102,7 +102,28 @@ function MarketIntelPage() {
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
   const unlocked = hasAceAccess(profile.plan);
-  const visibleInstruments = unlocked ? INSTRUMENTS : INSTRUMENTS.slice(0, 1);
+  const visibleMeta = useMemo(
+    () => (unlocked ? INSTRUMENT_META : INSTRUMENT_META.slice(0, 1)),
+    [unlocked],
+  );
+  const symbols = useMemo(() => visibleMeta.map((m) => m.symbol), [visibleMeta]);
+
+  const fetchQuotes = useServerFn(getLiveQuotes);
+  const { data: quotesData } = useQuery({
+    queryKey: ["live-quotes", symbols],
+    queryFn: () => fetchQuotes({ data: { symbols } }),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+    enabled: symbols.length > 0,
+  });
+  const quotesBySymbol = useMemo(() => {
+    const map = new Map<string, LiveQuote>();
+    quotesData?.quotes?.forEach((q) => map.set(q.symbol, q));
+    return map;
+  }, [quotesData]);
+  const visibleInstruments: Instrument[] = visibleMeta.map((m) =>
+    mergeInstrument(m, quotesBySymbol.get(m.symbol)),
+  );
 
   const session = getSessionStatus(now);
   const nyIn = timeUntilUTC(now, 13);
