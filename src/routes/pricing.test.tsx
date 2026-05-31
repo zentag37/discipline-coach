@@ -71,9 +71,6 @@ function renderPage() {
 }
 
 describe("Pricing CTAs", () => {
-  it("redirects all plan CTAs to /register when logged out", async () => {
-    getSessionMock.mockResolvedValue({ data: { session: null } });
-    renderPage();
 
   it.each(PLAN_BUTTONS.map((p, i) => [p, i] as const))(
     "redirects %s CTA to /register when logged out",
