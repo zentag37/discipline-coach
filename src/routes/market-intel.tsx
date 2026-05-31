@@ -281,19 +281,23 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
   return (
     <div className="p-5 rounded-[12px] animate-fade-in relative"
       style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}>
-      <DemoPill />
+      <LivePill live={ins.live} error={ins.error} />
       {/* Header */}
-      <div className="flex flex-wrap items-center gap-4 pr-20">
+      <div className="flex flex-wrap items-center gap-4 pr-24">
         <div>
           <div className="text-2xl tracking-tight">{ins.symbol}</div>
           <div className="text-[11px]" style={{ color: "#6b7280" }}>{ins.fullName}</div>
         </div>
         <div className="md:ml-auto flex items-center gap-3">
-          <div className="text-2xl" style={{ color: TEAL }}>{ins.price.toLocaleString()}</div>
-          <span className="text-xs px-2 py-1 rounded"
-            style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
-            {up ? "▲" : "▼"} {up ? "+" : ""}{ins.change.toFixed(2)}%
-          </span>
+          <div className="text-2xl" style={{ color: TEAL }}>
+            {ins.price > 0 ? ins.price.toLocaleString(undefined, { maximumFractionDigits: 4 }) : "—"}
+          </div>
+          {ins.price > 0 && (
+            <span className="text-xs px-2 py-1 rounded"
+              style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
+              {up ? "▲" : "▼"} {up ? "+" : ""}{ins.change.toFixed(2)}%
+            </span>
+          )}
         </div>
         <span className="text-[10px] px-2 py-0.5 rounded-full"
           style={{ background: "rgba(255,255,255,0.05)", color: "#9ca3af" }}>{ins.assetClass}</span>
