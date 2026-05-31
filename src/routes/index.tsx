@@ -7,7 +7,7 @@ function useDownloadClick() {
   return async () => {
     const { data } = await supabase.auth.getSession();
     if (data.session) {
-      navigate({ to: "/dashboard", search: { download: "1" } as any });
+      navigate({ to: "/dashboard" });
     } else {
       navigate({ to: "/register" });
     }
