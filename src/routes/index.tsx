@@ -160,7 +160,7 @@ function Hero() {
               Download Free
             </button>
             <a
-              href="#how"
+              href="#features"
               className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-sm font-mono text-foreground hover:bg-surface transition"
             >
               <PlayCircle className="h-4 w-4" />
