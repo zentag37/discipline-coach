@@ -323,10 +323,19 @@ function PlanCard({
               </li>
             );
           }
+          const soon = f.endsWith("::soon");
+          const label = soon ? f.slice(0, -"::soon".length) : f;
           return (
             <li key={i} className="flex items-start gap-2.5">
               <Check className={`h-4 w-4 mt-0.5 shrink-0 ${accent}`} />
-              <span className="text-foreground/90 leading-relaxed">{f}</span>
+              <span className="text-foreground/90 leading-relaxed">
+                {label}
+                {soon && (
+                  <span className="ml-2 inline-flex items-center rounded-full border border-warning/50 bg-warning/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-warning align-middle">
+                    Coming soon
+                  </span>
+                )}
+              </span>
             </li>
           );
         })}
