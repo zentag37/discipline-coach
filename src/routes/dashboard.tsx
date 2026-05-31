@@ -296,7 +296,7 @@ function DashboardPage() {
 
   const displayNow = now ?? new Date(0);
   const session = getSessionStatus(displayNow);
-  const opensIn = !session.open ? nextLondonOpen(now) : null;
+  const opensIn = !session.open ? nextLondonOpen(displayNow) : null;
 
   const checkedCount = checks.filter(Boolean).length;
   const allChecked = checkedCount === 5;
@@ -428,7 +428,7 @@ function DashboardPage() {
           </h1>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-2">
-              <span style={{ color: "#9ca3af" }}>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+              <span style={{ color: "#9ca3af" }}>{formatHeaderTime(displayNow)}</span>
               <span className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: session.open ? "#22c55e" : "#ef4444" }} />
                 <span style={{ color: session.open ? "#22c55e" : "#ef4444" }}>{session.label}</span>
@@ -461,8 +461,8 @@ function DashboardPage() {
               </p>
             </div>
             <div className="text-right text-xs" style={{ color: "#9ca3af" }}>
-              <div>{now.toLocaleDateString([], { weekday: "long" })}</div>
-              <div>{now.toLocaleDateString([], { year: "numeric", month: "short", day: "2-digit" })}</div>
+              <div>{formatWeekday(displayNow)}</div>
+              <div>{formatHeaderDate(displayNow)}</div>
             </div>
           </div>
 
