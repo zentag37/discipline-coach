@@ -132,9 +132,11 @@ function Logo() {
 }
 
 function Hero() {
+  const onDownload = useDownloadClick();
   return (
     <section className="relative">
       <Container className="grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:gap-10">
+
         <div className="flex flex-col justify-center">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
