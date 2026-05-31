@@ -10,6 +10,7 @@ import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { useServerFn } from "@tanstack/react-start";
 import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
 import { normalizePlan, planLabel } from "@/lib/plan";
+import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
