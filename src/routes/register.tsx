@@ -39,6 +39,13 @@ function RegisterPage() {
   const [oauthLoading, setOauthLoading] = useState(false);
 
   useEffect(() => {
+    console.log("[register] Supabase env check", {
+      url: import.meta.env.VITE_SUPABASE_URL,
+      hasAnonKey: Boolean(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY),
+    });
+  }, []);
+
+  useEffect(() => {
     if (search.plan) sessionStorage.setItem("pendingPlan", search.plan);
   }, [search.plan]);
 
@@ -69,6 +76,13 @@ function RegisterPage() {
   const pwValid = password.length >= 8;
   const matchValid = confirm.length > 0 && confirm === password;
 
+  const friendlyError = (msg: string) => {
+    if (/rate limit/i.test(msg)) {
+      return "Too many attempts. Please wait a few minutes and try again.";
+    }
+    return msg;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
@@ -81,16 +95,39 @@ function RegisterPage() {
     if (Object.keys(next).length) return;
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/onboarding`,
-        data: { full_name: fullName },
-      },
-    });
-    setLoading(false);
-    if (error) setErr(error.message);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/onboarding`,
+          data: { full_name: fullName },
+        },
+      });
+      if (error) {
+        console.error("[register] signUp error", error);
+        setErr(friendlyError(error.message));
+        return;
+      }
+      console.log("[register] signUp success", {
+        userId: data.user?.id,
+        hasSession: Boolean(data.session),
+      });
+      if (data.session) {
+        // onAuthStateChange will handle navigation, but redirect as fallback
+        navigate({ to: "/onboarding" });
+      } else {
+        setErr(
+          "Account created. Check your email to confirm before signing in.",
+        );
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Something went wrong";
+      console.error("[register] unexpected error", e);
+      setErr(friendlyError(msg));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const google = async () => {
