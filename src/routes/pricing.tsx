@@ -297,7 +297,7 @@ function PlanCard({
       <div className={`font-mono text-[11px] uppercase tracking-[0.2em] ${accent}`}>{name}</div>
 
       <div className="mt-4 flex items-baseline gap-1">
-        <span className="font-mono text-5xl font-medium">${price}</span>
+        <span className="font-mono text-5xl font-medium">€{price}</span>
         <span className="font-mono text-sm text-muted-foreground">/mo</span>
       </div>
       <div className="mt-1 font-mono text-[11px] text-muted-foreground">
