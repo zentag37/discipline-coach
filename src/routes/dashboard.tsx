@@ -27,6 +27,14 @@ import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { User as UserIcon, RefreshCcw, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
