@@ -49,6 +49,42 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          announcement_enabled: boolean
+          announcement_text: string
+          default_plan: string
+          feature_api_access: boolean
+          feature_pdf_reports: boolean
+          feature_prop_team: boolean
+          id: number
+          maintenance_mode: boolean
+          updated_at: string
+        }
+        Insert: {
+          announcement_enabled?: boolean
+          announcement_text?: string
+          default_plan?: string
+          feature_api_access?: boolean
+          feature_pdf_reports?: boolean
+          feature_prop_team?: boolean
+          id?: number
+          maintenance_mode?: boolean
+          updated_at?: string
+        }
+        Update: {
+          announcement_enabled?: boolean
+          announcement_text?: string
+          default_plan?: string
+          feature_api_access?: boolean
+          feature_pdf_reports?: boolean
+          feature_prop_team?: boolean
+          id?: number
+          maintenance_mode?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       journal_reviews: {
         Row: {
           ace_review: string | null
