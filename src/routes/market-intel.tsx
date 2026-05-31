@@ -409,7 +409,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
                   className="flex items-center justify-between px-2 py-1 rounded text-[11px]"
                   style={{ background: isPP ? "rgba(0,212,160,0.1)" : "transparent" }}>
                   <span style={{ color, width: 28 }}>{p.label}</span>
-                  <span style={{ color: isPP ? TEAL : "#d1d5db" }}>{p.price.toLocaleString()}</span>
+                  <span style={{ color: isPP ? TEAL : "#d1d5db" }}>{fmt(p.price, ins.decimals)}</span>
                   <span className="text-[10px]" style={{ color: "#6b7280" }}>
                     {isPP ? "── current" : "░░░░░░░░"}
                   </span>
