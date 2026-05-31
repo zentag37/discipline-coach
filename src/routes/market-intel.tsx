@@ -23,83 +23,61 @@ const GREEN = "#22c55e";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
-type Instrument = {
+type InstrumentMeta = {
   symbol: string;
   fullName: string;
   assetClass: string;
-  price: number;
-  change: number;
-  trend: { tf: string; dir: "Bullish" | "Bearish" | "Neutral"; strength: number }[];
-  pivots: { label: string; price: number; type: "R" | "S" | "PP" }[];
   intel: string;
   events: { label: string; impact: "high" | "med" | "low" }[];
 };
 
-const INSTRUMENTS: Instrument[] = [
+type Instrument = InstrumentMeta & {
+  price: number;
+  change: number;
+  trend: { tf: string; dir: "Bullish" | "Bearish" | "Neutral"; strength: number }[];
+  pivots: { label: string; price: number; type: "R" | "S" | "PP" }[];
+  live: boolean;
+  error?: string;
+};
+
+const INSTRUMENT_META: InstrumentMeta[] = [
   {
     symbol: "EURUSD", fullName: "Euro / US Dollar", assetClass: "FOREX",
-    price: 1.0842, change: 0.12,
-    trend: [
-      { tf: "1H", dir: "Bullish", strength: 65 },
-      { tf: "4H", dir: "Bullish", strength: 72 },
-      { tf: "D1", dir: "Neutral", strength: 50 },
-    ],
-    pivots: [
-      { label: "R3", price: 1.0920, type: "R" },
-      { label: "R2", price: 1.0895, type: "R" },
-      { label: "R1", price: 1.0868, type: "R" },
-      { label: "PP", price: 1.0842, type: "PP" },
-      { label: "S1", price: 1.0815, type: "S" },
-      { label: "S2", price: 1.0788, type: "S" },
-      { label: "S3", price: 1.0762, type: "S" },
-    ],
-    intel: "EURUSD is holding above the daily pivot at 1.0842. The 4H shows bullish momentum but RSI is approaching overbought. Watch for a pullback to 1.0815 (S1) for a cleaner long entry. Avoid trading 30 minutes before NFP tomorrow at 13:30 UTC.",
+    intel: "Watch the daily pivot for bias. Wait for a pullback to S1 for cleaner long entries. Avoid trading 30 minutes before high-impact USD events.",
     events: [
       { label: "📅 EUR CPI · 10:00 UTC", impact: "med" },
       { label: "📅 USD NFP Tomorrow", impact: "high" },
     ],
   },
   {
-    symbol: "NAS100", fullName: "Nasdaq 100 Index", assetClass: "INDEX",
-    price: 18432.5, change: -0.18,
-    trend: [
-      { tf: "1H", dir: "Bearish", strength: 58 },
-      { tf: "4H", dir: "Neutral", strength: 50 },
-      { tf: "D1", dir: "Bullish", strength: 68 },
-    ],
-    pivots: [
-      { label: "R3", price: 18620, type: "R" },
-      { label: "R2", price: 18545, type: "R" },
-      { label: "R1", price: 18490, type: "R" },
-      { label: "PP", price: 18432.5, type: "PP" },
-      { label: "S1", price: 18375, type: "S" },
-      { label: "S2", price: 18320, type: "S" },
-      { label: "S3", price: 18245, type: "S" },
-    ],
-    intel: "NAS100 is pulling back from yesterday's highs. The 1H is bearish but the daily trend remains intact. Watch S1 at 18,375 — a clean reclaim of 18,490 would suggest the dip is over.",
+    symbol: "NAS100", fullName: "Nasdaq 100 (via QQQ)", assetClass: "INDEX",
+    intel: "Reclaim of R1 with volume confirms continuation. Below PP, expect a test of S1. Respect the daily trend on pullbacks.",
     events: [{ label: "📅 USD NFP Tomorrow", impact: "high" }],
   },
   {
     symbol: "GOLD", fullName: "Spot Gold (XAUUSD)", assetClass: "COMMODITY",
-    price: 2384.6, change: 0.91,
-    trend: [
-      { tf: "1H", dir: "Bullish", strength: 78 },
-      { tf: "4H", dir: "Bullish", strength: 81 },
-      { tf: "D1", dir: "Bullish", strength: 70 },
-    ],
-    pivots: [
-      { label: "R3", price: 2412, type: "R" },
-      { label: "R2", price: 2402, type: "R" },
-      { label: "R1", price: 2394, type: "R" },
-      { label: "PP", price: 2384.6, type: "PP" },
-      { label: "S1", price: 2376, type: "S" },
-      { label: "S2", price: 2368, type: "S" },
-      { label: "S3", price: 2358, type: "S" },
-    ],
-    intel: "Gold is in a clean uptrend across all timeframes — the strongest setup on your watchlist. Pullbacks to PP (2384.6) or S1 (2376) are the highest-probability long entries. Don't chase highs.",
+    intel: "Pullbacks to PP or S1 are the highest-probability long entries when daily trend is bullish. Don't chase extensions above R2.",
     events: [{ label: "📅 USD NFP Tomorrow", impact: "high" }],
   },
 ];
+
+function mergeInstrument(meta: InstrumentMeta, quote: LiveQuote | undefined): Instrument {
+  return {
+    ...meta,
+    price: quote?.price ?? 0,
+    change: quote?.change ?? 0,
+    trend: quote?.trend?.length
+      ? quote.trend
+      : [
+          { tf: "1H", dir: "Neutral", strength: 50 },
+          { tf: "4H", dir: "Neutral", strength: 50 },
+          { tf: "D1", dir: "Neutral", strength: 50 },
+        ],
+    pivots: quote?.pivots ?? [],
+    live: !!quote && !quote.error && quote.price > 0,
+    error: quote?.error,
+  };
+}
 
 function MarketIntelPage() {
   const navigate = useNavigate();
