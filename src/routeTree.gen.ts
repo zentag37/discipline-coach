@@ -20,8 +20,16 @@ import { Route as JournalRouteImport } from './routes/journal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ApiAceChatRouteImport } from './routes/api/ace-chat'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
+import { Route as AdminAceRouteImport } from './routes/admin.ace'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -79,15 +87,55 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiAceChatRoute = ApiAceChatRouteImport.update({
   id: '/api/ace-chat',
   path: '/api/ace-chat',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAceRoute = AdminAceRouteImport.update({
+  id: '/ace',
+  path: '/ace',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe-webhook',
@@ -97,6 +145,7 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -108,7 +157,14 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/admin/ace': typeof AdminAceRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/ace-chat': typeof ApiAceChatRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -124,12 +180,20 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/admin/ace': typeof AdminAceRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/ace-chat': typeof ApiAceChatRoute
+  '/admin': typeof AdminIndexRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -141,13 +205,21 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/admin/ace': typeof AdminAceRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/subscriptions': typeof AdminSubscriptionsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/ace-chat': typeof ApiAceChatRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/dashboard'
     | '/forgot-password'
@@ -159,7 +231,14 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/settings'
+    | '/admin/ace'
+    | '/admin/activity'
+    | '/admin/feedback'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/users'
     | '/api/ace-chat'
+    | '/admin/'
     | '/api/public/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -175,11 +254,19 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/settings'
+    | '/admin/ace'
+    | '/admin/activity'
+    | '/admin/feedback'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/users'
     | '/api/ace-chat'
+    | '/admin'
     | '/api/public/stripe-webhook'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/auth'
     | '/dashboard'
     | '/forgot-password'
@@ -191,12 +278,20 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/settings'
+    | '/admin/ace'
+    | '/admin/activity'
+    | '/admin/feedback'
+    | '/admin/settings'
+    | '/admin/subscriptions'
+    | '/admin/users'
     | '/api/ace-chat'
+    | '/admin/'
     | '/api/public/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -291,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -298,12 +400,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/ace-chat': {
       id: '/api/ace-chat'
       path: '/api/ace-chat'
       fullPath: '/api/ace-chat'
       preLoaderRoute: typeof ApiAceChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/subscriptions': {
+      id: '/admin/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/admin/subscriptions'
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/feedback': {
+      id: '/admin/feedback'
+      path: '/feedback'
+      fullPath: '/admin/feedback'
+      preLoaderRoute: typeof AdminFeedbackRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ace': {
+      id: '/admin/ace'
+      path: '/ace'
+      fullPath: '/admin/ace'
+      preLoaderRoute: typeof AdminAceRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/api/public/stripe-webhook': {
       id: '/api/public/stripe-webhook'
@@ -315,8 +466,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminAceRoute: typeof AdminAceRoute
+  AdminActivityRoute: typeof AdminActivityRoute
+  AdminFeedbackRoute: typeof AdminFeedbackRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAceRoute: AdminAceRoute,
+  AdminActivityRoute: AdminActivityRoute,
+  AdminFeedbackRoute: AdminFeedbackRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
