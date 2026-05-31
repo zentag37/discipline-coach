@@ -11,6 +11,7 @@ import { Lock } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 import { getMarketNews } from "@/lib/news.functions";
+import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
@@ -590,16 +591,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
           </span>
           <span style={{ color: "#9ca3af" }}>ACE is ready</span>
         </div>
-        <div className="flex items-center gap-2 px-2">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-            style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>{initials}</div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs truncate">{firstName}</div>
-            <button onClick={onSignOut} className="text-[10px] hover:underline" style={{ color: "#6b7280" }}>
-              Sign out
-            </button>
-          </div>
-        </div>
+        <SidebarUserMenu initials={initials} firstName={firstName} />
       </div>
     </aside>
   );

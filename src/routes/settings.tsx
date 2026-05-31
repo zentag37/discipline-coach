@@ -10,6 +10,7 @@ import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { useServerFn } from "@tanstack/react-start";
 import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
 import { normalizePlan, planLabel } from "@/lib/plan";
+import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
@@ -775,14 +776,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
           </span>
           <span style={{ color: "#9ca3af" }}>ACE is ready</span>
         </div>
-        <div className="flex items-center gap-2 px-2">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-            style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>{initials}</div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs truncate">{firstName}</div>
-            <button onClick={onSignOut} className="text-[10px] hover:underline" style={{ color: "#6b7280" }}>Sign out</button>
-          </div>
-        </div>
+        <SidebarUserMenu initials={initials} firstName={firstName} />
       </div>
     </aside>
   );
