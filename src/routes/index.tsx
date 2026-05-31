@@ -1,5 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+function useDownloadClick() {
+  const navigate = useNavigate();
+  return async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      navigate({ to: "/dashboard", search: { download: "1" } as any });
+    } else {
+      navigate({ to: "/register" });
+    }
+  };
+}
 import {
   Activity,
   AlertTriangle,
@@ -84,6 +97,7 @@ function Container({ children, className = "" }: { children: React.ReactNode; cl
 }
 
 function Nav() {
+  const onDownload = useDownloadClick();
   return (
     <header className="border-b border-border">
       <Container className="flex h-14 items-center justify-between">
@@ -92,15 +106,15 @@ function Nav() {
           <a href="#problem" className="hover:text-foreground transition-colors">/problem</a>
           <a href="#how" className="hover:text-foreground transition-colors">/how</a>
           <a href="#features" className="hover:text-foreground transition-colors">/features</a>
-          <a href="#download" className="hover:text-foreground transition-colors">/download</a>
+          <a href="/pricing" className="hover:text-foreground transition-colors">/pricing</a>
         </nav>
-        <a
-          href="#download"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:opacity-90 transition"
+        <button
+          onClick={onDownload}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
         >
           <Download className="h-3.5 w-3.5" />
           Download
-        </a>
+        </button>
       </Container>
     </header>
   );
@@ -118,9 +132,11 @@ function Logo() {
 }
 
 function Hero() {
+  const onDownload = useDownloadClick();
   return (
     <section className="relative">
       <Container className="grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:gap-10">
+
         <div className="flex flex-col justify-center">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
@@ -136,13 +152,13 @@ function Hero() {
             enforces your rules, and shuts you down before you blow the day.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href="#download"
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition"
+            <button
+              onClick={onDownload}
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
             >
               <Download className="h-4 w-4" />
               Download Free
-            </a>
+            </button>
             <a
               href="#how"
               className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-sm font-mono text-foreground hover:bg-surface transition"
@@ -474,6 +490,7 @@ function Quotes() {
 }
 
 function DownloadSection() {
+  const onDownload = useDownloadClick();
   return (
     <section id="download">
       <Container className="py-20 md:py-28">
@@ -484,9 +501,9 @@ function DownloadSection() {
           </h2>
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-          <a
-            href="#"
-            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50"
+          <button
+            onClick={onDownload}
+            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
               <Monitor className="h-7 w-7 text-primary" />
@@ -496,10 +513,10 @@ function DownloadSection() {
               </div>
             </div>
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
-          </a>
-          <a
-            href="#"
-            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50"
+          </button>
+          <button
+            onClick={onDownload}
+            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
               <Apple className="h-7 w-7 text-primary" />
@@ -509,7 +526,7 @@ function DownloadSection() {
               </div>
             </div>
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
-          </a>
+          </button>
         </div>
         <p className="mt-6 text-center font-mono text-xs text-muted-foreground">
           Free · No account needed · Open source
@@ -532,7 +549,7 @@ function Footer() {
         <nav className="flex items-center gap-6 font-mono text-xs text-muted-foreground">
           <a href="#problem" className="hover:text-foreground transition">problem</a>
           <a href="#features" className="hover:text-foreground transition">features</a>
-          <a href="#download" className="hover:text-foreground transition">download</a>
+          <a href="/pricing" className="hover:text-foreground transition">pricing</a>
           <a
             href="https://github.com"
             target="_blank"

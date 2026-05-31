@@ -105,13 +105,24 @@ function DashboardPage() {
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
+  const [notifyDone, setNotifyDone] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    let changed = false;
     if (params.get("subscribed") === "true") {
       setWelcomeOpen(true);
       params.delete("subscribed");
+      changed = true;
+    }
+    if (params.get("download") === "1") {
+      setDownloadOpen(true);
+      params.delete("download");
+      changed = true;
+    }
+    if (changed) {
       const qs = params.toString();
       window.history.replaceState({}, "", window.location.pathname + (qs ? `?${qs}` : ""));
     }
@@ -327,7 +338,7 @@ function DashboardPage() {
           <NavItem icon={<CalendarDays size={16} />} label="Today's Session" />
           <NavItem icon={<BookOpen size={16} />} label="Journal" />
           <NavItem icon={<Globe size={16} />} label="Market Intel" />
-          <NavItem icon={<Download size={16} />} label="Download App" />
+          <NavItem icon={<Download size={16} />} label="Download App" onClick={() => setDownloadOpen(true)} />
           <NavItem icon={<Settings size={16} />} label="Settings" />
         </nav>
 
@@ -824,15 +835,52 @@ function DashboardPage() {
           </div>
         </div>
       )}
+
+      {downloadOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in"
+          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <div className="max-w-md w-full rounded-[14px] p-7 text-center relative"
+            style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <button
+              onClick={() => { setDownloadOpen(false); setNotifyDone(false); }}
+              className="absolute top-3 right-3 text-[#6b7280] hover:text-white cursor-pointer"
+              aria-label="Close"
+            >
+              <X size={16} />
+            </button>
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>DESKTOP APP</div>
+            <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
+              Desktop app coming soon.
+            </h2>
+            <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
+              You can use Trader Coach fully in your browser right now. We'll email you when the Mac and Windows app is ready.
+            </p>
+            {notifyDone ? (
+              <div className="mt-6 text-sm" style={{ color: TEAL, fontFamily: "Inter, sans-serif" }}>
+                ✓ You're on the list. We'll email you when it's ready.
+              </div>
+            ) : (
+              <button
+                onClick={() => setNotifyDone(true)}
+                className="mt-6 text-sm px-5 py-2 rounded font-medium cursor-pointer"
+                style={{ background: TEAL, color: "#0d0f12" }}
+              >
+                Notify me when it's ready
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function NavItem({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) {
+function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
   return (
     <a
       href="#"
-      className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
+      onClick={(e) => { if (onClick) { e.preventDefault(); onClick(); } }}
+      className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
       style={{
         background: active ? "rgba(0,212,160,0.08)" : "transparent",
         color: active ? TEAL : "#9ca3af",
