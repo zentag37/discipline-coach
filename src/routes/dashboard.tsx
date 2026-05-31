@@ -839,11 +839,12 @@ function DashboardPage() {
   );
 }
 
-function NavItem({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) {
+function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
   return (
     <a
       href="#"
-      className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
+      onClick={(e) => { if (onClick) { e.preventDefault(); onClick(); } }}
+      className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
       style={{
         background: active ? "rgba(0,212,160,0.08)" : "transparent",
         color: active ? TEAL : "#9ca3af",
