@@ -170,7 +170,13 @@ export function PrimaryButton({
       disabled={loading}
       className="w-full inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition disabled:opacity-60"
     >
-      {loading ? "Please wait…" : children}
+      {loading ? (
+        <span className="inline-flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" /> Please wait…
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 }
