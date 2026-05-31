@@ -102,14 +102,38 @@ function MarketIntelPage() {
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
   const unlocked = hasAceAccess(profile.plan);
-  const visibleMeta = useMemo(
-    () => (unlocked ? INSTRUMENT_META : INSTRUMENT_META.slice(0, 1)),
-    [unlocked],
-  );
+
+  // Derive watchlist from user profile.instruments, fall back to defaults.
+  const userSymbols = useMemo<string[]>(() => {
+    const raw = profile.instruments;
+    const list: string[] = Array.isArray(raw)
+      ? raw
+      : typeof raw === "string" && raw.length
+        ? raw.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : ["EURUSD", "NAS100", "GOLD"];
+    return list.map((s) => s.toUpperCase());
+  }, [profile.instruments]);
+
+  const visibleMeta = useMemo<InstrumentMeta[]>(() => {
+    const metaFor = (sym: string): InstrumentMeta => {
+      const found = INSTRUMENT_META.find((m) => m.symbol === sym);
+      if (found) return found;
+      return {
+        symbol: sym,
+        fullName: sym,
+        assetClass: "MARKET",
+        intel: "Watching live price action. Respect the daily trend on pullbacks; wait for a clean reaction at PP or S1/R1 before entering.",
+        events: [],
+      };
+    };
+    const list = userSymbols.map(metaFor);
+    return unlocked ? list : list.slice(0, 1);
+  }, [userSymbols, unlocked]);
+
   const symbols = useMemo(() => visibleMeta.map((m) => m.symbol), [visibleMeta]);
 
   const fetchQuotes = useServerFn(getLiveQuotes);
-  const { data: quotesData } = useQuery({
+  const { data: quotesData, isLoading, isError, dataUpdatedAt } = useQuery({
     queryKey: ["live-quotes", symbols],
     queryFn: () => fetchQuotes({ data: { symbols } }),
     refetchInterval: 60_000,
@@ -124,6 +148,7 @@ function MarketIntelPage() {
   const visibleInstruments: Instrument[] = visibleMeta.map((m) =>
     mergeInstrument(m, quotesBySymbol.get(m.symbol)),
   );
+  const secondsSinceUpdate = dataUpdatedAt ? Math.max(0, Math.floor((now.getTime() - dataUpdatedAt) / 1000)) : null;
 
   const session = getSessionStatus(now);
   const nyIn = timeUntilUTC(now, 13);
