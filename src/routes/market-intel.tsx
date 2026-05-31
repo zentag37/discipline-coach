@@ -11,6 +11,7 @@ import { Lock } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 import { getMarketNews } from "@/lib/news.functions";
+import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
