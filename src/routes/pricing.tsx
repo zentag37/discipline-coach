@@ -139,7 +139,11 @@ function Hero() {
           </div>
         </div>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3 items-stretch">
+        <div className="mt-10 rounded-lg border border-primary/40 bg-primary/10 px-5 py-3 text-center font-mono text-xs md:text-sm text-foreground">
+          <span className="text-primary">🚀 Early Access</span> — Some features are rolling out over the next 30 days. Early subscribers lock in this price forever.
+        </div>
+
+        <div className="mt-8 grid gap-5 md:grid-cols-3 items-stretch">
           <PlanCard
             plan="solo"
             name="SOLO"
