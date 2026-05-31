@@ -34,6 +34,7 @@ type InstrumentMeta = {
 type Instrument = InstrumentMeta & {
   price: number;
   change: number;
+  decimals: number;
   trend: { tf: string; dir: "Bullish" | "Bearish" | "Neutral"; strength: number }[];
   pivots: { label: string; price: number; type: "R" | "S" | "PP" }[];
   live: boolean;
@@ -50,7 +51,7 @@ const INSTRUMENT_META: InstrumentMeta[] = [
     ],
   },
   {
-    symbol: "NAS100", fullName: "Nasdaq 100 (via QQQ)", assetClass: "INDEX",
+    symbol: "NAS100", fullName: "Nasdaq 100", assetClass: "INDEX",
     intel: "Reclaim of R1 with volume confirms continuation. Below PP, expect a test of S1. Respect the daily trend on pullbacks.",
     events: [{ label: "📅 USD NFP Tomorrow", impact: "high" }],
   },
@@ -66,6 +67,7 @@ function mergeInstrument(meta: InstrumentMeta, quote: LiveQuote | undefined): In
     ...meta,
     price: quote?.price ?? 0,
     change: quote?.change ?? 0,
+    decimals: quote?.decimals ?? 2,
     trend: quote?.trend?.length
       ? quote.trend
       : [
@@ -77,6 +79,36 @@ function mergeInstrument(meta: InstrumentMeta, quote: LiveQuote | undefined): In
     live: !!quote && !quote.error && quote.price > 0,
     error: quote?.error,
   };
+}
+
+function fmt(n: number, decimals: number) {
+  return n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function InstrumentSkeleton({ symbol }: { symbol: string }) {
+  return (
+    <div className="p-5 rounded-[12px] relative animate-pulse"
+      style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded"
+        style={{ background: "rgba(156,163,175,0.12)", color: "#9ca3af", border: "1px solid rgba(156,163,175,0.3)" }}>
+        LOADING…
+      </span>
+      <div className="flex items-center gap-4">
+        <div className="text-2xl tracking-tight">{symbol}</div>
+        <div className="md:ml-auto h-6 w-28 rounded" style={{ background: "rgba(255,255,255,0.06)" }} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="space-y-2">
+            <div className="h-2 w-16 rounded" style={{ background: "rgba(255,255,255,0.08)" }} />
+            <div className="h-2 w-full rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+            <div className="h-2 w-3/4 rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+            <div className="h-2 w-2/3 rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function MarketIntelPage() {
