@@ -336,8 +336,25 @@ function DashboardPage() {
 
 
   async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/login" });
+    try {
+      await supabase.auth.signOut();
+    } catch {}
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch {}
+    window.location.href = "/login";
+  }
+
+  async function switchAccount() {
+    try {
+      await supabase.auth.signOut();
+    } catch {}
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch {}
+    window.location.href = "/login";
   }
 
   return (
