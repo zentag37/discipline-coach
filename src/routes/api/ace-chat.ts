@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { ACE_SYSTEM_CHAT, buildTraderContext } from "@/lib/ace.server";
 
-const MODEL = "claude-sonnet-4-5";
+const MODEL = "claude-sonnet-4-20250514";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
