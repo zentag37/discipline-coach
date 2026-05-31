@@ -34,6 +34,7 @@ type InstrumentMeta = {
 type Instrument = InstrumentMeta & {
   price: number;
   change: number;
+  decimals: number;
   trend: { tf: string; dir: "Bullish" | "Bearish" | "Neutral"; strength: number }[];
   pivots: { label: string; price: number; type: "R" | "S" | "PP" }[];
   live: boolean;
@@ -50,7 +51,7 @@ const INSTRUMENT_META: InstrumentMeta[] = [
     ],
   },
   {
-    symbol: "NAS100", fullName: "Nasdaq 100 (via QQQ)", assetClass: "INDEX",
+    symbol: "NAS100", fullName: "Nasdaq 100", assetClass: "INDEX",
     intel: "Reclaim of R1 with volume confirms continuation. Below PP, expect a test of S1. Respect the daily trend on pullbacks.",
     events: [{ label: "📅 USD NFP Tomorrow", impact: "high" }],
   },
@@ -66,6 +67,7 @@ function mergeInstrument(meta: InstrumentMeta, quote: LiveQuote | undefined): In
     ...meta,
     price: quote?.price ?? 0,
     change: quote?.change ?? 0,
+    decimals: quote?.decimals ?? 2,
     trend: quote?.trend?.length
       ? quote.trend
       : [
@@ -77,6 +79,36 @@ function mergeInstrument(meta: InstrumentMeta, quote: LiveQuote | undefined): In
     live: !!quote && !quote.error && quote.price > 0,
     error: quote?.error,
   };
+}
+
+function fmt(n: number, decimals: number) {
+  return n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function InstrumentSkeleton({ symbol }: { symbol: string }) {
+  return (
+    <div className="p-5 rounded-[12px] relative animate-pulse"
+      style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded"
+        style={{ background: "rgba(156,163,175,0.12)", color: "#9ca3af", border: "1px solid rgba(156,163,175,0.3)" }}>
+        LOADING…
+      </span>
+      <div className="flex items-center gap-4">
+        <div className="text-2xl tracking-tight">{symbol}</div>
+        <div className="md:ml-auto h-6 w-28 rounded" style={{ background: "rgba(255,255,255,0.06)" }} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="space-y-2">
+            <div className="h-2 w-16 rounded" style={{ background: "rgba(255,255,255,0.08)" }} />
+            <div className="h-2 w-full rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+            <div className="h-2 w-3/4 rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+            <div className="h-2 w-2/3 rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function MarketIntelPage() {
@@ -102,14 +134,38 @@ function MarketIntelPage() {
   const initials = (profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
   const plan = (profile.plan || "PRO").toUpperCase();
   const unlocked = hasAceAccess(profile.plan);
-  const visibleMeta = useMemo(
-    () => (unlocked ? INSTRUMENT_META : INSTRUMENT_META.slice(0, 1)),
-    [unlocked],
-  );
+
+  // Derive watchlist from user profile.instruments, fall back to defaults.
+  const userSymbols = useMemo<string[]>(() => {
+    const raw = profile.instruments;
+    const list: string[] = Array.isArray(raw)
+      ? raw
+      : typeof raw === "string" && raw.length
+        ? raw.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : ["EURUSD", "NAS100", "GOLD"];
+    return list.map((s) => s.toUpperCase());
+  }, [profile.instruments]);
+
+  const visibleMeta = useMemo<InstrumentMeta[]>(() => {
+    const metaFor = (sym: string): InstrumentMeta => {
+      const found = INSTRUMENT_META.find((m) => m.symbol === sym);
+      if (found) return found;
+      return {
+        symbol: sym,
+        fullName: sym,
+        assetClass: "MARKET",
+        intel: "Watching live price action. Respect the daily trend on pullbacks; wait for a clean reaction at PP or S1/R1 before entering.",
+        events: [],
+      };
+    };
+    const list = userSymbols.map(metaFor);
+    return unlocked ? list : list.slice(0, 1);
+  }, [userSymbols, unlocked]);
+
   const symbols = useMemo(() => visibleMeta.map((m) => m.symbol), [visibleMeta]);
 
   const fetchQuotes = useServerFn(getLiveQuotes);
-  const { data: quotesData } = useQuery({
+  const { data: quotesData, isLoading, isError, dataUpdatedAt } = useQuery({
     queryKey: ["live-quotes", symbols],
     queryFn: () => fetchQuotes({ data: { symbols } }),
     refetchInterval: 60_000,
@@ -124,6 +180,7 @@ function MarketIntelPage() {
   const visibleInstruments: Instrument[] = visibleMeta.map((m) =>
     mergeInstrument(m, quotesBySymbol.get(m.symbol)),
   );
+  const secondsSinceUpdate = dataUpdatedAt ? Math.max(0, Math.floor((now.getTime() - dataUpdatedAt) / 1000)) : null;
 
   const session = getSessionStatus(now);
   const nyIn = timeUntilUTC(now, 13);
@@ -166,10 +223,26 @@ function MarketIntelPage() {
             </div>
           </DemoCard>
 
+          {/* Status row */}
+          <div className="flex items-center justify-between text-[11px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+            <span>
+              {isError ? (
+                <span style={{ color: AMBER }}>Price data unavailable — retrying…</span>
+              ) : isLoading && !quotesData ? (
+                <span>Loading live market data…</span>
+              ) : secondsSinceUpdate !== null ? (
+                <>Updated {secondsSinceUpdate}s ago · refreshes every 60s</>
+              ) : null}
+            </span>
+            <span>Data: TwelveData</span>
+          </div>
+
           {/* Instrument cards */}
-          {visibleInstruments.map((ins) => (
-            <InstrumentCard key={ins.symbol} ins={ins} />
-          ))}
+          {isLoading && !quotesData
+            ? visibleMeta.map((m) => <InstrumentSkeleton key={m.symbol} symbol={m.symbol} />)
+            : visibleInstruments.map((ins) => (
+                <InstrumentCard key={ins.symbol} ins={ins} />
+              ))}
           {!unlocked && (
             <div className="p-6 rounded-[12px] flex flex-col items-center justify-center gap-3 text-center"
               style={{ background: "#141820", border: `1px dashed ${TEAL}60` }}>
@@ -290,7 +363,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
         </div>
         <div className="md:ml-auto flex items-center gap-3">
           <div className="text-2xl" style={{ color: TEAL }}>
-            {ins.price > 0 ? ins.price.toLocaleString(undefined, { maximumFractionDigits: 4 }) : "—"}
+            {ins.price > 0 ? fmt(ins.price, ins.decimals) : "—"}
           </div>
           {ins.price > 0 && (
             <span className="text-xs px-2 py-1 rounded"
@@ -336,7 +409,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
                   className="flex items-center justify-between px-2 py-1 rounded text-[11px]"
                   style={{ background: isPP ? "rgba(0,212,160,0.1)" : "transparent" }}>
                   <span style={{ color, width: 28 }}>{p.label}</span>
-                  <span style={{ color: isPP ? TEAL : "#d1d5db" }}>{p.price.toLocaleString()}</span>
+                  <span style={{ color: isPP ? TEAL : "#d1d5db" }}>{fmt(p.price, ins.decimals)}</span>
                   <span className="text-[10px]" style={{ color: "#6b7280" }}>
                     {isPP ? "── current" : "░░░░░░░░"}
                   </span>

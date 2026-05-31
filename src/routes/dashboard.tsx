@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { getLiveQuotes } from "@/lib/market.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
@@ -267,6 +269,21 @@ function DashboardPage() {
     : typeof rawIns === "string" && rawIns.length
     ? rawIns.split(",").map((s: string) => s.trim()).filter(Boolean)
     : ["EURUSD", "NAS100", "GOLD"];
+
+  const fetchQuotes = useServerFn(getLiveQuotes);
+  const watchlistSymbols = useMemo(() => instruments.map((s) => s.toUpperCase()), [instruments]);
+  const { data: watchlistData } = useQuery({
+    queryKey: ["live-quotes", watchlistSymbols],
+    queryFn: () => fetchQuotes({ data: { symbols: watchlistSymbols } }),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+    enabled: watchlistSymbols.length > 0,
+  });
+  const quoteMap = useMemo(() => {
+    const m = new Map<string, { price: number; change: number; decimals: number; error?: string }>();
+    watchlistData?.quotes?.forEach((q) => m.set(q.symbol, { price: q.price, change: q.change, decimals: q.decimals, error: q.error }));
+    return m;
+  }, [watchlistData]);
 
   const session = getSessionStatus(now);
   const opensIn = !session.open ? nextLondonOpen(now) : null;
@@ -663,31 +680,49 @@ function DashboardPage() {
               className="p-5 rounded-[10px]"
               style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)" }}
             >
-              <div className="text-[10px] tracking-widest mb-3" style={{ color: "#9ca3af" }}>
-                YOUR WATCHLIST
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-[10px] tracking-widest" style={{ color: "#9ca3af" }}>
+                  YOUR WATCHLIST
+                </div>
+                <span className="flex items-center gap-1 text-[9px] tracking-widest px-1.5 py-0.5 rounded"
+                  style={{ background: "rgba(34,197,94,0.12)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }}>
+                  <span className="w-1 h-1 rounded-full" style={{ background: "#22c55e" }} />
+                  LIVE
+                </span>
               </div>
               <div className="space-y-1">
                 {instruments.map((sym, i) => {
-                  const change = [0.42, -0.18, 0.91][i % 3];
-                  const price = [1.0842, 18432.5, 2384.6][i % 3];
-                  const up = change >= 0;
+                  const key = sym.toUpperCase();
+                  const q = quoteMap.get(key);
+                  const hasPrice = !!q && !q.error && q.price > 0;
+                  const up = (q?.change ?? 0) >= 0;
                   return (
                     <div key={sym} className="flex items-center justify-between py-2" style={{ borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                       <span className="text-sm">{sym}</span>
                       <div className="flex items-center gap-3 text-xs">
-                        <span style={{ color: "#d1d5db" }}>{price.toLocaleString()}</span>
-                        <span className="flex items-center gap-0.5" style={{ color: up ? "#22c55e" : "#ef4444" }}>
-                          {up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                          {up ? "+" : ""}{change.toFixed(2)}%
-                        </span>
+                        {hasPrice ? (
+                          <>
+                            <span style={{ color: "#d1d5db" }}>
+                              {q!.price.toLocaleString(undefined, { minimumFractionDigits: q!.decimals, maximumFractionDigits: q!.decimals })}
+                            </span>
+                            <span className="flex items-center gap-0.5" style={{ color: up ? "#22c55e" : "#ef4444" }}>
+                              {up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                              {up ? "+" : ""}{q!.change.toFixed(2)}%
+                            </span>
+                          </>
+                        ) : q?.error ? (
+                          <span style={{ color: "#f59e0b" }} className="text-[10px]">unavailable</span>
+                        ) : (
+                          <span style={{ color: "#6b7280" }} className="text-[10px]">loading…</span>
+                        )}
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="mt-3 text-[10px]" style={{ color: "#6b7280" }}>
-                Live prices connect after backend setup
-              </div>
+              <Link to="/market-intel" className="block mt-3 text-[10px] hover:underline" style={{ color: "#00d4a0" }}>
+                Open full Market Intel →
+              </Link>
             </div>
           </div>
 
