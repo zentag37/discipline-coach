@@ -200,11 +200,11 @@ function Hero() {
               "Everything in Pro, plus:",
               "Unlimited instruments",
               "Custom mentor voice and name",
-              "Real-time macro news alerts in floating window",
+              "Real-time macro news alerts in floating window::soon",
               "Multi-account support",
-              "Prop firm team dashboard",
-              "Monthly AI performance report (PDF)",
-              "API access",
+              "Prop firm team dashboard::soon",
+              "Monthly AI performance report (PDF)::soon",
+              "API access::soon",
               "Priority onboarding call",
             ]}
             ctaLabel="Start Free Trial"
