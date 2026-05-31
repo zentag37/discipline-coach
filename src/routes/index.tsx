@@ -97,6 +97,7 @@ function Container({ children, className = "" }: { children: React.ReactNode; cl
 }
 
 function Nav() {
+  const onDownload = useDownloadClick();
   return (
     <header className="border-b border-border">
       <Container className="flex h-14 items-center justify-between">
@@ -105,15 +106,15 @@ function Nav() {
           <a href="#problem" className="hover:text-foreground transition-colors">/problem</a>
           <a href="#how" className="hover:text-foreground transition-colors">/how</a>
           <a href="#features" className="hover:text-foreground transition-colors">/features</a>
-          <a href="#download" className="hover:text-foreground transition-colors">/download</a>
+          <a href="/pricing" className="hover:text-foreground transition-colors">/pricing</a>
         </nav>
-        <a
-          href="#download"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:opacity-90 transition"
+        <button
+          onClick={onDownload}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
         >
           <Download className="h-3.5 w-3.5" />
           Download
-        </a>
+        </button>
       </Container>
     </header>
   );
