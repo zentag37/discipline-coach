@@ -17,7 +17,7 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:title", content: "Pricing — Trader Coach Pro" },
       {
         property: "og:description",
-        content: "The discipline system 95% of traders never had. From $19/mo.",
+        content: "The discipline system 95% of traders never had. From €19/mo.",
       },
     ],
   }),
