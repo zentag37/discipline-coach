@@ -549,7 +549,7 @@ function Footer() {
         <nav className="flex items-center gap-6 font-mono text-xs text-muted-foreground">
           <a href="#problem" className="hover:text-foreground transition">problem</a>
           <a href="#features" className="hover:text-foreground transition">features</a>
-          <a href="#download" className="hover:text-foreground transition">download</a>
+          <a href="/pricing" className="hover:text-foreground transition">pricing</a>
           <a
             href="https://github.com"
             target="_blank"
