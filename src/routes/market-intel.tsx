@@ -10,6 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
+import { getMarketNews } from "@/lib/news.functions";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
@@ -315,32 +316,9 @@ function MarketIntelPage() {
             </DemoCard>
 
             <DemoCard title="LATEST NEWS">
-              <div className="space-y-3 mt-3">
-                {[
-                  { source: "Reuters", headline: "ECB holds rates steady, signals caution on future cuts", tag: "EURUSD", time: "14m ago" },
-                  { source: "Bloomberg", headline: "Gold edges higher as dollar weakens ahead of NFP", tag: "GOLD", time: "32m ago" },
-                  { source: "ForexLive", headline: "US tech stocks rally on strong earnings beat", tag: "NAS100", time: "1h ago" },
-                  { source: "Reuters", headline: "Fed minutes show divided views on rate path", tag: "USD", time: "2h ago" },
-                ].map((n, i) => (
-                  <div key={i} className="flex items-start gap-2 py-2" style={{ borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)", color: "#9ca3af" }}>
-                          {n.source}
-                        </span>
-                        <span className="text-[10px]" style={{ color: "#6b7280" }}>{n.time}</span>
-                      </div>
-                      <p className="text-xs truncate" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>{n.headline}</p>
-                    </div>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded flex-shrink-0"
-                      style={{ border: `1px solid ${TEAL}50`, color: TEAL }}>
-                      {n.tag}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <a href="#" className="block mt-3 text-xs hover:underline" style={{ color: TEAL }}>View all news →</a>
+              <NewsList symbols={symbols} />
             </DemoCard>
+
           </div>
         </main>
       </div>
