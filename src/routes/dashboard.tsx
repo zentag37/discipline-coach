@@ -82,11 +82,19 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const formatHeaderTime = (date: Date) =>
+  date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "UTC" });
+
+const formatWeekday = (date: Date) => date.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+
+const formatHeaderDate = (date: Date) =>
+  date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit", timeZone: "UTC" });
+
 function DashboardPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile>({});
   const [userId, setUserId] = useState<string | null>(null);
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [checks, setChecks] = useState([false, false, false, false, false]);
   const [showLog, setShowLog] = useState(false);
   const [trades, setTrades] = useState<any[]>([]);
@@ -159,6 +167,7 @@ function DashboardPage() {
   }, [userId]);
 
   useEffect(() => {
+    setNow(new Date());
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
@@ -285,7 +294,8 @@ function DashboardPage() {
     return m;
   }, [watchlistData]);
 
-  const session = getSessionStatus(now);
+  const displayNow = now ?? new Date(0);
+  const session = getSessionStatus(displayNow);
   const opensIn = !session.open ? nextLondonOpen(now) : null;
 
   const checkedCount = checks.filter(Boolean).length;
