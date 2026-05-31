@@ -604,3 +604,82 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
     </aside>
   );
 }
+
+function NewsList({ symbols }: { symbols: string[] }) {
+  const fetchNews = useServerFn(getMarketNews);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["market-news", symbols],
+    queryFn: () => fetchNews({ data: { symbols } }),
+    refetchInterval: 5 * 60_000,
+    staleTime: 5 * 60_000,
+    enabled: symbols.length > 0,
+  });
+
+  if (isLoading && !data) {
+    return (
+      <div className="space-y-3 mt-3">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="py-2 animate-pulse" style={{ borderTop: i ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-3 w-14 rounded" style={{ background: "rgba(255,255,255,0.06)" }} />
+              <div className="h-3 w-12 rounded" style={{ background: "rgba(255,255,255,0.04)" }} />
+            </div>
+            <div className="h-3 w-5/6 rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className="text-xs mt-3" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+        News feed unavailable — retrying shortly.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-1 mt-3">
+      {(data?.results ?? []).map((group) => (
+        <div key={group.symbol} className="pb-2">
+          {group.articles.length === 0 ? (
+            <div className="flex items-center gap-2 py-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+              <span className="text-[10px] px-1.5 py-0.5 rounded flex-shrink-0"
+                style={{ border: `1px solid ${TEAL}50`, color: TEAL }}>
+                {group.symbol}
+              </span>
+              <span className="text-xs" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                No recent news for this instrument
+              </span>
+            </div>
+          ) : (
+            group.articles.map((n, i) => (
+              <div key={`${group.symbol}-${i}`} className="flex items-start gap-2 py-2"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded"
+                      style={{ background: "rgba(255,255,255,0.05)", color: "#9ca3af" }}>
+                      {n.source}
+                    </span>
+                    <span className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_MONO }}>{n.timeAgo}</span>
+                  </div>
+                  <a href={n.url} target="_blank" rel="noopener noreferrer"
+                    className="text-xs hover:underline block truncate"
+                    style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>
+                    {n.headline}
+                  </a>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded flex-shrink-0"
+                  style={{ border: `1px solid ${TEAL}50`, color: TEAL }}>
+                  {group.symbol}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
