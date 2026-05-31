@@ -465,7 +465,7 @@ function DashboardPage() {
                   : `London session opens in ${opensIn}. Stay patient — wait for your setup.`}
               </p>
               <button
-                onClick={() => { navigator.clipboard.writeText(userId); }}
+                onClick={() => { if (userId) navigator.clipboard.writeText(userId); }}
                 className="mt-2 text-[11px] font-mono px-2 py-1 rounded border border-yellow-500/40 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20"
                 title="Click to copy"
               >
