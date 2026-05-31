@@ -191,10 +191,26 @@ function MarketIntelPage() {
             </div>
           </DemoCard>
 
+          {/* Status row */}
+          <div className="flex items-center justify-between text-[11px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+            <span>
+              {isError ? (
+                <span style={{ color: AMBER }}>Price data unavailable — retrying…</span>
+              ) : isLoading && !quotesData ? (
+                <span>Loading live market data…</span>
+              ) : secondsSinceUpdate !== null ? (
+                <>Updated {secondsSinceUpdate}s ago · refreshes every 60s</>
+              ) : null}
+            </span>
+            <span>Data: TwelveData</span>
+          </div>
+
           {/* Instrument cards */}
-          {visibleInstruments.map((ins) => (
-            <InstrumentCard key={ins.symbol} ins={ins} />
-          ))}
+          {isLoading && !quotesData
+            ? visibleMeta.map((m) => <InstrumentSkeleton key={m.symbol} symbol={m.symbol} />)
+            : visibleInstruments.map((ins) => (
+                <InstrumentCard key={ins.symbol} ins={ins} />
+              ))}
           {!unlocked && (
             <div className="p-6 rounded-[12px] flex flex-col items-center justify-center gap-3 text-center"
               style={{ background: "#141820", border: `1px dashed ${TEAL}60` }}>
