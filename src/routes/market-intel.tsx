@@ -363,7 +363,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
         </div>
         <div className="md:ml-auto flex items-center gap-3">
           <div className="text-2xl" style={{ color: TEAL }}>
-            {ins.price > 0 ? ins.price.toLocaleString(undefined, { maximumFractionDigits: 4 }) : "—"}
+            {ins.price > 0 ? fmt(ins.price, ins.decimals) : "—"}
           </div>
           {ins.price > 0 && (
             <span className="text-xs px-2 py-1 rounded"
