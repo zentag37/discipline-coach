@@ -152,13 +152,13 @@ function Hero() {
             enforces your rules, and shuts you down before you blow the day.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href="#download"
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition"
+            <button
+              onClick={onDownload}
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
             >
               <Download className="h-4 w-4" />
               Download Free
-            </a>
+            </button>
             <a
               href="#how"
               className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-sm font-mono text-foreground hover:bg-surface transition"
