@@ -270,6 +270,21 @@ function DashboardPage() {
     ? rawIns.split(",").map((s: string) => s.trim()).filter(Boolean)
     : ["EURUSD", "NAS100", "GOLD"];
 
+  const fetchQuotes = useServerFn(getLiveQuotes);
+  const watchlistSymbols = useMemo(() => instruments.map((s) => s.toUpperCase()), [instruments]);
+  const { data: watchlistData } = useQuery({
+    queryKey: ["live-quotes", watchlistSymbols],
+    queryFn: () => fetchQuotes({ data: { symbols: watchlistSymbols } }),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+    enabled: watchlistSymbols.length > 0,
+  });
+  const quoteMap = useMemo(() => {
+    const m = new Map<string, { price: number; change: number; decimals: number; error?: string }>();
+    watchlistData?.quotes?.forEach((q) => m.set(q.symbol, { price: q.price, change: q.change, decimals: q.decimals, error: q.error }));
+    return m;
+  }, [watchlistData]);
+
   const session = getSessionStatus(now);
   const opensIn = !session.open ? nextLondonOpen(now) : null;
 
