@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
+import * as React from "react";
 
 // --- Mocks ---
 const navigateMock = vi.fn();
@@ -61,7 +62,7 @@ beforeEach(() => {
 // Import after mocks
 const { Route } = await import("./pricing");
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PricingPage = (Route as any).component as () => JSX.Element;
+const PricingPage = (Route as any).component as () => React.ReactElement;
 
 const PLAN_BUTTONS = ["solo", "pro", "elite"] as const;
 
