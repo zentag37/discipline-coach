@@ -338,7 +338,7 @@ function DashboardPage() {
           <NavItem icon={<CalendarDays size={16} />} label="Today's Session" />
           <NavItem icon={<BookOpen size={16} />} label="Journal" />
           <NavItem icon={<Globe size={16} />} label="Market Intel" />
-          <NavItem icon={<Download size={16} />} label="Download App" />
+          <NavItem icon={<Download size={16} />} label="Download App" onClick={() => setDownloadOpen(true)} />
           <NavItem icon={<Settings size={16} />} label="Settings" />
         </nav>
 
