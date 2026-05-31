@@ -490,6 +490,7 @@ function Quotes() {
 }
 
 function DownloadSection() {
+  const onDownload = useDownloadClick();
   return (
     <section id="download">
       <Container className="py-20 md:py-28">
@@ -500,9 +501,9 @@ function DownloadSection() {
           </h2>
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-          <a
-            href="#"
-            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50"
+          <button
+            onClick={onDownload}
+            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
               <Monitor className="h-7 w-7 text-primary" />
@@ -512,10 +513,10 @@ function DownloadSection() {
               </div>
             </div>
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
-          </a>
-          <a
-            href="#"
-            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50"
+          </button>
+          <button
+            onClick={onDownload}
+            className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
               <Apple className="h-7 w-7 text-primary" />
@@ -525,7 +526,7 @@ function DownloadSection() {
               </div>
             </div>
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
-          </a>
+          </button>
         </div>
         <p className="mt-6 text-center font-mono text-xs text-muted-foreground">
           Free · No account needed · Open source
