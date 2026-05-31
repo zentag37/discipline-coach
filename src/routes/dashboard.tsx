@@ -52,8 +52,8 @@ type Profile = {
   voice_consent_decided?: boolean | null;
 };
 
-function getGreeting() {
-  const h = new Date().getHours();
+function getGreeting(date = new Date()) {
+  const h = date.getUTCHours();
   if (h < 12) return "Good morning";
   if (h < 18) return "Good afternoon";
   return "Good evening";
@@ -82,11 +82,19 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const formatHeaderTime = (date: Date) =>
+  date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "UTC" });
+
+const formatWeekday = (date: Date) => date.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+
+const formatHeaderDate = (date: Date) =>
+  date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit", timeZone: "UTC" });
+
 function DashboardPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile>({});
   const [userId, setUserId] = useState<string | null>(null);
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [checks, setChecks] = useState([false, false, false, false, false]);
   const [showLog, setShowLog] = useState(false);
   const [trades, setTrades] = useState<any[]>([]);
@@ -159,6 +167,7 @@ function DashboardPage() {
   }, [userId]);
 
   useEffect(() => {
+    setNow(new Date());
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
@@ -285,8 +294,9 @@ function DashboardPage() {
     return m;
   }, [watchlistData]);
 
-  const session = getSessionStatus(now);
-  const opensIn = !session.open ? nextLondonOpen(now) : null;
+  const displayNow = now ?? new Date(0);
+  const session = getSessionStatus(displayNow);
+  const opensIn = !session.open ? nextLondonOpen(displayNow) : null;
 
   const checkedCount = checks.filter(Boolean).length;
   const allChecked = checkedCount === 5;
@@ -418,7 +428,7 @@ function DashboardPage() {
           </h1>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-2">
-              <span style={{ color: "#9ca3af" }}>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+              <span style={{ color: "#9ca3af" }}>{formatHeaderTime(displayNow)}</span>
               <span className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: session.open ? "#22c55e" : "#ef4444" }} />
                 <span style={{ color: session.open ? "#22c55e" : "#ef4444" }}>{session.label}</span>
@@ -442,7 +452,7 @@ function DashboardPage() {
           <div className="flex flex-wrap items-start justify-between gap-4 animate-fade-in">
             <div>
               <h2 className="text-2xl tracking-tight" style={{ fontFamily: "Inter, sans-serif" }}>
-                {getGreeting()}, {firstName}.
+                {getGreeting(displayNow)}, {firstName}.
               </h2>
               <p className="text-sm mt-1" style={{ color: "#9ca3af" }}>
                 {session.open
@@ -451,8 +461,8 @@ function DashboardPage() {
               </p>
             </div>
             <div className="text-right text-xs" style={{ color: "#9ca3af" }}>
-              <div>{now.toLocaleDateString([], { weekday: "long" })}</div>
-              <div>{now.toLocaleDateString([], { year: "numeric", month: "short", day: "2-digit" })}</div>
+              <div>{formatWeekday(displayNow)}</div>
+              <div>{formatHeaderDate(displayNow)}</div>
             </div>
           </div>
 

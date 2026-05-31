@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { ACE_SYSTEM_CHAT, buildTraderContext } from "@/lib/ace.server";
-
-const MODEL = "claude-sonnet-4-5";
+import { ACE_SYSTEM_CHAT, CLAUDE_MODEL, buildTraderContext } from "@/lib/ace.server";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -49,7 +47,7 @@ export const Route = createFileRoute("/api/ace-chat")({
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            model: MODEL,
+            model: CLAUDE_MODEL,
             max_tokens: 400,
             stream: true,
             system,

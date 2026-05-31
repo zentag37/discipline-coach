@@ -1,5 +1,5 @@
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-sonnet-4-5";
+export const CLAUDE_MODEL = "claude-sonnet-4-6";
 
 export async function callClaude({
   system,
@@ -20,7 +20,7 @@ export async function callClaude({
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: CLAUDE_MODEL,
       max_tokens: maxTokens,
       system,
       messages: [{ role: "user", content: user }],
