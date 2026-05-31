@@ -126,7 +126,7 @@ function Logo() {
       <div className="grid h-6 w-6 place-items-center rounded-sm border border-primary/40 bg-primary/10">
         <div className="h-2 w-2 rounded-[1px] bg-primary" />
       </div>
-      <span className="font-mono text-sm tracking-tight">floatline</span>
+      <span className="font-mono text-sm tracking-tight">Trader Coach</span>
     </div>
   );
 }
