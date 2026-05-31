@@ -7,7 +7,7 @@ function useDownloadClick() {
   return async () => {
     const { data } = await supabase.auth.getSession();
     if (data.session) {
-      navigate({ to: "/dashboard", search: { download: "1" } as any });
+      navigate({ to: "/dashboard" });
     } else {
       navigate({ to: "/register" });
     }
@@ -97,7 +97,7 @@ function Container({ children, className = "" }: { children: React.ReactNode; cl
 }
 
 function Nav() {
-  const onDownload = useDownloadClick();
+  const navigate = useNavigate();
   return (
     <header className="border-b border-border">
       <Container className="flex h-14 items-center justify-between">
@@ -109,7 +109,7 @@ function Nav() {
           <a href="/pricing" className="hover:text-foreground transition-colors">/pricing</a>
         </nav>
         <button
-          onClick={onDownload}
+          onClick={() => navigate({ to: "/register" })}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
         >
           <Download className="h-3.5 w-3.5" />
@@ -126,7 +126,7 @@ function Logo() {
       <div className="grid h-6 w-6 place-items-center rounded-sm border border-primary/40 bg-primary/10">
         <div className="h-2 w-2 rounded-[1px] bg-primary" />
       </div>
-      <span className="font-mono text-sm tracking-tight">floatline</span>
+      <span className="font-mono text-sm tracking-tight">Trader Coach</span>
     </div>
   );
 }
@@ -160,7 +160,7 @@ function Hero() {
               Download Free
             </button>
             <a
-              href="#how"
+              href="#features"
               className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-sm font-mono text-foreground hover:bg-surface transition"
             >
               <PlayCircle className="h-4 w-4" />
