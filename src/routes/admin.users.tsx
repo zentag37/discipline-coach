@@ -182,7 +182,7 @@ function UserDetailPanel({ userId, onClose }: { userId: string; onClose: () => v
               </div>
 
               <div className="text-xs space-y-1.5" style={{ color: "#9ca3af" }}>
-                <div>Status: <StatusPill status={data.profile?.subscription_status} /></div>
+                <div>Status: <StatusPill status={data.profile?.subscription_status ?? undefined} /></div>
                 <div>Account size: {data.profile?.account_size || "—"}</div>
                 <div>Risk/trade: {data.profile?.risk_per_trade ?? "—"}%</div>
                 <div>Max trades: {data.profile?.max_trades ?? "—"}</div>
