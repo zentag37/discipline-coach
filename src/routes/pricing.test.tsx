@@ -75,26 +75,23 @@ describe("Pricing CTAs", () => {
     getSessionMock.mockResolvedValue({ data: { session: null } });
     renderPage();
 
-    const buttons = screen.getAllByRole("button", { name: /start free trial/i });
-    expect(buttons).toHaveLength(3);
+  it.each(PLAN_BUTTONS.map((p, i) => [p, i] as const))(
+    "redirects %s CTA to /register when logged out",
+    async (plan, idx) => {
+      getSessionMock.mockResolvedValue({ data: { session: null } });
+      renderPage();
+      const btn = screen.getAllByRole("button", {
+        name: /start free trial/i,
+      })[idx];
+      await userEvent.setup().click(btn);
 
-    const user = userEvent.setup();
-    for (let i = 0; i < buttons.length; i++) {
-      // Re-query because state changes re-render
-      const btn = screen.getAllByRole("button", { name: /start free trial/i })[i];
-      await user.click(btn);
-    }
-
-    expect(checkoutMock).not.toHaveBeenCalled();
-    expect(navigateMock).toHaveBeenCalledTimes(3);
-    for (const call of navigateMock.mock.calls) {
-      expect(call[0].to).toBe("/register");
-    }
-    // pendingPlan recorded for post-register resume
-    expect(sessionStorage.getItem("pendingPlan")).toBe(
-      PLAN_BUTTONS[PLAN_BUTTONS.length - 1],
-    );
-  });
+      expect(checkoutMock).not.toHaveBeenCalled();
+      expect(navigateMock).toHaveBeenCalledWith(
+        expect.objectContaining({ to: "/register" }),
+      );
+      expect(sessionStorage.getItem("pendingPlan")).toBe(plan);
+    },
+  );
 
   it.each(PLAN_BUTTONS.map((p, i) => [p, i] as const))(
     "routes %s CTA to Stripe checkout when logged in",
