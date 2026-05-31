@@ -442,6 +442,36 @@ function DemoPill() {
   );
 }
 
+function LivePill({ live, error }: { live: boolean; error?: string }) {
+  if (error) {
+    return (
+      <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10"
+        title={error}
+        style={{ background: "rgba(239,68,68,0.12)", color: RED, border: "1px solid rgba(239,68,68,0.3)" }}>
+        OFFLINE
+      </span>
+    );
+  }
+  if (!live) {
+    return (
+      <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10"
+        style={{ background: "rgba(156,163,175,0.12)", color: "#9ca3af", border: "1px solid rgba(156,163,175,0.3)" }}>
+        LOADING…
+      </span>
+    );
+  }
+  return (
+    <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10 flex items-center gap-1"
+      style={{ background: "rgba(34,197,94,0.12)", color: GREEN, border: "1px solid rgba(34,197,94,0.3)" }}>
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: GREEN }} />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: GREEN }} />
+      </span>
+      LIVE
+    </span>
+  );
+}
+
 function getSessionStatus(now: Date) {
   const h = now.getUTCHours();
   if (h >= 7 && h < 16) return { label: "London Session Open", open: true };
