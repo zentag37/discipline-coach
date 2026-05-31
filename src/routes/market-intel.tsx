@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings, Bell,
 } from "lucide-react";
@@ -7,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
+import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — Trader Coach" }] }),
