@@ -464,6 +464,13 @@ function DashboardPage() {
                   ? `${session.label}. Stay focused — trade your plan.`
                   : `London session opens in ${opensIn}. Stay patient — wait for your setup.`}
               </p>
+              <button
+                onClick={() => { navigator.clipboard.writeText(userId); }}
+                className="mt-2 text-[11px] font-mono px-2 py-1 rounded border border-yellow-500/40 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20"
+                title="Click to copy"
+              >
+                DEBUG User ID: {userId} (click to copy)
+              </button>
             </div>
             <div className="text-right text-xs" style={{ color: "#9ca3af" }}>
               <div>{formatWeekday(displayNow)}</div>
