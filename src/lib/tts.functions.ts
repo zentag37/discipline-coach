@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 
 const VOICE_IDS: Record<string, string> = {
   marcus: 'pNInz6obpgDQGcFmaJgB',
