@@ -190,6 +190,7 @@ async function buildQuote(
 
 // ---------- exported server function ----------
 export const getLiveQuotes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: { symbols: string[] }) => ({
     symbols: (data.symbols || []).map((s) => s.toUpperCase().trim()).filter(Boolean).slice(0, 10),
   }))
