@@ -254,7 +254,7 @@ export const getAceSignals = createServerFn({ method: "POST" })
 
 export const updateSignalStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string; followed?: boolean; status?: string; outcome?: string }) => data)
+  .inputValidator((data: unknown) => updateSignalStatusSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const patch: { followed?: boolean; status?: string; outcome?: string } = {};
