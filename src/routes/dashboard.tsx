@@ -22,6 +22,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { marked } from "marked";
 import { getLiveQuotes } from "@/lib/market.functions";
 import { getAceSignals } from "@/lib/signals.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
@@ -31,16 +32,9 @@ import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
-function renderInlineMarkdown(src: string): string {
-  const esc = src
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  return esc
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\n/g, "<br />");
+marked.setOptions({ breaks: true, gfm: true });
+function renderMarkdown(src: string): string {
+  return marked.parse(src, { async: false }) as string;
 }
 
 export const Route = createFileRoute("/dashboard")({
@@ -538,7 +532,7 @@ function DashboardPage() {
                       ACE is thinking... tap to retry
                     </button>
                   ) : aceMsg ? (
-                    <span dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(aceMsg) }} />
+                    <span className="ace-md" dangerouslySetInnerHTML={{ __html: renderMarkdown(aceMsg) }} />
                   ) : (
                     `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
                   )}
@@ -821,13 +815,26 @@ function DashboardPage() {
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 h-14 flex items-center justify-around z-30"
-        style={{ background: "#141820", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        className="md:hidden fixed bottom-0 inset-x-0 flex items-stretch justify-around z-40"
+        style={{ background: "#141820", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {[LayoutDashboard, CalendarDays, BookOpen, Globe, Settings].map((Icon, i) => (
-          <button key={i} className="p-2" style={{ color: i === 0 ? TEAL : "#6b7280" }}>
-            <Icon size={18} />
-          </button>
+        {[
+          { to: "/dashboard", Icon: LayoutDashboard, label: "Home" },
+          { to: "/journal", Icon: BookOpen, label: "Journal" },
+          { to: "/signals", Icon: Radio, label: "Signals" },
+          { to: "/market-intel", Icon: Globe, label: "Market" },
+          { to: "/settings", Icon: Settings, label: "Settings" },
+        ].map(({ to, Icon, label }) => (
+          <Link
+            key={to}
+            to={to}
+            className="flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[56px] active:bg-white/5"
+            activeProps={{ style: { color: TEAL } }}
+            inactiveProps={{ style: { color: "#6b7280" } }}
+          >
+            <Icon size={20} />
+            <span className="text-[10px] leading-none">{label}</span>
+          </Link>
         ))}
       </nav>
 
