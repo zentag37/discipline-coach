@@ -815,13 +815,26 @@ function DashboardPage() {
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 h-14 flex items-center justify-around z-30"
-        style={{ background: "#141820", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        className="md:hidden fixed bottom-0 inset-x-0 flex items-stretch justify-around z-40"
+        style={{ background: "#141820", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {[LayoutDashboard, CalendarDays, BookOpen, Globe, Settings].map((Icon, i) => (
-          <button key={i} className="p-2" style={{ color: i === 0 ? TEAL : "#6b7280" }}>
-            <Icon size={18} />
-          </button>
+        {[
+          { to: "/dashboard", Icon: LayoutDashboard, label: "Home" },
+          { to: "/journal", Icon: BookOpen, label: "Journal" },
+          { to: "/signals", Icon: Radio, label: "Signals" },
+          { to: "/market-intel", Icon: Globe, label: "Market" },
+          { to: "/settings", Icon: Settings, label: "Settings" },
+        ].map(({ to, Icon, label }) => (
+          <Link
+            key={to}
+            to={to}
+            className="flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[56px] active:bg-white/5"
+            activeProps={{ style: { color: TEAL } }}
+            inactiveProps={{ style: { color: "#6b7280" } }}
+          >
+            <Icon size={20} />
+            <span className="text-[10px] leading-none">{label}</span>
+          </Link>
         ))}
       </nav>
 
