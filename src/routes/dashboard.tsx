@@ -627,6 +627,42 @@ function DashboardPage() {
             </div>
           </div>
 
+          {/* ACE Signals strip */}
+          {aceUnlocked && (
+            <div
+              className="px-4 py-3 rounded-[10px] flex items-center justify-between gap-3 flex-wrap animate-fade-in"
+              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}
+            >
+              <div className="flex items-center gap-3 text-xs" style={{ fontFamily: "Inter, sans-serif" }}>
+                <Radio size={14} style={{ color: TEAL }} />
+                <span className="tracking-widest text-[10px]" style={{ color: TEAL }}>ACE SIGNALS</span>
+                <span style={{ color: "#6b7280" }}>•</span>
+                {activeSignals.length === 0 ? (
+                  <span style={{ color: "#9ca3af" }}>No signals right now</span>
+                ) : (
+                  <>
+                    <span style={{ color: "#9ca3af" }}>
+                      {activeSignals.length} signal{activeSignals.length === 1 ? "" : "s"} active
+                    </span>
+                    <span style={{ color: "#6b7280" }}>•</span>
+                    <div className="flex items-center gap-3">
+                      {activeSignals.slice(0, 3).map((s) => (
+                        <span key={s.id} className="flex items-center gap-1" style={{ color: "#e6e8eb" }}>
+                          <span>{s.direction === "BUY" ? "🟢" : "🔴"}</span>
+                          <span className="font-medium">{s.instrument}</span>
+                          <span style={{ color: s.direction === "BUY" ? TEAL : "#ef4444" }}>{s.direction}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              <Link to="/signals" className="text-xs hover:underline" style={{ color: TEAL, fontFamily: "Inter, sans-serif" }}>
+                View all →
+              </Link>
+            </div>
+          )}
+
           {/* Row 4 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in">
             <div
