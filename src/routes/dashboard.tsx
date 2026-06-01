@@ -17,11 +17,13 @@ import {
   Volume2,
   VolumeX,
   Lock,
+  Radio,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getLiveQuotes } from "@/lib/market.functions";
+import { getAceSignals } from "@/lib/signals.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
@@ -295,6 +297,17 @@ function DashboardPage() {
     return m;
   }, [watchlistData]);
 
+  // ACE Signals strip
+  const fetchAceSignals = useServerFn(getAceSignals);
+  const { data: signalsData } = useQuery({
+    queryKey: ["ace-signals-strip", watchlistSymbols],
+    queryFn: () => fetchAceSignals({ data: { symbols: watchlistSymbols } }),
+    refetchInterval: 15 * 60 * 1000,
+    staleTime: 60_000,
+    enabled: !!userId && watchlistSymbols.length > 0 && aceUnlocked,
+  });
+  const activeSignals = signalsData?.signals || [];
+
   const displayNow = now ?? new Date(0);
   const session = getSessionStatus(displayNow);
   const opensIn = !session.open ? nextLondonOpen(displayNow) : null;
@@ -381,10 +394,11 @@ function DashboardPage() {
         <nav className="flex-1 px-2 space-y-0.5">
           <NavItem icon={<LayoutDashboard size={16} />} label="Dashboard" active />
           <NavItem icon={<CalendarDays size={16} />} label="Today's Session" />
-          <NavItem icon={<BookOpen size={16} />} label="Journal" />
-          <NavItem icon={<Globe size={16} />} label="Market Intel" />
+          <NavItem icon={<BookOpen size={16} />} label="Journal" onClick={() => navigate({ to: "/journal" })} />
+          <NavItem icon={<Globe size={16} />} label="Market Intel" onClick={() => navigate({ to: "/market-intel" })} />
+          <NavItem icon={<Radio size={16} />} label="Signals" onClick={() => navigate({ to: "/signals" })} />
           <NavItem icon={<Download size={16} />} label="Download App" onClick={() => setDownloadOpen(true)} />
-          <NavItem icon={<Settings size={16} />} label="Settings" />
+          <NavItem icon={<Settings size={16} />} label="Settings" onClick={() => navigate({ to: "/settings" })} />
         </nav>
 
         <div className="p-3 space-y-3">
@@ -612,6 +626,42 @@ function DashboardPage() {
               )}
             </div>
           </div>
+
+          {/* ACE Signals strip */}
+          {aceUnlocked && (
+            <div
+              className="px-4 py-3 rounded-[10px] flex items-center justify-between gap-3 flex-wrap animate-fade-in"
+              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}
+            >
+              <div className="flex items-center gap-3 text-xs" style={{ fontFamily: "Inter, sans-serif" }}>
+                <Radio size={14} style={{ color: TEAL }} />
+                <span className="tracking-widest text-[10px]" style={{ color: TEAL }}>ACE SIGNALS</span>
+                <span style={{ color: "#6b7280" }}>•</span>
+                {activeSignals.length === 0 ? (
+                  <span style={{ color: "#9ca3af" }}>No signals right now</span>
+                ) : (
+                  <>
+                    <span style={{ color: "#9ca3af" }}>
+                      {activeSignals.length} signal{activeSignals.length === 1 ? "" : "s"} active
+                    </span>
+                    <span style={{ color: "#6b7280" }}>•</span>
+                    <div className="flex items-center gap-3">
+                      {activeSignals.slice(0, 3).map((s) => (
+                        <span key={s.id} className="flex items-center gap-1" style={{ color: "#e6e8eb" }}>
+                          <span>{s.direction === "BUY" ? "🟢" : "🔴"}</span>
+                          <span className="font-medium">{s.instrument}</span>
+                          <span style={{ color: s.direction === "BUY" ? TEAL : "#ef4444" }}>{s.direction}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              <Link to="/signals" className="text-xs hover:underline" style={{ color: TEAL, fontFamily: "Inter, sans-serif" }}>
+                View all →
+              </Link>
+            </div>
+          )}
 
           {/* Row 4 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in">

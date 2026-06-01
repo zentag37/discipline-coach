@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings, Bell,
+  LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings, Bell, Radio,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
@@ -550,8 +550,9 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
     { icon: CalendarDays, label: "Today's Session", to: "#" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
+    { icon: Radio, label: "Signals", to: "/signals" },
     { icon: Download, label: "Download App", to: "#" },
-    { icon: Settings, label: "Settings", to: "#" },
+    { icon: Settings, label: "Settings", to: "/settings" },
   ];
   return (
     <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 w-[220px] z-20"
