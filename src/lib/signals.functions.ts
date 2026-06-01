@@ -1,5 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const updateSignalStatusSchema = z.object({
+  id: z.string().uuid(),
+  followed: z.boolean().optional(),
+  status: z.enum(["active", "dismissed", "expired", "hit_target", "hit_stop"]).optional(),
+  outcome: z.enum(["win", "loss", "break_even", "missed"]).optional(),
+});
 
 const BASE_URL = "https://api.twelvedata.com";
 
