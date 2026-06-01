@@ -304,7 +304,7 @@ function DashboardPage() {
     queryFn: () => fetchAceSignals({ data: { symbols: watchlistSymbols } }),
     refetchInterval: 15 * 60 * 1000,
     staleTime: 60_000,
-    enabled: !!userId && watchlistSymbols.length > 0 && aceUnlockedEarly(profile),
+    enabled: !!userId && watchlistSymbols.length > 0 && aceUnlocked,
   });
   const activeSignals = signalsData?.signals || [];
 
