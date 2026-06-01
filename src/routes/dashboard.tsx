@@ -436,6 +436,20 @@ function DashboardPage() {
               </>
             )}
           </button>
+          <button
+            onClick={() => {
+              speakAsACE(
+                `Hey ${firstName || "trader"}, this is a voice test. If you can hear me, audio is working.`,
+                profile.voice_style || "marcus",
+              ).catch((e) => console.error("[dashboard] test voice failed:", e));
+            }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs w-full transition-colors hover:bg-white/5"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "#9ca3af" }}
+            title="Play a test voice message"
+          >
+            <Volume2 size={12} />
+            <span>Test voice</span>
+          </button>
 
           <SidebarUserMenu initials={initials} firstName={firstName} />
         </div>
