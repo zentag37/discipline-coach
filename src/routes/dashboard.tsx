@@ -31,6 +31,18 @@ import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
+function renderInlineMarkdown(src: string): string {
+  const esc = src
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return esc
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\n/g, "<br />");
+}
+
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [{ title: "Dashboard — Trader Coach" }],
@@ -526,7 +538,7 @@ function DashboardPage() {
                       ACE is thinking... tap to retry
                     </button>
                   ) : aceMsg ? (
-                    aceMsg
+                    <span dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(aceMsg) }} />
                   ) : (
                     `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
                   )}
