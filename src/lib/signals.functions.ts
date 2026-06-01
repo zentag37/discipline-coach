@@ -1,5 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const updateSignalStatusSchema = z.object({
+  id: z.string().uuid(),
+  followed: z.boolean().optional(),
+  status: z.enum(["active", "dismissed", "expired", "hit_target", "hit_stop"]).optional(),
+  outcome: z.enum(["win", "loss", "break_even", "missed"]).optional(),
+});
 
 const BASE_URL = "https://api.twelvedata.com";
 
@@ -246,7 +254,7 @@ export const getAceSignals = createServerFn({ method: "POST" })
 
 export const updateSignalStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string; followed?: boolean; status?: string; outcome?: string }) => data)
+  .inputValidator((data: unknown) => updateSignalStatusSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const patch: { followed?: boolean; status?: string; outcome?: string } = {};

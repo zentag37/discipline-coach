@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type NewsArticle = {
   headline: string;
@@ -141,6 +142,7 @@ async function fetchForSymbol(symbol: string): Promise<NewsArticle[]> {
 }
 
 export const getMarketNews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z.object({ symbols: z.array(z.string().min(1).max(20)).min(1).max(20) }).parse(input),
   )

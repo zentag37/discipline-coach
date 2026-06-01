@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 
 const VOICE_IDS: Record<string, string> = {
   marcus: 'pNInz6obpgDQGcFmaJgB',
@@ -14,6 +15,7 @@ const schema = z.object({
 });
 
 export const synthesizeSpeech = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => schema.parse(input))
   .handler(async ({ data }) => {
     const apiKey = process.env.ELEVENLABS_API_KEY;
