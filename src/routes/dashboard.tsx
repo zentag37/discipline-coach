@@ -815,7 +815,7 @@ function DashboardPage() {
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 flex items-stretch justify-around z-40"
+        className="md:hidden fixed bottom-0 left-0 right-0 grid grid-cols-5 z-[60]"
         style={{ background: "#141820", borderTop: "1px solid rgba(255,255,255,0.08)", paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {[
@@ -824,18 +824,22 @@ function DashboardPage() {
           { to: "/signals", Icon: Radio, label: "Signals" },
           { to: "/market-intel", Icon: Globe, label: "Market" },
           { to: "/settings", Icon: Settings, label: "Settings" },
-        ].map(({ to, Icon, label }) => (
-          <Link
-            key={to}
-            to={to}
-            className="flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[56px] active:bg-white/5"
-            activeProps={{ style: { color: TEAL } }}
-            inactiveProps={{ style: { color: "#6b7280" } }}
-          >
-            <Icon size={20} />
-            <span className="text-[10px] leading-none">{label}</span>
-          </Link>
-        ))}
+        ].map(({ to, Icon, label }) => {
+          const active = typeof window !== "undefined" && window.location.pathname === to;
+          return (
+            <button
+              key={to}
+              type="button"
+              onClick={() => navigate({ to })}
+              className="flex flex-col items-center justify-center gap-1 min-w-[78px] min-h-[56px] active:bg-white/10 cursor-pointer select-none"
+              style={{ color: active ? TEAL : "#6b7280", background: "transparent", border: "none", touchAction: "manipulation" }}
+              aria-label={label}
+            >
+              <Icon size={20} />
+              <span className="text-[10px] leading-none">{label}</span>
+            </button>
+          );
+        })}
       </nav>
 
       {showLog && (
