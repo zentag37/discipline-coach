@@ -22,6 +22,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { marked } from "marked";
 import { getLiveQuotes } from "@/lib/market.functions";
 import { getAceSignals } from "@/lib/signals.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
@@ -31,16 +32,9 @@ import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
-function renderInlineMarkdown(src: string): string {
-  const esc = src
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  return esc
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\n/g, "<br />");
+marked.setOptions({ breaks: true, gfm: true });
+function renderMarkdown(src: string): string {
+  return marked.parse(src, { async: false }) as string;
 }
 
 export const Route = createFileRoute("/dashboard")({
