@@ -297,6 +297,17 @@ function DashboardPage() {
     return m;
   }, [watchlistData]);
 
+  // ACE Signals strip
+  const fetchAceSignals = useServerFn(getAceSignals);
+  const { data: signalsData } = useQuery({
+    queryKey: ["ace-signals-strip", watchlistSymbols],
+    queryFn: () => fetchAceSignals({ data: { symbols: watchlistSymbols } }),
+    refetchInterval: 15 * 60 * 1000,
+    staleTime: 60_000,
+    enabled: !!userId && watchlistSymbols.length > 0 && aceUnlockedEarly(profile),
+  });
+  const activeSignals = signalsData?.signals || [];
+
   const displayNow = now ?? new Date(0);
   const session = getSessionStatus(displayNow);
   const opensIn = !session.open ? nextLondonOpen(displayNow) : null;
