@@ -532,7 +532,7 @@ function DashboardPage() {
                       ACE is thinking... tap to retry
                     </button>
                   ) : aceMsg ? (
-                    <span dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(aceMsg) }} />
+                    <span className="ace-md" dangerouslySetInnerHTML={{ __html: renderMarkdown(aceMsg) }} />
                   ) : (
                     `Good ${getGreeting().split(" ")[1]} ${firstName}. Loading your coaching message...`
                   )}
