@@ -381,10 +381,11 @@ function DashboardPage() {
         <nav className="flex-1 px-2 space-y-0.5">
           <NavItem icon={<LayoutDashboard size={16} />} label="Dashboard" active />
           <NavItem icon={<CalendarDays size={16} />} label="Today's Session" />
-          <NavItem icon={<BookOpen size={16} />} label="Journal" />
-          <NavItem icon={<Globe size={16} />} label="Market Intel" />
+          <NavItem icon={<BookOpen size={16} />} label="Journal" onClick={() => navigate({ to: "/journal" })} />
+          <NavItem icon={<Globe size={16} />} label="Market Intel" onClick={() => navigate({ to: "/market-intel" })} />
+          <NavItem icon={<Radio size={16} />} label="Signals" onClick={() => navigate({ to: "/signals" })} />
           <NavItem icon={<Download size={16} />} label="Download App" onClick={() => setDownloadOpen(true)} />
-          <NavItem icon={<Settings size={16} />} label="Settings" />
+          <NavItem icon={<Settings size={16} />} label="Settings" onClick={() => navigate({ to: "/settings" })} />
         </nav>
 
         <div className="p-3 space-y-3">
