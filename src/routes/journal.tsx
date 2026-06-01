@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { aceWeeklyReview, getLatestWeeklyReview } from "@/lib/ace.functions";
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
+import { Lock, Radio } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
@@ -497,9 +497,10 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
     { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
     { icon: CalendarDays, label: "Today's Session", to: "#" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
-    { icon: Globe, label: "Market Intel", to: "#" },
+    { icon: Globe, label: "Market Intel", to: "/market-intel" },
+    { icon: Radio, label: "Signals", to: "/signals" },
     { icon: Download, label: "Download App", to: "#" },
-    { icon: Settings, label: "Settings", to: "#" },
+    { icon: Settings, label: "Settings", to: "/settings" },
   ];
   return (
     <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 w-[220px] z-20"
