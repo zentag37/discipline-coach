@@ -142,6 +142,7 @@ async function fetchForSymbol(symbol: string): Promise<NewsArticle[]> {
 }
 
 export const getMarketNews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z.object({ symbols: z.array(z.string().min(1).max(20)).min(1).max(20) }).parse(input),
   )
