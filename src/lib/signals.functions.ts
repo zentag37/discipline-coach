@@ -249,7 +249,7 @@ export const updateSignalStatus = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string; followed?: boolean; status?: string; outcome?: string }) => data)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch: Record<string, unknown> = {};
+    const patch: { followed?: boolean; status?: string; outcome?: string } = {};
     if (data.followed !== undefined) patch.followed = data.followed;
     if (data.status) patch.status = data.status;
     if (data.outcome) patch.outcome = data.outcome;
