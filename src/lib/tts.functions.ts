@@ -15,6 +15,7 @@ const schema = z.object({
 });
 
 export const synthesizeSpeech = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => schema.parse(input))
   .handler(async ({ data }) => {
     const apiKey = process.env.ELEVENLABS_API_KEY;
