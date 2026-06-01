@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings as SettingsIcon,
-  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square,
+  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square, Radio,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -740,6 +740,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
     { icon: CalendarDays, label: "Today's Session", to: "#" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
+    { icon: Radio, label: "Signals", to: "/signals" },
     { icon: Download, label: "Download App", to: "#" },
     { icon: SettingsIcon, label: "Settings", to: "/settings" },
   ];
