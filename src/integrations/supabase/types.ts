@@ -307,6 +307,66 @@ export type Database = {
         }
         Relationships: []
       }
+      signals: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          direction: string
+          entry_price: number | null
+          followed: boolean
+          id: string
+          instrument: string
+          outcome: string | null
+          reasons: string[] | null
+          rr: number | null
+          rsi: number | null
+          status: string
+          stop_loss: number | null
+          target1: number | null
+          target2: number | null
+          timeframe: string | null
+          user_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          direction: string
+          entry_price?: number | null
+          followed?: boolean
+          id?: string
+          instrument: string
+          outcome?: string | null
+          reasons?: string[] | null
+          rr?: number | null
+          rsi?: number | null
+          status?: string
+          stop_loss?: number | null
+          target1?: number | null
+          target2?: number | null
+          timeframe?: string | null
+          user_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          direction?: string
+          entry_price?: number | null
+          followed?: boolean
+          id?: string
+          instrument?: string
+          outcome?: string | null
+          reasons?: string[] | null
+          rr?: number | null
+          rsi?: number | null
+          status?: string
+          stop_loss?: number | null
+          target1?: number | null
+          target2?: number | null
+          timeframe?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       trades: {
         Row: {
           ace_note: string | null
