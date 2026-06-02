@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalsRouteImport } from './routes/signals'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -33,6 +34,11 @@ import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AdminAceRouteImport } from './routes/admin.ace'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignalsRoute = SignalsRouteImport.update({
   id: '/signals',
   path: '/signals',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/signals': typeof SignalsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/ace': typeof AdminAceRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/feedback': typeof AdminFeedbackRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/signals': typeof SignalsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/ace': typeof AdminAceRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/feedback': typeof AdminFeedbackRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/signals': typeof SignalsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/ace': typeof AdminAceRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/feedback': typeof AdminFeedbackRoute
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/signals'
+    | '/sitemap.xml'
     | '/admin/ace'
     | '/admin/activity'
     | '/admin/feedback'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/signals'
+    | '/sitemap.xml'
     | '/admin/ace'
     | '/admin/activity'
     | '/admin/feedback'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/signals'
+    | '/sitemap.xml'
     | '/admin/ace'
     | '/admin/activity'
     | '/admin/feedback'
@@ -316,12 +328,20 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   SignalsRoute: typeof SignalsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiAceChatRoute: typeof ApiAceChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signals': {
       id: '/signals'
       path: '/signals'
@@ -523,6 +543,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   SignalsRoute: SignalsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiAceChatRoute: ApiAceChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }

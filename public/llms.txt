@@ -1,0 +1,10 @@
+# Trade with ACE
+
+> Trade with ACE is a floating desktop discipline coach for day traders and prop firm traders. It sits over your trading platform with a pre-trade checklist, trade counter, risk guardrails, and an AI mentor.
+
+## Pages
+
+- [Home](/): Product overview, features, and download for Windows & Mac.
+- [Pricing](/pricing): Free and paid plans with feature comparison.
+- [Sign up](/register): Create an account to download the app.
+- [Log in](/login): Existing user sign-in.
