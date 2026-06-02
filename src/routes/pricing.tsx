@@ -8,18 +8,20 @@ import { createCheckout, type PlanKey } from "@/lib/checkout.functions";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Trader Coach Pro" },
+      { title: "Pricing — Trade with ACE" },
       {
         name: "description",
         content:
-          "One flat price for your AI trading mentor. Solo, Pro and Elite plans. 7-day free trial. Cancel anytime.",
+          "Trade with ACE pricing: Solo, Pro and Elite plans for your AI trading mentor. 7-day free trial. Cancel anytime.",
       },
-      { property: "og:title", content: "Pricing — Trader Coach Pro" },
+      { property: "og:title", content: "Pricing — Trade with ACE" },
       {
         property: "og:description",
         content: "The discipline system 95% of traders never had. From €19/mo.",
       },
+      { property: "og:url", content: "https://tradewithace.com/pricing" },
     ],
+    links: [{ rel: "canonical", href: "https://tradewithace.com/pricing" }],
   }),
   component: PricingPage,
 });

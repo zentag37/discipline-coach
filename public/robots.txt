@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /journal
+Disallow: /settings
+Disallow: /onboarding
+Disallow: /market-intel
+Disallow: /signals
+Disallow: /reset-password
+Disallow: /api/
+
+Sitemap: https://tradewithace.com/sitemap.xml

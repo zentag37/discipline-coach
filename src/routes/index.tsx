@@ -34,19 +34,37 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Floatline — Trade with discipline. Every session." },
+      { title: "Trade with ACE — Trade with discipline. Every session." },
       {
         name: "description",
         content:
-          "A floating discipline coach that sits over your trading platform. Pre-trade checklist, trade counter, risk reminders. Free, open source, Windows & Mac.",
+          "Trade with ACE is a floating discipline coach that sits over your trading platform. Pre-trade checklist, trade counter, risk reminders, AI mentor. Free, Windows & Mac.",
       },
-      { property: "og:title", content: "Floatline — Trade with discipline" },
+      { property: "og:title", content: "Trade with ACE — Trade with discipline" },
       {
         property: "og:description",
         content:
           "An always-on-top window that keeps day traders, prop firm traders and forex traders disciplined.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://tradewithace.com/" },
+    ],
+    links: [{ rel: "canonical", href: "https://tradewithace.com/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Trade with ACE",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Windows, macOS",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          url: "https://tradewithace.com/",
+          description:
+            "Floating desktop discipline coach for day traders: pre-trade checklist, trade counter, risk guardrails, AI mentor.",
+        }),
+      },
     ],
   }),
   component: Index,
