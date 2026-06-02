@@ -84,6 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "A floating desktop coach that keeps day traders and prop firm traders disciplined. Checklists, trade counter, AI mentor." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://tradewithace.com/" },
+      { name: "google-site-verification", content: "mFpYYHls_ko46yCy-pzSTi-LrfSBYSxYHpK4C3IHlow" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Trade with ACE — Discipline coach for day traders" },
       { name: "twitter:description", content: "Floating desktop coach for day traders. Checklists, trade counter, AI mentor." },
