@@ -155,7 +155,8 @@ function Logo() {
 }
 
 function Hero() {
-  const onDownload = useDownloadClick();
+  const isMac = typeof navigator !== "undefined" && /mac/i.test(navigator.platform || navigator.userAgent || "");
+  const heroHref = isMac ? DOWNLOAD_MAC : DOWNLOAD_WIN;
   return (
     <section className="relative">
       <Container className="grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:gap-10">
@@ -175,13 +176,15 @@ function Hero() {
             enforces your rules, and shuts you down before you blow the day.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <button
-              onClick={onDownload}
+            <a
+              href={heroHref}
+              download
+              onClick={() => trackDownload(isMac ? "mac" : "windows")}
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
             >
               <Download className="h-4 w-4" />
               Download Free
-            </button>
+            </a>
             <a
               href="#features"
               className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-sm font-mono text-foreground hover:bg-surface transition"
@@ -190,6 +193,7 @@ function Hero() {
               See how it works
             </a>
           </div>
+
           <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">
             <Stat label="traders" value="12k+" />
             <Stat label="trades coached" value="2.1M" />
@@ -524,7 +528,7 @@ function DownloadSection() {
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
           <a
-            href={DOWNLOAD_WIN} onClick={() => trackDownload("windows")}
+            href={DOWNLOAD_WIN} download onClick={() => trackDownload("windows")}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
@@ -537,7 +541,7 @@ function DownloadSection() {
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
           </a>
           <a
-            href={DOWNLOAD_MAC} onClick={() => trackDownload("mac")}
+            href={DOWNLOAD_MAC} download onClick={() => trackDownload("mac")}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
