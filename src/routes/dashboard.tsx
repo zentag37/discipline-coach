@@ -125,8 +125,6 @@ function DashboardPage() {
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
-  const [downloadOpen, setDownloadOpen] = useState(false);
-  const [notifyDone, setNotifyDone] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
