@@ -547,11 +547,11 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
 }) {
   const items = [
     { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
-    { icon: CalendarDays, label: "Today's Session", to: "#" },
+    { icon: CalendarDays, label: "Today's Session", to: "/dashboard" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
     { icon: Radio, label: "Signals", to: "/signals" },
-    { icon: Download, label: "Download App", to: "https://github.com/zentag37/discipline-coach/releases/latest" },
+    { icon: Download, label: "Download App", to: "/download" },
     { icon: Settings, label: "Settings", to: "/settings" },
   ];
   return (

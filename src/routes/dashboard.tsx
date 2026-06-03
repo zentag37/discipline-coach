@@ -31,7 +31,7 @@ import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
-import { DOWNLOAD_MAC, DOWNLOAD_WIN } from "@/lib/downloads";
+
 
 marked.setOptions({ breaks: true, gfm: true });
 function renderMarkdown(src: string): string {
@@ -125,8 +125,6 @@ function DashboardPage() {
   const tradeLimitSpokenRef = useRef(false);
   const lossLimitSpokenRef = useRef(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
-  const [downloadOpen, setDownloadOpen] = useState(false);
-  const [notifyDone, setNotifyDone] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -138,7 +136,6 @@ function DashboardPage() {
       changed = true;
     }
     if (params.get("download") === "1") {
-      setDownloadOpen(true);
       params.delete("download");
       changed = true;
     }
@@ -404,7 +401,7 @@ function DashboardPage() {
           <NavItem icon={<BookOpen size={16} />} label="Journal" onClick={() => navigate({ to: "/journal" })} />
           <NavItem icon={<Globe size={16} />} label="Market Intel" onClick={() => navigate({ to: "/market-intel" })} />
           <NavItem icon={<Radio size={16} />} label="Signals" onClick={() => navigate({ to: "/signals" })} />
-          <NavItem icon={<Download size={16} />} label="Download App" onClick={() => setDownloadOpen(true)} />
+          <NavItem icon={<Download size={16} />} label="Download App" onClick={() => navigate({ to: "/download" })} />
           <NavItem icon={<Settings size={16} />} label="Settings" onClick={() => navigate({ to: "/settings" })} />
         </nav>
 
@@ -974,45 +971,6 @@ function DashboardPage() {
         </div>
       )}
 
-      {downloadOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in"
-          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
-          <div className="max-w-md w-full rounded-[14px] p-7 text-center relative"
-            style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
-            <button
-              onClick={() => { setDownloadOpen(false); setNotifyDone(false); }}
-              className="absolute top-3 right-3 text-[#6b7280] hover:text-white cursor-pointer"
-              aria-label="Close"
-            >
-              <X size={16} />
-            </button>
-            <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>DESKTOP APP</div>
-            <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
-              Download TradeWithAce
-            </h2>
-            <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
-              Pick your platform. The floating coach sits on top of any trading platform.
-            </p>
-            <div className="mt-6 flex flex-col gap-2">
-              <a
-                href={DOWNLOAD_MAC}
-                className="text-sm px-5 py-2.5 rounded font-medium cursor-pointer"
-                style={{ background: TEAL, color: "#0d0f12", fontFamily: "Inter, sans-serif" }}
-              >
-                Download for Mac (.dmg, Apple Silicon)
-              </a>
-              <a
-                href={DOWNLOAD_WIN}
-                className="text-sm px-5 py-2.5 rounded font-medium cursor-pointer"
-                style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}`, fontFamily: "Inter, sans-serif" }}
-              >
-                Download for Windows (.exe)
-              </a>
-            </div>
-            {notifyDone && <div className="hidden" />}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

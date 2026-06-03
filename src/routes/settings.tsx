@@ -38,7 +38,7 @@ const NAV = [
 function SettingsPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>({});
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<any>(null);
   const [dirty, setDirty] = useState(false);
   const [active, setActive] = useState("profile");
   const refs = useRef<Record<string, HTMLElement | null>>({});
@@ -147,9 +147,17 @@ function SettingsPage() {
     }
   }
 
-  const firstName = (profile.full_name || "Trader").split(" ")[0];
-  const initials = (form.full_name || profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
-  const plan = (profile.plan || "PRO").toUpperCase();
+  const firstName = (profile?.full_name || "Trader").split(" ")[0];
+  const initials = (form?.full_name || profile?.full_name || "T R").split(" ").map((s: string) => s?.[0] || "").slice(0, 2).join("").toUpperCase();
+  const plan = (profile?.plan || "PRO").toUpperCase();
+
+  if (!form) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0d0f12", color: "#9ca3af", fontFamily: FONT_MONO }}>
+        <div className="text-xs">Loading settings…</div>
+      </div>
+    );
+  }
 
   async function save() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -737,11 +745,11 @@ function OptionCard({ label, active, onClick }: { label: string; active: boolean
 function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initials: string; firstName: string; onSignOut: () => void }) {
   const items = [
     { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
-    { icon: CalendarDays, label: "Today's Session", to: "#" },
+    { icon: CalendarDays, label: "Today's Session", to: "/dashboard" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
     { icon: Radio, label: "Signals", to: "/signals" },
-    { icon: Download, label: "Download App", to: "https://github.com/zentag37/discipline-coach/releases/latest" },
+    { icon: Download, label: "Download App", to: "/download" },
     { icon: SettingsIcon, label: "Settings", to: "/settings" },
   ];
   return (
