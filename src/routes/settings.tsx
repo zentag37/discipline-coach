@@ -147,9 +147,17 @@ function SettingsPage() {
     }
   }
 
-  const firstName = (profile.full_name || "Trader").split(" ")[0];
-  const initials = (form.full_name || profile.full_name || "T R").split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
-  const plan = (profile.plan || "PRO").toUpperCase();
+  const firstName = (profile?.full_name || "Trader").split(" ")[0];
+  const initials = (form?.full_name || profile?.full_name || "T R").split(" ").map((s: string) => s?.[0] || "").slice(0, 2).join("").toUpperCase();
+  const plan = (profile?.plan || "PRO").toUpperCase();
+
+  if (!form) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0d0f12", color: "#9ca3af", fontFamily: FONT_MONO }}>
+        <div className="text-xs">Loading settings…</div>
+      </div>
+    );
+  }
 
   async function save() {
     const { data: { user } } = await supabase.auth.getUser();
