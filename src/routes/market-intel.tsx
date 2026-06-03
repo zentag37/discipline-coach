@@ -210,8 +210,7 @@ function MarketIntelPage() {
             </span>
             <span className="hidden md:inline" style={{ color: "#6b7280" }}>Next: New York opens in {nyIn}</span>
             <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-              style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>{initials}</div>
+            <AvatarMenu initials={initials} />
           </div>
         </header>
 
