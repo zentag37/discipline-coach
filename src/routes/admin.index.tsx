@@ -75,6 +75,21 @@ function AdminOverview() {
           </div>
         </Panel>
       </div>
+      <Panel title={`Desktop downloads (last 30 days) — Mac ${downloads?.macTotal ?? 0} · Windows ${downloads?.winTotal ?? 0} · Total ${downloads?.total ?? 0}`}>
+        <div style={{ width: "100%", height: 240 }}>
+          <ResponsiveContainer>
+            <LineChart data={downloads?.daily ?? []}>
+              <XAxis dataKey="date" stroke="#6b7280" fontSize={10} />
+              <YAxis stroke="#6b7280" fontSize={10} allowDecimals={false} />
+              <Tooltip contentStyle={{ background: "#0d0f12", border: `1px solid ${adminTheme.BORDER}`, fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Line type="monotone" dataKey="mac" name="Mac" stroke={adminTheme.TEAL} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="windows" name="Windows" stroke="#f59e0b" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </Panel>
+      <div className="h-4" />
       <Panel title="Recent signups">
         <table className="w-full text-sm">
           <thead>
