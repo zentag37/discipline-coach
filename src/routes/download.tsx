@@ -56,7 +56,7 @@ function DownloadPage() {
             <DownloadIcon size={16} style={{ color: "#6b7280" }} />
           </a>
 
-          <a href={DOWNLOAD_WIN}
+          <a href={DOWNLOAD_WIN} onClick={() => trackDownload("windows")}
             className="group flex items-center justify-between rounded-lg p-5 transition hover:-translate-y-0.5"
             style={{ background: "#141820", border: `1px solid ${TEAL}40` }}>
             <div className="flex items-center gap-3">
