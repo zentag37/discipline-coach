@@ -439,3 +439,38 @@ export const deleteFeedback = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const getDownloadStats = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .handler(async () => {
+    const since = new Date(Date.now() - 30 * 86400_000).toISOString();
+    const { data } = await supabaseAdmin
+      .from("download_events" as any)
+      .select("platform, created_at")
+      .gte("created_at", since);
+
+    const buckets: Record<string, { date: string; mac: number; windows: number }> = {};
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400_000).toISOString().slice(0, 10);
+      buckets[d] = { date: d.slice(5), mac: 0, windows: 0 };
+    }
+    let macTotal = 0;
+    let winTotal = 0;
+    (data || []).forEach((e: any) => {
+      const d = (e.created_at as string).slice(0, 10);
+      const platform = (e.platform || "").toLowerCase();
+      if (buckets[d]) {
+        if (platform === "mac") buckets[d].mac++;
+        else if (platform === "windows") buckets[d].windows++;
+      }
+      if (platform === "mac") macTotal++;
+      else if (platform === "windows") winTotal++;
+    });
+
+    return {
+      daily: Object.values(buckets),
+      macTotal,
+      winTotal,
+      total: macTotal + winTotal,
+    };
+  });
