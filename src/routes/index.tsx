@@ -537,7 +537,7 @@ function DownloadSection() {
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
           </a>
           <a
-            href={DOWNLOAD_MAC}
+            href={DOWNLOAD_MAC} onClick={() => trackDownload("mac")}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
