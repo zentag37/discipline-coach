@@ -43,7 +43,7 @@ function DownloadPage() {
         </p>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <a href={DOWNLOAD_MAC} onClick={() => trackDownload("mac")}
+          <a href={DOWNLOAD_MAC} download onClick={() => trackDownload("mac")}
             className="group flex items-center justify-between rounded-lg p-5 transition hover:-translate-y-0.5"
             style={{ background: "#141820", border: `1px solid ${TEAL}40` }}>
             <div className="flex items-center gap-3">
