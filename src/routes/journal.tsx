@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { Lock, Radio } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({ meta: [{ title: "Journal — TradeWithAce" }] }),
