@@ -1,16 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { DOWNLOAD_MAC, DOWNLOAD_WIN, pickDownloadUrl } from "@/lib/downloads";
 
 function useDownloadClick() {
+  return () => {
+    window.location.href = pickDownloadUrl();
+  };
+}
+
+function useGetStartedClick() {
   const navigate = useNavigate();
   return async () => {
     const { data } = await supabase.auth.getSession();
-    if (data.session) {
-      navigate({ to: "/dashboard" });
-    } else {
-      navigate({ to: "/register" });
-    }
+    navigate({ to: data.session ? "/dashboard" : "/register" });
   };
 }
 import {
