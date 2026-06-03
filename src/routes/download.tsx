@@ -43,7 +43,7 @@ function DownloadPage() {
         </p>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <a href={DOWNLOAD_MAC} download onClick={() => trackDownload("mac")}
+          <a href={DOWNLOAD_MAC} download
             className="group flex items-center justify-between rounded-lg p-5 transition hover:-translate-y-0.5"
             style={{ background: "#141820", border: `1px solid ${TEAL}40` }}>
             <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ function DownloadPage() {
             <DownloadIcon size={16} style={{ color: "#6b7280" }} />
           </a>
 
-          <a href={DOWNLOAD_WIN} download onClick={() => trackDownload("windows")}
+          <a href={DOWNLOAD_WIN} download
             className="group flex items-center justify-between rounded-lg p-5 transition hover:-translate-y-0.5"
             style={{ background: "#141820", border: `1px solid ${TEAL}40` }}>
             <div className="flex items-center gap-3">
@@ -68,6 +68,7 @@ function DownloadPage() {
             </div>
             <DownloadIcon size={16} style={{ color: "#6b7280" }} />
           </a>
+
         </div>
 
         <p className="text-[11px] mt-6" style={{ color: "#6b7280", fontFamily: "Inter, sans-serif" }}>
