@@ -138,7 +138,6 @@ function DashboardPage() {
       changed = true;
     }
     if (params.get("download") === "1") {
-      setDownloadOpen(true);
       params.delete("download");
       changed = true;
     }
