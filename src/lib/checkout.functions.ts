@@ -47,7 +47,10 @@ export const createCheckout = createServerFn({ method: "POST" })
       success_url: `${origin}/dashboard?subscribed=true`,
       cancel_url: `${origin}/pricing`,
       metadata: { user_id: userId },
-      subscription_data: { metadata: { user_id: userId } },
+      subscription_data: {
+        metadata: { user_id: userId },
+        trial_period_days: 7,
+      },
     });
 
     return { url: session.url };
