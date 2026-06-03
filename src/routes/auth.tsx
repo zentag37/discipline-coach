@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Trader Coach Pro" }] }),
+  head: () => ({ meta: [{ title: "Sign in — TradeWithAce" }] }),
   component: AuthPage,
 });
 
@@ -57,7 +57,7 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full border border-border rounded-lg bg-[var(--surface)] p-8">
         <h1 className="font-mono text-2xl mb-1">{mode === "signup" ? "Create account" : "Sign in"}</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mb-6">Trader Coach Pro</p>
+        <p className="text-sm text-[var(--muted-foreground)] mb-6">TradeWithAce</p>
 
         <button
           onClick={google}

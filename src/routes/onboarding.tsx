@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Check, X, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/onboarding")({
-  head: () => ({ meta: [{ title: "Onboarding — Trader Coach Pro" }] }),
+  head: () => ({ meta: [{ title: "Onboarding — TradeWithAce" }] }),
   component: OnboardingPage,
 });
 
@@ -835,7 +835,7 @@ function Step5({ p, set }: { p: Profile; set: <K extends keyof Profile>(k: K, v:
       />
 
       <p className="mt-4 font-mono text-[11px] text-muted-foreground/80">
-        Your voice preference can be changed anytime in Settings. Trader Coach never records your microphone.
+        Your voice preference can be changed anytime in Settings. TradeWithAce never records your microphone.
       </p>
     </div>
   );

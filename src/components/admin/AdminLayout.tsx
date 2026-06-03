@@ -69,7 +69,7 @@ export function AdminLayout({ children, title }: { children: ReactNode; title: s
         style={{ background: PANEL, borderRight: `1px solid ${BORDER}` }}
       >
         <div className="px-5 py-5 border-b" style={{ borderColor: BORDER }}>
-          <div className="text-sm font-semibold tracking-wide">Trader Coach</div>
+          <div className="text-sm font-semibold tracking-wide">TradeWithAce</div>
           <div className="text-[10px] mt-1 tracking-widest" style={{ color: "#ef4444" }}>ADMIN CONSOLE</div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5">

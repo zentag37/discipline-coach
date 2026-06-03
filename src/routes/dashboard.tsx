@@ -31,6 +31,7 @@ import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { DOWNLOAD_MAC, DOWNLOAD_WIN } from "@/lib/downloads";
 
 marked.setOptions({ breaks: true, gfm: true });
 function renderMarkdown(src: string): string {
@@ -39,7 +40,7 @@ function renderMarkdown(src: string): string {
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
-    meta: [{ title: "Dashboard — Trader Coach" }],
+    meta: [{ title: "Dashboard — TradeWithAce" }],
   }),
   component: DashboardPage,
 });
@@ -387,7 +388,7 @@ function DashboardPage() {
         <div className="p-5">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded" style={{ background: TEAL }} />
-            <span className="font-semibold tracking-tight" style={{ color: TEAL }}>Trader Coach</span>
+            <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
           </div>
           <span
             className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
@@ -959,7 +960,7 @@ function DashboardPage() {
             style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
             <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>WELCOME</div>
             <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
-              You're in. Welcome to Trader Coach {planLabel(profile.plan)}.
+              You're in. Welcome to TradeWithAce {planLabel(profile.plan)}.
             </h2>
             <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
               ACE is ready. Your rules are set. Let's build a consistent trading career.
@@ -987,24 +988,28 @@ function DashboardPage() {
             </button>
             <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>DESKTOP APP</div>
             <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
-              Desktop app coming soon.
+              Download TradeWithAce
             </h2>
             <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
-              You can use Trader Coach fully in your browser right now. We'll email you when the Mac and Windows app is ready.
+              Pick your platform. The floating coach sits on top of any trading platform.
             </p>
-            {notifyDone ? (
-              <div className="mt-6 text-sm" style={{ color: TEAL, fontFamily: "Inter, sans-serif" }}>
-                ✓ You're on the list. We'll email you when it's ready.
-              </div>
-            ) : (
-              <button
-                onClick={() => setNotifyDone(true)}
-                className="mt-6 text-sm px-5 py-2 rounded font-medium cursor-pointer"
-                style={{ background: TEAL, color: "#0d0f12" }}
+            <div className="mt-6 flex flex-col gap-2">
+              <a
+                href={DOWNLOAD_MAC}
+                className="text-sm px-5 py-2.5 rounded font-medium cursor-pointer"
+                style={{ background: TEAL, color: "#0d0f12", fontFamily: "Inter, sans-serif" }}
               >
-                Notify me when it's ready
-              </button>
-            )}
+                Download for Mac (.dmg, Apple Silicon)
+              </a>
+              <a
+                href={DOWNLOAD_WIN}
+                className="text-sm px-5 py-2.5 rounded font-medium cursor-pointer"
+                style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}`, fontFamily: "Inter, sans-serif" }}
+              >
+                Download for Windows (.exe)
+              </a>
+            </div>
+            {notifyDone && <div className="hidden" />}
           </div>
         </div>
       )}

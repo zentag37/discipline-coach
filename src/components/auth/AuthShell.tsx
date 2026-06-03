@@ -28,7 +28,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
               <div className="h-2 w-2 rounded-[1px] bg-primary" />
             </div>
             <span className="font-mono text-sm text-primary tracking-tight">
-              Trader Coach
+              TradeWithAce
             </span>
           </div>
           {children}

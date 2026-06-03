@@ -11,7 +11,7 @@ import {
 } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/forgot-password")({
-  head: () => ({ meta: [{ title: "Reset password — Trader Coach Pro" }] }),
+  head: () => ({ meta: [{ title: "Reset password — TradeWithAce" }] }),
   component: ForgotPage,
 });
 

@@ -13,7 +13,7 @@ import { normalizePlan, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Settings — Trader Coach" }] }),
+  head: () => ({ meta: [{ title: "Settings — TradeWithAce" }] }),
   component: SettingsPage,
 });
 
@@ -429,7 +429,7 @@ function SettingsPage() {
                 <Toggle label="Speak encouragement after wins" value={form.speak_wins} onChange={(v) => set("speak_wins", v)} />
                 <Toggle label="Speak after losses" value={form.speak_after_loss} onChange={(v) => set("speak_after_loss", v)} />
                 <p className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                  Trader Coach uses your microphone only to play audio. We never record or store voice data.
+                  TradeWithAce uses your microphone only to play audio. We never record or store voice data.
                 </p>
               </div>
             </Section>
@@ -741,7 +741,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
     { icon: Radio, label: "Signals", to: "/signals" },
-    { icon: Download, label: "Download App", to: "#" },
+    { icon: Download, label: "Download App", to: "https://github.com/zentag37/discipline-coach/releases/latest" },
     { icon: SettingsIcon, label: "Settings", to: "/settings" },
   ];
   return (
@@ -750,7 +750,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
       <div className="p-5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded" style={{ background: TEAL }} />
-          <span className="font-semibold tracking-tight" style={{ color: TEAL }}>Trader Coach</span>
+          <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
           style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
