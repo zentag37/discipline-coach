@@ -10,6 +10,7 @@ import { getAceSignals, updateSignalStatus, type AceSignal } from "@/lib/signals
 import { hasAceAccess } from "@/lib/plan";
 import { speakAsACE } from "@/lib/ace-voice";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 export const Route = createFileRoute("/signals")({
   head: () => ({ meta: [{ title: "ACE Signals — TradeWithAce" }] }),
