@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AdminLayout, StatCard, Panel, adminTheme } from "@/components/admin/AdminLayout";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { getOverviewStats, getRecentSignups } from "@/lib/admin.functions";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { getOverviewStats, getRecentSignups, getDownloadStats } from "@/lib/admin.functions";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Admin — Overview" }] }),
