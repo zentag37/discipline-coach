@@ -38,7 +38,7 @@ const NAV = [
 function SettingsPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>({});
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<any>(null);
   const [dirty, setDirty] = useState(false);
   const [active, setActive] = useState("profile");
   const refs = useRef<Record<string, HTMLElement | null>>({});
