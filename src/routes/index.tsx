@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { DOWNLOAD_MAC, DOWNLOAD_WIN, pickDownloadUrl } from "@/lib/downloads";
+import { DOWNLOAD_MAC, DOWNLOAD_WIN, pickDownloadUrl, trackDownload } from "@/lib/downloads";
 
 function useDownloadClick() {
   return () => {
-    window.location.href = pickDownloadUrl();
+    const url = pickDownloadUrl();
+    trackDownload(url === DOWNLOAD_MAC ? "mac" : "windows");
+    window.location.href = url;
   };
 }
 
@@ -522,7 +524,7 @@ function DownloadSection() {
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
           <a
-            href={DOWNLOAD_WIN}
+            href={DOWNLOAD_WIN} onClick={() => trackDownload("windows")}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
@@ -535,7 +537,7 @@ function DownloadSection() {
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
           </a>
           <a
-            href={DOWNLOAD_MAC}
+            href={DOWNLOAD_MAC} onClick={() => trackDownload("mac")}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
