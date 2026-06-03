@@ -31,6 +31,7 @@ import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 
 marked.setOptions({ breaks: true, gfm: true });
@@ -474,12 +475,7 @@ function DashboardPage() {
             <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}>
               <Bell size={16} />
             </button>
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-              style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}
-            >
-              {initials}
-            </div>
+            <AvatarMenu initials={initials} />
           </div>
         </header>
 

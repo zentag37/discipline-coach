@@ -10,6 +10,7 @@ import { getAceSignals, updateSignalStatus, type AceSignal } from "@/lib/signals
 import { hasAceAccess } from "@/lib/plan";
 import { speakAsACE } from "@/lib/ace-voice";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 export const Route = createFileRoute("/signals")({
   head: () => ({ meta: [{ title: "ACE Signals — TradeWithAce" }] }),
@@ -136,8 +137,7 @@ function SignalsPage() {
           <h1 className="text-sm font-medium" style={{ fontFamily: FONT_SANS }}>ACE Signals</h1>
           <div className="flex items-center gap-4 text-xs">
             <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-              style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>{initials}</div>
+            <AvatarMenu initials={initials} />
           </div>
         </header>
 

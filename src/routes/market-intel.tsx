@@ -12,6 +12,7 @@ import { hasAceAccess } from "@/lib/plan";
 import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 import { getMarketNews } from "@/lib/news.functions";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — TradeWithAce" }] }),
@@ -209,8 +210,7 @@ function MarketIntelPage() {
             </span>
             <span className="hidden md:inline" style={{ color: "#6b7280" }}>Next: New York opens in {nyIn}</span>
             <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-              style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>{initials}</div>
+            <AvatarMenu initials={initials} />
           </div>
         </header>
 
