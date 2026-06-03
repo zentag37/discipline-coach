@@ -31,6 +31,7 @@ import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 
 marked.setOptions({ breaks: true, gfm: true });
