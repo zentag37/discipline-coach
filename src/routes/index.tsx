@@ -132,11 +132,10 @@ function Nav() {
           <a href="/pricing" className="hover:text-foreground transition-colors">/pricing</a>
         </nav>
         <button
-          onClick={() => navigate({ to: "/register" })}
+          onClick={() => navigate({ to: "/login" })}
           className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
         >
-          <Download className="h-3.5 w-3.5" />
-          Download
+          Sign In / Sign Up
         </button>
       </Container>
     </header>
@@ -177,13 +176,11 @@ function Hero() {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
-              href={heroHref}
-              download
-              onClick={() => trackDownload(isMac ? "mac" : "windows")}
+              href="/download"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
             >
               <Download className="h-4 w-4" />
-              Download Free
+              Download
             </a>
             <a
               href="#features"
