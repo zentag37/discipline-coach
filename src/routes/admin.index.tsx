@@ -15,8 +15,10 @@ const COLORS = ["#6b7280", adminTheme.TEAL, "#f59e0b"];
 function AdminOverview() {
   const statsFn = useServerFn(getOverviewStats);
   const signupsFn = useServerFn(getRecentSignups);
+  const downloadsFn = useServerFn(getDownloadStats);
   const { data: stats } = useQuery({ queryKey: ["admin", "overview"], queryFn: () => statsFn() });
   const { data: signups } = useQuery({ queryKey: ["admin", "signups"], queryFn: () => signupsFn() });
+  const { data: downloads } = useQuery({ queryKey: ["admin", "downloads"], queryFn: () => downloadsFn() });
 
   const pieData = stats
     ? [
