@@ -741,7 +741,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
     { icon: Radio, label: "Signals", to: "/signals" },
-    { icon: Download, label: "Download App", to: "#" },
+    { icon: Download, label: "Download App", to: "https://github.com/zentag37/discipline-coach/releases/latest" },
     { icon: SettingsIcon, label: "Settings", to: "/settings" },
   ];
   return (
