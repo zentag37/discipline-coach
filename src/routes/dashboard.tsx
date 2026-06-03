@@ -404,7 +404,7 @@ function DashboardPage() {
           <NavItem icon={<BookOpen size={16} />} label="Journal" onClick={() => navigate({ to: "/journal" })} />
           <NavItem icon={<Globe size={16} />} label="Market Intel" onClick={() => navigate({ to: "/market-intel" })} />
           <NavItem icon={<Radio size={16} />} label="Signals" onClick={() => navigate({ to: "/signals" })} />
-          <NavItem icon={<Download size={16} />} label="Download App" onClick={() => setDownloadOpen(true)} />
+          <NavItem icon={<Download size={16} />} label="Download App" onClick={() => navigate({ to: "/download" })} />
           <NavItem icon={<Settings size={16} />} label="Settings" onClick={() => navigate({ to: "/settings" })} />
         </nav>
 
