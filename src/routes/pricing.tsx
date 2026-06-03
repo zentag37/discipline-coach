@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronDown, Github, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,6 +97,19 @@ function Hero() {
   const navigate = useNavigate();
   const checkout = useServerFn(createCheckout);
 
+
+  useEffect(() => {
+    setLoadingPlan(null);
+    const onShow = () => setLoadingPlan(null);
+    const onVis = () => { if (document.visibilityState === "visible") setLoadingPlan(null); };
+    window.addEventListener("pageshow", onShow);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pageshow", onShow);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
   const startCheckout = async (plan: PlanKey) => {
     if (loadingPlan) return;
     setLoadingPlan(plan);
@@ -109,6 +122,7 @@ function Hero() {
       }
       const { url } = await checkout({ data: { plan } });
       if (url) window.location.href = url;
+      else setLoadingPlan(null);
     } catch (e) {
       console.error(e);
       setLoadingPlan(null);
