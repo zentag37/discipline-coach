@@ -384,11 +384,11 @@ function Trust() {
 const FAQS = [
   {
     q: "Do I need to install anything?",
-    a: "Yes — after signup you download the lightweight Trader Coach desktop app for Windows or Mac. The web dashboard works in any browser.",
+    a: "Yes — after signup you download the lightweight TradeWithAce desktop app for Windows or Mac. The web dashboard works in any browser.",
   },
   {
     q: "Will it work with my trading platform?",
-    a: "Yes. Trader Coach floats on top of any platform — TradingView, MT4, MT5, Thinkorswim, cTrader, or anything else you use.",
+    a: "Yes. TradeWithAce floats on top of any platform — TradingView, MT4, MT5, Thinkorswim, cTrader, or anything else you use.",
   },
   {
     q: "What is ACE?",

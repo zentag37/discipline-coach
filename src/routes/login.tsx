@@ -15,7 +15,7 @@ import {
 } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — Trader Coach Pro" }] }),
+  head: () => ({ meta: [{ title: "Sign in — TradeWithAce" }] }),
   component: LoginPage,
 });
 
@@ -77,7 +77,7 @@ function LoginPage() {
     <AuthShell>
       <AuthHeading
         title="Welcome back"
-        subtitle="Sign in to your Trader Coach account"
+        subtitle="Sign in to your TradeWithAce account"
       />
       <ErrorBanner message={err} />
       <form onSubmit={submit} noValidate>

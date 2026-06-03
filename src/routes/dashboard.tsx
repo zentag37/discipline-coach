@@ -40,7 +40,7 @@ function renderMarkdown(src: string): string {
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
-    meta: [{ title: "Dashboard — Trader Coach" }],
+    meta: [{ title: "Dashboard — TradeWithAce" }],
   }),
   component: DashboardPage,
 });
@@ -388,7 +388,7 @@ function DashboardPage() {
         <div className="p-5">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded" style={{ background: TEAL }} />
-            <span className="font-semibold tracking-tight" style={{ color: TEAL }}>Trader Coach</span>
+            <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
           </div>
           <span
             className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
@@ -960,7 +960,7 @@ function DashboardPage() {
             style={{ background: "#141820", border: `2px solid ${TEAL}`, fontFamily: "'IBM Plex Mono', monospace" }}>
             <div className="text-[10px] tracking-widest mb-3" style={{ color: TEAL }}>WELCOME</div>
             <h2 className="text-xl tracking-tight" style={{ fontFamily: "Inter, sans-serif", color: "#e6e8eb" }}>
-              You're in. Welcome to Trader Coach {planLabel(profile.plan)}.
+              You're in. Welcome to TradeWithAce {planLabel(profile.plan)}.
             </h2>
             <p className="text-sm mt-3 leading-relaxed" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
               ACE is ready. Your rules are set. Let's build a consistent trading career.

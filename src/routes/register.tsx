@@ -20,7 +20,7 @@ import {
 const planSchema = z.object({ plan: z.enum(["solo", "pro", "elite"]).optional() });
 
 export const Route = createFileRoute("/register")({
-  head: () => ({ meta: [{ title: "Create account — Trader Coach Pro" }] }),
+  head: () => ({ meta: [{ title: "Create account — TradeWithAce" }] }),
   validateSearch: (s) => planSchema.parse(s),
   component: RegisterPage,
 });

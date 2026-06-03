@@ -10,7 +10,7 @@ import {
 } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Set new password — Trader Coach Pro" }] }),
+  head: () => ({ meta: [{ title: "Set new password — TradeWithAce" }] }),
   component: ResetPage,
 });
 

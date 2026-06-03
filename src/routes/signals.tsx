@@ -12,7 +12,7 @@ import { speakAsACE } from "@/lib/ace-voice";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 
 export const Route = createFileRoute("/signals")({
-  head: () => ({ meta: [{ title: "ACE Signals — Trader Coach" }] }),
+  head: () => ({ meta: [{ title: "ACE Signals — TradeWithAce" }] }),
   component: SignalsPage,
 });
 
@@ -339,7 +339,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
       <div className="p-5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded" style={{ background: TEAL }} />
-          <span className="font-semibold tracking-tight" style={{ color: TEAL }}>Trader Coach</span>
+          <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
           style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
