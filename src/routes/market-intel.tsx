@@ -547,7 +547,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
 }) {
   const items = [
     { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
-    { icon: CalendarDays, label: "Today&#39;s Session", to: "/dashboard" },
+    { icon: CalendarDays, label: "Today's Session", to: "/dashboard" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
     { icon: Radio, label: "Signals", to: "/signals" },
