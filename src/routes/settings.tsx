@@ -745,7 +745,7 @@ function OptionCard({ label, active, onClick }: { label: string; active: boolean
 function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initials: string; firstName: string; onSignOut: () => void }) {
   const items = [
     { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
-    { icon: CalendarDays, label: "Today's Session", to: "/dashboard" },
+    { icon: CalendarDays, label: "Today's Session", to: "/session" },
     { icon: BookOpen, label: "Journal", to: "/journal" },
     { icon: Globe, label: "Market Intel", to: "/market-intel" },
     { icon: Radio, label: "Signals", to: "/signals" },
