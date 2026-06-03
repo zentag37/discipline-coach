@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Apple, Monitor, Download as DownloadIcon, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { DOWNLOAD_MAC, DOWNLOAD_WIN, trackDownload } from "@/lib/downloads";
+import { DOWNLOAD_MAC, DOWNLOAD_WIN } from "@/lib/downloads";
 
 export const Route = createFileRoute("/download")({
   head: () => ({ meta: [{ title: "Download — TradeWithAce" }] }),
