@@ -511,7 +511,6 @@ function Quotes() {
 }
 
 function DownloadSection() {
-  const onDownload = useDownloadClick();
   return (
     <section id="download">
       <Container className="py-20 md:py-28">
@@ -522,32 +521,32 @@ function DownloadSection() {
           </h2>
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-          <button
-            onClick={onDownload}
+          <a
+            href={DOWNLOAD_WIN}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
               <Monitor className="h-7 w-7 text-primary" />
               <div className="text-left">
                 <div className="font-mono text-base">Download for Windows</div>
-                <div className="font-mono text-xs text-muted-foreground">floatline-1.0.exe · 6.2 MB</div>
+                <div className="font-mono text-xs text-muted-foreground">TradeWithAce.Setup.1.0.0.exe</div>
               </div>
             </div>
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
-          </button>
-          <button
-            onClick={onDownload}
+          </a>
+          <a
+            href={DOWNLOAD_MAC}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface p-6 transition hover:-translate-y-0.5 hover:border-primary/50 cursor-pointer text-left"
           >
             <div className="flex items-center gap-4">
               <Apple className="h-7 w-7 text-primary" />
               <div className="text-left">
                 <div className="font-mono text-base">Download for Mac</div>
-                <div className="font-mono text-xs text-muted-foreground">floatline-1.0.dmg · 7.1 MB</div>
+                <div className="font-mono text-xs text-muted-foreground">TradeWithAce-1.0.0-arm64.dmg</div>
               </div>
             </div>
             <Download className="h-5 w-5 text-muted-foreground group-hover:text-primary transition" />
-          </button>
+          </a>
         </div>
         <p className="mt-6 text-center font-mono text-xs text-muted-foreground">
           Free · No account needed · Open source
