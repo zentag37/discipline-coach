@@ -12,6 +12,7 @@ import { hasAceAccess } from "@/lib/plan";
 import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 import { getMarketNews } from "@/lib/news.functions";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { AvatarMenu } from "@/components/AvatarMenu";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — TradeWithAce" }] }),
