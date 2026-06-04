@@ -27,6 +27,7 @@ import { getLiveQuotes } from "@/lib/market.functions";
 import { getAceSignals } from "@/lib/signals.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
