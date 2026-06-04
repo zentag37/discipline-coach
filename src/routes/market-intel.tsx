@@ -14,6 +14,7 @@ import { getMarketNews } from "@/lib/news.functions";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { FinnhubNewsFeed } from "@/components/FinnhubNewsFeed";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — TradeWithAce" }] }),
