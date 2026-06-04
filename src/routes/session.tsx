@@ -55,7 +55,7 @@ function SessionPage() {
           style={{ background: "#141820", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <h1 className="text-sm font-medium" style={{ fontFamily: FONT_SANS }}>Today's Session</h1>
           <div className="flex items-center gap-4 text-xs">
-            <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
+            <NotificationsBell />
             <AvatarMenu initials={initials} />
           </div>
         </header>
