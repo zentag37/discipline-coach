@@ -12,6 +12,7 @@ import { Lock, Radio } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({ meta: [{ title: "Journal — TradeWithAce" }] }),
