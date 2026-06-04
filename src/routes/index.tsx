@@ -216,29 +216,70 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 function FloatingMockup() {
+  const [minimized, setMinimized] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const movedRef = useRef(false);
+
+  function onFabPointerDown(e: React.PointerEvent) {
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y };
+    movedRef.current = false;
+  }
+  function onFabPointerMove(e: React.PointerEvent) {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) movedRef.current = true;
+    setPos({ x: dragRef.current.origX + dx, y: dragRef.current.origY + dy });
+  }
+  function onFabPointerUp(e: React.PointerEvent) {
+    dragRef.current = null;
+    if (!movedRef.current) setMinimized(false);
+  }
+
+  if (minimized) {
+    return (
+      <div className="relative w-full max-w-md min-h-[420px]">
+        <button
+          onPointerDown={onFabPointerDown}
+          onPointerMove={onFabPointerMove}
+          onPointerUp={onFabPointerUp}
+          className="absolute h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 grid place-items-center cursor-grab active:cursor-grabbing touch-none select-none"
+          style={{ transform: `translate(${pos.x}px, ${pos.y}px)`, left: 0, top: 0 }}
+          aria-label="Expand coach"
+        >
+          <Circle className="h-3 w-3 fill-current" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full max-w-md">
       <div className="absolute -inset-6 -z-10 rounded-2xl bg-primary/5 blur-2xl" />
       <div className="overflow-hidden rounded-lg border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border bg-surface-2 px-3 py-2">
-          <div className="flex items-center gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-danger/80" />
-            <div className="h-2.5 w-2.5 rounded-full bg-warning/80" />
-            <div className="h-2.5 w-2.5 rounded-full bg-primary/80" />
-          </div>
           <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
             <Pin className="h-3 w-3" /> always on top
           </div>
-          <Minimize2 className="h-3 w-3 text-muted-foreground" />
+          <button
+            onClick={() => { setPos({ x: 0, y: 0 }); setMinimized(true); }}
+            className="p-1 -m-1 rounded hover:bg-surface text-muted-foreground hover:text-foreground transition"
+            aria-label="Minimize"
+          >
+            <Minimize2 className="h-3 w-3" />
+          </button>
         </div>
 
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">session</div>
             <div className="font-mono text-[10px] text-primary flex items-center gap-1.5">
-              <Circle className="h-2 w-2 fill-primary text-primary" /> live
+              <Circle className="h-2 w-2 fill-primary text-primary" /> Active
             </div>
           </div>
+
 
           <div className="grid grid-cols-3 gap-2">
             <MetricCell label="trades" value="3 / 5" tone="ok" />
