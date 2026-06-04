@@ -163,6 +163,14 @@ const SUPPORTED_PLATFORMS: { name: string; domain: string; kind: PlatformKind; i
 ];
 
 function SupportedPlatforms() {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? SUPPORTED_PLATFORMS.filter(
+        (p) => p.domain.toLowerCase().includes(q) || p.name.toLowerCase().includes(q),
+      )
+    : SUPPORTED_PLATFORMS;
+
   return (
     <section id="platforms">
       <Container className="py-20 md:py-24">
@@ -171,31 +179,56 @@ function SupportedPlatforms() {
           title="Works with your broker."
           desc="ACE auto-detects when you're on one of these platforms and floats over your trading window."
         />
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px bg-border border border-border rounded-lg overflow-hidden">
-          {SUPPORTED_PLATFORMS.map((p) => {
-            const style = PLATFORM_STYLES[p.kind];
-            const Icon = p.icon;
-            return (
-              <div
-                key={p.domain}
-                className="bg-background p-4 hover:bg-surface transition-colors flex items-start gap-3"
-              >
-                <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md border ${style.cls}`}>
-                  <Icon className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm text-foreground truncate">{p.name}</span>
-                    <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.cls}`}>
-                      {style.label}
-                    </span>
-                  </div>
-                  <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{p.domain}</div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="mb-6 flex items-center gap-2 max-w-sm rounded-md border border-border bg-surface px-3 py-2 focus-within:border-primary/50 transition">
+          <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Filter by domain or name…"
+            className="w-full bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="font-mono text-[10px] text-muted-foreground hover:text-foreground transition"
+              aria-label="Clear filter"
+            >
+              clear
+            </button>
+          )}
         </div>
+        {filtered.length === 0 ? (
+          <div className="rounded-lg border border-border bg-surface p-8 text-center font-mono text-xs text-muted-foreground">
+            No platforms match "{query}".
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px bg-border border border-border rounded-lg overflow-hidden">
+            {filtered.map((p) => {
+              const style = PLATFORM_STYLES[p.kind];
+              const Icon = p.icon;
+              return (
+                <div
+                  key={p.domain}
+                  className="bg-background p-4 hover:bg-surface transition-colors flex items-start gap-3"
+                >
+                  <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md border ${style.cls}`}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm text-foreground truncate">{p.name}</span>
+                      <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.cls}`}>
+                        {style.label}
+                      </span>
+                    </div>
+                    <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{p.domain}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
         <p className="mt-6 font-mono text-[11px] text-muted-foreground">
           Don't see your broker? ACE still works as an always-on-top window over any platform.
         </p>
