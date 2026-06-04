@@ -98,7 +98,6 @@ function FloatingOverlay() {
       expand();
     } else if (pos) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(pos)); } catch {/*noop*/}
-      sendToElectron("overlay:fab-move", pos);
     }
   }
 
