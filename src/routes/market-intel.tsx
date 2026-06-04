@@ -210,7 +210,7 @@ function MarketIntelPage() {
               <span style={{ color: "#9ca3af" }}>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
             </span>
             <span className="hidden md:inline" style={{ color: "#6b7280" }}>Next: New York opens in {nyIn}</span>
-            <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
+            <NotificationsBell />
             <AvatarMenu initials={initials} />
           </div>
         </header>
