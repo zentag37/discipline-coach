@@ -14,6 +14,7 @@ import { getMarketNews } from "@/lib/news.functions";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { FinnhubNewsFeed } from "@/components/FinnhubNewsFeed";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — TradeWithAce" }] }),
@@ -225,6 +226,9 @@ function MarketIntelPage() {
               <SessionBlock flag="🔄" name="Overlap" hours="13:00 – 17:00 UTC" status={`In ${nyIn}`} color="#9ca3af" instruments="Highest liquidity window" />
             </div>
           </DemoCard>
+
+          {/* Live market news */}
+          <FinnhubNewsFeed />
 
           {/* Status row */}
           <div className="flex items-center justify-between text-[11px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
