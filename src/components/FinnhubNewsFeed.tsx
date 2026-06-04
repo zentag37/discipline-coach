@@ -1,33 +1,59 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-type Category = "general" | "forex" | "crypto" | "merger";
+type Category = "all" | "forex" | "crypto" | "stocks";
 
-type FinnhubNews = {
-  id: number;
-  headline: string;
-  source: string;
-  summary: string;
-  url: string;
-  image: string;
-  datetime: number; // unix seconds
-  category: string;
+type RssItem = {
+  title: string;
+  link: string;
+  pubDate: string;
+  description?: string;
+  content?: string;
+  thumbnail?: string;
+  enclosure?: { link?: string };
+  author?: string;
+};
+
+type Rss2JsonResp = {
+  status: string;
+  feed?: { title?: string; link?: string };
+  items?: RssItem[];
+  message?: string;
 };
 
 const TEAL = "#00d4a0";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
-const FINNHUB_TOKEN = "d1ib5i9r01qhqvp8ueu0d1ib5i9r01qhqvp8ueug";
+const FEEDS: Record<Category, { url: string; source: string }[]> = {
+  all: [
+    { url: "https://www.forexlive.com/feed/news", source: "ForexLive" },
+    { url: "https://cointelegraph.com/rss", source: "Cointelegraph" },
+    { url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC", source: "Yahoo Finance" },
+  ],
+  forex: [{ url: "https://www.forexlive.com/feed/news", source: "ForexLive" }],
+  crypto: [{ url: "https://cointelegraph.com/rss", source: "Cointelegraph" }],
+  stocks: [{ url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC", source: "Yahoo Finance" }],
+};
 
 const TABS: { label: string; value: Category }[] = [
-  { label: "All", value: "general" },
+  { label: "All", value: "all" },
   { label: "Forex", value: "forex" },
   { label: "Crypto", value: "crypto" },
-  { label: "Stocks", value: "merger" },
+  { label: "Stocks", value: "stocks" },
 ];
 
-function timeAgo(unixSec: number): string {
-  const s = Math.max(0, Math.floor(Date.now() / 1000 - unixSec));
+type NewsItem = {
+  id: string;
+  title: string;
+  source: string;
+  link: string;
+  pubDateMs: number;
+  description: string;
+  thumbnail?: string;
+};
+
+function timeAgo(ms: number): string {
+  const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
   if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
   if (m < 60) return `${m}m ago`;
@@ -36,9 +62,47 @@ function timeAgo(unixSec: number): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractImage(item: RssItem): string | undefined {
+  if (item.thumbnail) return item.thumbnail;
+  if (item.enclosure?.link) return item.enclosure.link;
+  const html = item.content || item.description || "";
+  const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return m?.[1];
+}
+
+async function loadFeed(url: string, source: string): Promise<NewsItem[]> {
+  const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
+  const res = await fetch(api);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data: Rss2JsonResp = await res.json();
+  if (data.status !== "ok" || !data.items) throw new Error(data.message || "Feed error");
+  return data.items.map((it, idx) => ({
+    id: `${source}-${idx}-${it.link}`,
+    title: stripHtml(it.title || ""),
+    source,
+    link: it.link,
+    pubDateMs: it.pubDate ? new Date(it.pubDate).getTime() || Date.now() : Date.now(),
+    description: stripHtml(it.description || it.content || ""),
+    thumbnail: extractImage(it),
+  }));
+}
+
 export function FinnhubNewsFeed() {
   const [tabIdx, setTabIdx] = useState(0);
-  const [items, setItems] = useState<FinnhubNews[] | null>(null);
+  const [items, setItems] = useState<NewsItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -50,13 +114,16 @@ export function FinnhubNewsFeed() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(
-          `https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB_TOKEN}`,
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: FinnhubNews[] = await res.json();
+        const feeds = FEEDS[category];
+        const results = await Promise.allSettled(feeds.map((f) => loadFeed(f.url, f.source)));
+        const merged = results
+          .filter((r): r is PromiseFulfilledResult<NewsItem[]> => r.status === "fulfilled")
+          .flatMap((r) => r.value)
+          .sort((a, b) => b.pubDateMs - a.pubDateMs)
+          .slice(0, 20);
         if (cancelled) return;
-        setItems(Array.isArray(data) ? data.slice(0, 20) : []);
+        if (merged.length === 0) throw new Error("No items returned");
+        setItems(merged);
       } catch (e) {
         if (cancelled) return;
         setError((e as Error).message || "Failed to load news");
@@ -71,9 +138,6 @@ export function FinnhubNewsFeed() {
       clearInterval(id);
     };
   }, [category]);
-
-  const filtered = items ?? [];
-
 
   return (
     <div
@@ -141,29 +205,26 @@ export function FinnhubNewsFeed() {
         </div>
       )}
 
-      {!loading && !error && filtered.length === 0 && (
-        <div
-          className="p-4 rounded text-[12px] text-center"
-          style={{ color: "#6b7280", fontFamily: FONT_SANS }}
-        >
+      {!loading && !error && items && items.length === 0 && (
+        <div className="p-4 rounded text-[12px] text-center" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
           No news available right now.
         </div>
       )}
 
-      {filtered.length > 0 && (
+      {items && items.length > 0 && (
         <ul className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-          {filtered.map((n) => (
+          {items.map((n) => (
             <li key={n.id}>
               <a
-                href={n.url}
+                href={n.link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex gap-3 p-3 rounded hover:bg-white/5 transition-colors"
                 style={{ border: "1px solid rgba(255,255,255,0.04)" }}
               >
-                {n.image ? (
+                {n.thumbnail ? (
                   <img
-                    src={n.image}
+                    src={n.thumbnail}
                     alt=""
                     loading="lazy"
                     className="w-20 h-20 rounded object-cover shrink-0"
@@ -179,24 +240,24 @@ export function FinnhubNewsFeed() {
                       className="text-[13px] font-semibold text-white leading-snug line-clamp-2"
                       style={{ fontFamily: FONT_SANS }}
                     >
-                      {n.headline}
+                      {n.title}
                     </h4>
                     <span
                       className="text-[10px] shrink-0 mt-0.5"
                       style={{ color: "#6b7280", fontFamily: FONT_MONO }}
                     >
-                      {timeAgo(n.datetime)}
+                      {timeAgo(n.pubDateMs)}
                     </span>
                   </div>
                   <div className="text-[10px] mt-1" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
                     {n.source}
                   </div>
-                  {n.summary && (
+                  {n.description && (
                     <p
                       className="text-[11px] mt-1.5 line-clamp-2"
                       style={{ color: "#9ca3af", fontFamily: FONT_SANS }}
                     >
-                      {n.summary}
+                      {n.description}
                     </p>
                   )}
                 </div>
