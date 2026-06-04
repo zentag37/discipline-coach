@@ -163,6 +163,20 @@ const SUPPORTED_PLATFORMS: { name: string; domain: string; kind: PlatformKind; i
   { name: "NinjaTrader",         domain: "ninjatrader.com",        kind: "platform", icon: LineChart },
 ];
 
+function highlight(text: string, q: string) {
+  if (!q) return text;
+  const lower = text.toLowerCase();
+  const idx = lower.indexOf(q);
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-primary/25 text-primary rounded-sm px-0.5">{text.slice(idx, idx + q.length)}</mark>
+      {text.slice(idx + q.length)}
+    </>
+  );
+}
+
 function SupportedPlatforms() {
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
