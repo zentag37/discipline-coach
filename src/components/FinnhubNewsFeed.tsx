@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-type Category = "general" | "forex" | "crypto";
+type Category = "general" | "forex" | "crypto" | "merger";
 
 type FinnhubNews = {
   id: number;
@@ -17,11 +17,13 @@ const TEAL = "#00d4a0";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
+const FINNHUB_TOKEN = "d1ib5i9r01qhqvp8ueu0d1ib5i9r01qhqvp8ueug";
+
 const TABS: { label: string; value: Category }[] = [
   { label: "All", value: "general" },
   { label: "Forex", value: "forex" },
   { label: "Crypto", value: "crypto" },
-  { label: "Stocks", value: "general" },
+  { label: "Stocks", value: "merger" },
 ];
 
 function timeAgo(unixSec: number): string {
@@ -41,21 +43,15 @@ export function FinnhubNewsFeed() {
   const [loading, setLoading] = useState(true);
 
   const category = TABS[tabIdx].value;
-  const apiKey = import.meta.env.VITE_FINNHUB_API_KEY as string | undefined;
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      if (!apiKey) {
-        setError("News API key not configured");
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       setError(null);
       try {
         const res = await fetch(
-          `https://finnhub.io/api/v1/news?category=${category}&token=${apiKey}`,
+          `https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB_TOKEN}`,
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: FinnhubNews[] = await res.json();
@@ -74,19 +70,10 @@ export function FinnhubNewsFeed() {
       cancelled = true;
       clearInterval(id);
     };
-  }, [category, apiKey]);
+  }, [category]);
 
-  const filtered = useMemo(() => {
-    if (!items) return [];
-    // "Stocks" tab uses 'general' but we filter out forex/crypto entries
-    if (TABS[tabIdx].label === "Stocks") {
-      return items.filter((i) => {
-        const c = (i.category || "").toLowerCase();
-        return c !== "forex" && c !== "crypto";
-      });
-    }
-    return items;
-  }, [items, tabIdx]);
+  const filtered = items ?? [];
+
 
   return (
     <div
