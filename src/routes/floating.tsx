@@ -73,11 +73,9 @@ function FloatingOverlay() {
   }, [minimized]);
 
   function minimize() {
-    sendToElectron("overlay:minimize", { width: FAB_SIZE, height: FAB_SIZE });
     setMinimized(true);
   }
   function expand() {
-    sendToElectron("overlay:expand", { width: WIDTH });
     setMinimized(false);
   }
 
