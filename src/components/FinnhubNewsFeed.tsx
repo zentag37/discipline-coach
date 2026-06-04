@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-type Category = "general" | "forex" | "crypto";
+type Category = "general" | "forex" | "crypto" | "merger";
 
 type FinnhubNews = {
   id: number;
@@ -17,11 +17,13 @@ const TEAL = "#00d4a0";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
+const FINNHUB_TOKEN = "d1ib5i9r01qhqvp8ueu0d1ib5i9r01qhqvp8ueug";
+
 const TABS: { label: string; value: Category }[] = [
   { label: "All", value: "general" },
   { label: "Forex", value: "forex" },
   { label: "Crypto", value: "crypto" },
-  { label: "Stocks", value: "general" },
+  { label: "Stocks", value: "merger" },
 ];
 
 function timeAgo(unixSec: number): string {
