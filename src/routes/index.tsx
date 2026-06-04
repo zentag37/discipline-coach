@@ -130,6 +130,7 @@ import {
   TrendingUp,
   Briefcase,
   Coins,
+  Search,
 } from "lucide-react";
 
 type PlatformKind = "broker" | "chart" | "crypto" | "platform";
