@@ -73,11 +73,9 @@ function FloatingOverlay() {
   }, [minimized]);
 
   function minimize() {
-    (window as any).electronAPI?.minimizeToFab?.();
     setMinimized(true);
   }
   function expand() {
-    (window as any).electronAPI?.expandWindow?.();
     setMinimized(false);
   }
 
