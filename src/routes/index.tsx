@@ -121,25 +121,45 @@ function Container({ children, className = "" }: { children: React.ReactNode; cl
   return <div className={`mx-auto w-full max-w-6xl px-6 ${className}`}>{children}</div>;
 }
 
-const SUPPORTED_PLATFORMS = [
-  { name: "IG", domain: "deal.ig.com" },
-  { name: "IG Web", domain: "web.ig.com" },
-  { name: "TradingView", domain: "tradingview.com" },
-  { name: "Pepperstone", domain: "pepperstone.com" },
-  { name: "eToro", domain: "etoro.com" },
-  { name: "Plus500", domain: "plus500.com" },
-  { name: "OANDA", domain: "oanda.com" },
-  { name: "IC Markets", domain: "icmarkets.com" },
-  { name: "FXCM", domain: "fxcm.com" },
-  { name: "Interactive Brokers", domain: "interactivebrokers.com" },
-  { name: "MetaTrader", domain: "metatrader5.com" },
-  { name: "cTrader", domain: "ctrader.com" },
-  { name: "Binance", domain: "binance.com" },
-  { name: "Coinbase", domain: "coinbase.com" },
-  { name: "Kraken", domain: "kraken.com" },
-  { name: "Bybit", domain: "bybit.com" },
-  { name: "thinkorswim", domain: "thinkorswim.com" },
-  { name: "NinjaTrader", domain: "ninjatrader.com" },
+import {
+  LineChart,
+  CandlestickChart,
+  Bitcoin,
+  Globe,
+  Building2,
+  TrendingUp,
+  Briefcase,
+  Coins,
+} from "lucide-react";
+
+type PlatformKind = "broker" | "chart" | "crypto" | "platform";
+
+const PLATFORM_STYLES: Record<PlatformKind, { icon: typeof Globe; label: string; cls: string }> = {
+  broker:   { icon: Building2,       label: "Broker",   cls: "border-primary/40 bg-primary/10 text-primary" },
+  chart:    { icon: CandlestickChart, label: "Charts",   cls: "border-blue-500/40 bg-blue-500/10 text-blue-400" },
+  crypto:   { icon: Bitcoin,         label: "Crypto",   cls: "border-warning/40 bg-warning/10 text-warning" },
+  platform: { icon: LineChart,       label: "Platform", cls: "border-muted-foreground/30 bg-surface text-muted-foreground" },
+};
+
+const SUPPORTED_PLATFORMS: { name: string; domain: string; kind: PlatformKind; icon: typeof Globe }[] = [
+  { name: "IG",                  domain: "deal.ig.com",            kind: "broker",   icon: Building2 },
+  { name: "IG Web",              domain: "web.ig.com",             kind: "broker",   icon: Building2 },
+  { name: "TradingView",         domain: "tradingview.com",        kind: "chart",    icon: CandlestickChart },
+  { name: "Pepperstone",         domain: "pepperstone.com",        kind: "broker",   icon: Briefcase },
+  { name: "eToro",               domain: "etoro.com",              kind: "broker",   icon: TrendingUp },
+  { name: "Plus500",             domain: "plus500.com",            kind: "broker",   icon: Briefcase },
+  { name: "OANDA",               domain: "oanda.com",              kind: "broker",   icon: Globe },
+  { name: "IC Markets",          domain: "icmarkets.com",          kind: "broker",   icon: Briefcase },
+  { name: "FXCM",                domain: "fxcm.com",               kind: "broker",   icon: Globe },
+  { name: "Interactive Brokers", domain: "interactivebrokers.com", kind: "broker",   icon: Building2 },
+  { name: "MetaTrader",          domain: "metatrader5.com",        kind: "platform", icon: LineChart },
+  { name: "cTrader",             domain: "ctrader.com",            kind: "platform", icon: LineChart },
+  { name: "Binance",             domain: "binance.com",            kind: "crypto",   icon: Bitcoin },
+  { name: "Coinbase",            domain: "coinbase.com",           kind: "crypto",   icon: Coins },
+  { name: "Kraken",              domain: "kraken.com",             kind: "crypto",   icon: Bitcoin },
+  { name: "Bybit",               domain: "bybit.com",              kind: "crypto",   icon: Coins },
+  { name: "thinkorswim",         domain: "thinkorswim.com",        kind: "platform", icon: CandlestickChart },
+  { name: "NinjaTrader",         domain: "ninjatrader.com",        kind: "platform", icon: LineChart },
 ];
 
 function SupportedPlatforms() {
@@ -152,15 +172,29 @@ function SupportedPlatforms() {
           desc="ACE auto-detects when you're on one of these platforms and floats over your trading window."
         />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px bg-border border border-border rounded-lg overflow-hidden">
-          {SUPPORTED_PLATFORMS.map((p) => (
-            <div
-              key={p.domain}
-              className="bg-background p-4 hover:bg-surface transition-colors"
-            >
-              <div className="font-mono text-sm text-foreground">{p.name}</div>
-              <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{p.domain}</div>
-            </div>
-          ))}
+          {SUPPORTED_PLATFORMS.map((p) => {
+            const style = PLATFORM_STYLES[p.kind];
+            const Icon = p.icon;
+            return (
+              <div
+                key={p.domain}
+                className="bg-background p-4 hover:bg-surface transition-colors flex items-start gap-3"
+              >
+                <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md border ${style.cls}`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm text-foreground truncate">{p.name}</span>
+                    <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.cls}`}>
+                      {style.label}
+                    </span>
+                  </div>
+                  <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{p.domain}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
         <p className="mt-6 font-mono text-[11px] text-muted-foreground">
           Don't see your broker? ACE still works as an always-on-top window over any platform.
