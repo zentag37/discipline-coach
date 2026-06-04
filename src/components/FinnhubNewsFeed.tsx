@@ -72,17 +72,8 @@ export function FinnhubNewsFeed() {
     };
   }, [category]);
 
-  const filtered = useMemo(() => {
-    if (!items) return [];
-    // "Stocks" tab uses 'general' but we filter out forex/crypto entries
-    if (TABS[tabIdx].label === "Stocks") {
-      return items.filter((i) => {
-        const c = (i.category || "").toLowerCase();
-        return c !== "forex" && c !== "crypto";
-      });
-    }
-    return items;
-  }, [items, tabIdx]);
+  const filtered = items ?? [];
+
 
   return (
     <div
