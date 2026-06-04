@@ -102,6 +102,8 @@ function Index() {
       <Divider />
       <Features />
       <Divider />
+      <SupportedPlatforms />
+      <Divider />
       <Quotes />
       <Divider />
       <DownloadSection />
