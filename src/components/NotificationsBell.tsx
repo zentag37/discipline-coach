@@ -88,7 +88,10 @@ export function NotificationsBell() {
               {items.map((n) => (
                 <li
                   key={n.id}
-                  className="flex gap-3 px-3 py-3 hover:bg-white/5"
+                  onClick={() =>
+                    setItems((arr) => arr.map((x) => (x.id === n.id ? { ...x, read: true } : x)))
+                  }
+                  className="flex gap-3 px-3 py-3 hover:bg-white/5 cursor-pointer"
                   style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
                 >
                   <div className="mt-0.5"><TypeIcon type={n.type} /></div>
