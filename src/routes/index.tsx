@@ -218,12 +218,12 @@ function SupportedPlatforms() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm text-foreground truncate">{p.name}</span>
+                      <span className="font-mono text-sm text-foreground truncate">{highlight(p.name, q)}</span>
                       <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.cls}`}>
                         {style.label}
                       </span>
                     </div>
-                    <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{p.domain}</div>
+                    <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{highlight(p.domain, q)}</div>
                   </div>
                 </div>
               );
