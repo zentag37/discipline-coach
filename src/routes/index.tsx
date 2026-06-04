@@ -215,13 +215,47 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+const FAB_SIZE = 56;
+const FAB_STORAGE_KEY = "tw-ace-fab-pos";
+
 function FloatingMockup() {
   const [minimized, setMinimized] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const movedRef = useRef(false);
 
+  const clamp = (x: number, y: number) => {
+    if (typeof window === "undefined") return { x, y };
+    const maxX = window.innerWidth - FAB_SIZE - 8;
+    const maxY = window.innerHeight - FAB_SIZE - 8;
+    return { x: Math.max(8, Math.min(x, maxX)), y: Math.max(8, Math.min(y, maxY)) };
+  };
+
+  // Load saved position when minimizing
+  useEffect(() => {
+    if (!minimized || typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(FAB_STORAGE_KEY);
+      const saved = raw ? JSON.parse(raw) : null;
+      const initial = saved && typeof saved.x === "number"
+        ? clamp(saved.x, saved.y)
+        : clamp(window.innerWidth - FAB_SIZE - 24, window.innerHeight - FAB_SIZE - 24);
+      setPos(initial);
+    } catch {
+      setPos(clamp(window.innerWidth - FAB_SIZE - 24, window.innerHeight - FAB_SIZE - 24));
+    }
+  }, [minimized]);
+
+  // Keep within viewport on resize
+  useEffect(() => {
+    if (!minimized) return;
+    const onResize = () => setPos((p) => (p ? clamp(p.x, p.y) : p));
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [minimized]);
+
   function onFabPointerDown(e: React.PointerEvent) {
+    if (!pos) return;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y };
     movedRef.current = false;
@@ -231,29 +265,38 @@ function FloatingMockup() {
     const dx = e.clientX - dragRef.current.startX;
     const dy = e.clientY - dragRef.current.startY;
     if (Math.abs(dx) + Math.abs(dy) > 3) movedRef.current = true;
-    setPos({ x: dragRef.current.origX + dx, y: dragRef.current.origY + dy });
+    setPos(clamp(dragRef.current.origX + dx, dragRef.current.origY + dy));
   }
-  function onFabPointerUp(e: React.PointerEvent) {
+  function onFabPointerUp() {
     dragRef.current = null;
-    if (!movedRef.current) setMinimized(false);
+    if (!movedRef.current) {
+      setMinimized(false);
+    } else if (pos) {
+      try { localStorage.setItem(FAB_STORAGE_KEY, JSON.stringify(pos)); } catch {/*noop*/}
+    }
   }
 
   if (minimized) {
     return (
-      <div className="relative w-full max-w-md min-h-[420px]">
-        <button
-          onPointerDown={onFabPointerDown}
-          onPointerMove={onFabPointerMove}
-          onPointerUp={onFabPointerUp}
-          className="absolute h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 grid place-items-center cursor-grab active:cursor-grabbing touch-none select-none"
-          style={{ transform: `translate(${pos.x}px, ${pos.y}px)`, left: 0, top: 0 }}
-          aria-label="Expand coach"
-        >
-          <Circle className="h-3 w-3 fill-current" />
-        </button>
-      </div>
+      <>
+        <div className="relative w-full max-w-md min-h-[420px]" aria-hidden />
+        {pos && (
+          <button
+            onPointerDown={onFabPointerDown}
+            onPointerMove={onFabPointerMove}
+            onPointerUp={onFabPointerUp}
+            className="fixed z-50 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 grid place-items-center cursor-grab active:cursor-grabbing touch-none select-none"
+            style={{ left: pos.x, top: pos.y, width: FAB_SIZE, height: FAB_SIZE }}
+            aria-label="Expand coach"
+          >
+            <Circle className="h-3 w-3 fill-current" />
+          </button>
+        )}
+      </>
     );
   }
+
+
 
   return (
     <div className="relative w-full max-w-md">
