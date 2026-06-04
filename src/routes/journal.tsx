@@ -12,6 +12,7 @@ import { Lock, Radio } from "lucide-react";
 import { hasAceAccess } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({ meta: [{ title: "Journal — TradeWithAce" }] }),
@@ -150,7 +151,7 @@ function JournalPage() {
               <Plus size={14} /> Log a trade
             </button>
             <span style={{ color: "#9ca3af" }}>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-            <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
+            <NotificationsBell />
             <AvatarMenu initials={initials} />
           </div>
         </header>

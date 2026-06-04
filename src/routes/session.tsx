@@ -7,6 +7,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 export const Route = createFileRoute("/session")({
   head: () => ({ meta: [{ title: "Today's Session — TradeWithAce" }] }),
@@ -54,7 +55,7 @@ function SessionPage() {
           style={{ background: "#141820", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <h1 className="text-sm font-medium" style={{ fontFamily: FONT_SANS }}>Today's Session</h1>
           <div className="flex items-center gap-4 text-xs">
-            <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
+            <NotificationsBell />
             <AvatarMenu initials={initials} />
           </div>
         </header>

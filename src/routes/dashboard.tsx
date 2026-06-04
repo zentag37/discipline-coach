@@ -27,6 +27,7 @@ import { getLiveQuotes } from "@/lib/market.functions";
 import { getAceSignals } from "@/lib/signals.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
 import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
@@ -472,9 +473,7 @@ function DashboardPage() {
                 <span style={{ color: session.open ? "#22c55e" : "#ef4444" }}>{session.label}</span>
               </span>
             </div>
-            <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}>
-              <Bell size={16} />
-            </button>
+            <NotificationsBell />
             <AvatarMenu initials={initials} />
           </div>
         </header>

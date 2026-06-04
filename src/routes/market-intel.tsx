@@ -13,6 +13,7 @@ import { getLiveQuotes, type LiveQuote } from "@/lib/market.functions";
 import { getMarketNews } from "@/lib/news.functions";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 export const Route = createFileRoute("/market-intel")({
   head: () => ({ meta: [{ title: "Market Intel — TradeWithAce" }] }),
@@ -209,7 +210,7 @@ function MarketIntelPage() {
               <span style={{ color: "#9ca3af" }}>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
             </span>
             <span className="hidden md:inline" style={{ color: "#6b7280" }}>Next: New York opens in {nyIn}</span>
-            <button className="p-1.5 rounded hover:bg-white/5" style={{ color: "#9ca3af" }}><Bell size={16} /></button>
+            <NotificationsBell />
             <AvatarMenu initials={initials} />
           </div>
         </header>
