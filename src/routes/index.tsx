@@ -102,6 +102,8 @@ function Index() {
       <Divider />
       <Features />
       <Divider />
+      <SupportedPlatforms />
+      <Divider />
       <Quotes />
       <Divider />
       <DownloadSection />
@@ -117,6 +119,55 @@ function Divider() {
 
 function Container({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`mx-auto w-full max-w-6xl px-6 ${className}`}>{children}</div>;
+}
+
+const SUPPORTED_PLATFORMS = [
+  { name: "IG", domain: "deal.ig.com" },
+  { name: "IG Web", domain: "web.ig.com" },
+  { name: "TradingView", domain: "tradingview.com" },
+  { name: "Pepperstone", domain: "pepperstone.com" },
+  { name: "eToro", domain: "etoro.com" },
+  { name: "Plus500", domain: "plus500.com" },
+  { name: "OANDA", domain: "oanda.com" },
+  { name: "IC Markets", domain: "icmarkets.com" },
+  { name: "FXCM", domain: "fxcm.com" },
+  { name: "Interactive Brokers", domain: "interactivebrokers.com" },
+  { name: "MetaTrader", domain: "metatrader5.com" },
+  { name: "cTrader", domain: "ctrader.com" },
+  { name: "Binance", domain: "binance.com" },
+  { name: "Coinbase", domain: "coinbase.com" },
+  { name: "Kraken", domain: "kraken.com" },
+  { name: "Bybit", domain: "bybit.com" },
+  { name: "thinkorswim", domain: "thinkorswim.com" },
+  { name: "NinjaTrader", domain: "ninjatrader.com" },
+];
+
+function SupportedPlatforms() {
+  return (
+    <section id="platforms">
+      <Container className="py-20 md:py-24">
+        <SectionHead
+          tag="04 / supported"
+          title="Works with your broker."
+          desc="ACE auto-detects when you're on one of these platforms and floats over your trading window."
+        />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px bg-border border border-border rounded-lg overflow-hidden">
+          {SUPPORTED_PLATFORMS.map((p) => (
+            <div
+              key={p.domain}
+              className="bg-background p-4 hover:bg-surface transition-colors"
+            >
+              <div className="font-mono text-sm text-foreground">{p.name}</div>
+              <div className="mt-1 font-mono text-[11px] text-muted-foreground truncate">{p.domain}</div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 font-mono text-[11px] text-muted-foreground">
+          Don't see your broker? ACE still works as an always-on-top window over any platform.
+        </p>
+      </Container>
+    </section>
+  );
 }
 
 function Nav() {
