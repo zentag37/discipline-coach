@@ -73,11 +73,9 @@ function FloatingOverlay() {
   }, [minimized]);
 
   function minimize() {
-    sendToElectron("overlay:minimize", { width: FAB_SIZE, height: FAB_SIZE });
     setMinimized(true);
   }
   function expand() {
-    sendToElectron("overlay:expand", { width: WIDTH });
     setMinimized(false);
   }
 
@@ -100,7 +98,6 @@ function FloatingOverlay() {
       expand();
     } else if (pos) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(pos)); } catch {/*noop*/}
-      sendToElectron("overlay:fab-move", pos);
     }
   }
 
