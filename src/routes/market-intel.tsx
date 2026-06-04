@@ -227,6 +227,9 @@ function MarketIntelPage() {
             </div>
           </DemoCard>
 
+          {/* Live market news */}
+          <FinnhubNewsFeed />
+
           {/* Status row */}
           <div className="flex items-center justify-between text-[11px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
             <span>
