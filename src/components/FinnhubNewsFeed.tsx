@@ -43,21 +43,15 @@ export function FinnhubNewsFeed() {
   const [loading, setLoading] = useState(true);
 
   const category = TABS[tabIdx].value;
-  const apiKey = import.meta.env.VITE_FINNHUB_API_KEY as string | undefined;
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      if (!apiKey) {
-        setError("News API key not configured");
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       setError(null);
       try {
         const res = await fetch(
-          `https://finnhub.io/api/v1/news?category=${category}&token=${apiKey}`,
+          `https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB_TOKEN}`,
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: FinnhubNews[] = await res.json();
@@ -76,7 +70,7 @@ export function FinnhubNewsFeed() {
       cancelled = true;
       clearInterval(id);
     };
-  }, [category, apiKey]);
+  }, [category]);
 
   const filtered = useMemo(() => {
     if (!items) return [];
