@@ -21,6 +21,7 @@ import { Route as MarketIntelRouteImport } from './routes/market-intel'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FloatingRouteImport } from './routes/floating'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -94,6 +95,11 @@ const JournalRoute = JournalRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FloatingRoute = FloatingRouteImport.update({
+  id: '/floating',
+  path: '/floating',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/download': typeof DownloadRoute
+  '/floating': typeof FloatingRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/download': typeof DownloadRoute
+  '/floating': typeof FloatingRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/download': typeof DownloadRoute
+  '/floating': typeof FloatingRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/download'
+    | '/floating'
     | '/forgot-password'
     | '/journal'
     | '/login'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/download'
+    | '/floating'
     | '/forgot-password'
     | '/journal'
     | '/login'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/download'
+    | '/floating'
     | '/forgot-password'
     | '/journal'
     | '/login'
@@ -343,6 +355,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   DownloadRoute: typeof DownloadRoute
+  FloatingRoute: typeof FloatingRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   JournalRoute: typeof JournalRoute
   LoginRoute: typeof LoginRoute
@@ -443,6 +456,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/floating': {
+      id: '/floating'
+      path: '/floating'
+      fullPath: '/floating'
+      preLoaderRoute: typeof FloatingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -574,6 +594,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   DownloadRoute: DownloadRoute,
+  FloatingRoute: FloatingRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   JournalRoute: JournalRoute,
   LoginRoute: LoginRoute,
