@@ -413,8 +413,8 @@ function DashboardPage() {
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#22c55e" }} />
-              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22c55e" }} />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#ef4444" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#ef4444" }} />
             </span>
             <span style={{ color: "#9ca3af" }}>ACE is ready</span>
           </div>
@@ -469,8 +469,8 @@ function DashboardPage() {
             <div className="flex items-center gap-2">
               <span style={{ color: "#9ca3af" }}>{formatHeaderTime(displayNow)}</span>
               <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: session.open ? "#22c55e" : "#ef4444" }} />
-                <span style={{ color: session.open ? "#22c55e" : "#ef4444" }}>{session.label}</span>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: session.open ? "#ef4444" : "#ef4444" }} />
+                <span style={{ color: session.open ? "#ef4444" : "#ef4444" }}>{session.label}</span>
               </span>
             </div>
             <NotificationsBell />
@@ -724,8 +724,8 @@ function DashboardPage() {
                                 <span
                                   className="px-1.5 py-0.5 rounded text-[10px]"
                                   style={{
-                                    background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
-                                    color: t.direction === "BUY" ? "#22c55e" : "#ef4444",
+                                    background: t.direction === "BUY" ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.15)",
+                                    color: t.direction === "BUY" ? "#ef4444" : "#ef4444",
                                   }}
                                 >
                                   {t.direction}
@@ -763,8 +763,8 @@ function DashboardPage() {
                   YOUR WATCHLIST
                 </div>
                 <span className="flex items-center gap-1 text-[9px] tracking-widest px-1.5 py-0.5 rounded"
-                  style={{ background: "rgba(34,197,94,0.12)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }}>
-                  <span className="w-1 h-1 rounded-full" style={{ background: "#22c55e" }} />
+                  style={{ background: "rgba(239,68,68,0.12)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.3)" }}>
+                  <span className="w-1 h-1 rounded-full" style={{ background: "#ef4444" }} />
                   LIVE
                 </span>
               </div>
@@ -783,7 +783,7 @@ function DashboardPage() {
                             <span style={{ color: "#d1d5db" }}>
                               {q!.price.toLocaleString(undefined, { minimumFractionDigits: q!.decimals, maximumFractionDigits: q!.decimals })}
                             </span>
-                            <span className="flex items-center gap-0.5" style={{ color: up ? "#22c55e" : "#ef4444" }}>
+                            <span className="flex items-center gap-0.5" style={{ color: up ? "#ef4444" : "#ef4444" }}>
                               {up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                               {up ? "+" : ""}{q!.change.toFixed(2)}%
                             </span>
@@ -1065,7 +1065,7 @@ function TradeLogModal({ onClose, onSave, instruments }: { onClose: () => void; 
             <div className="grid grid-cols-2 gap-2">
               {(["BUY", "SELL"] as const).map((d) => {
                 const active = direction === d;
-                const color = d === "BUY" ? "#22c55e" : "#ef4444";
+                const color = d === "BUY" ? "#ef4444" : "#ef4444";
                 return (
                   <button
                     key={d}
