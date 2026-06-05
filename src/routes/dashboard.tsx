@@ -47,7 +47,7 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
 });
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 
 type Profile = {
   full_name?: string | null;
@@ -237,7 +237,7 @@ function DashboardPage() {
     const sLabel = getSessionStatus(new Date()).label.replace(" Open", "").replace(" Session", "") || "London";
     const greet = getGreeting();
     speakAsACE(
-      `${greet} ${fn}. ${sLabel} session is now open. Your max risk today is $${maxRiskAmt} per trade. Stay disciplined and wait for your setup.`,
+      `${greet} ${fn}. ${sLabel} session is now open. Your max risk today is €${maxRiskAmt} per trade. Stay disciplined and wait for your setup.`,
       p.voice_style || "marcus",
     ).catch(() => {});
   }
@@ -342,7 +342,7 @@ function DashboardPage() {
     if (!profile.voice_enabled || !userId) return;
     if (sessionPL <= -dailyStop && dailyStop > 0 && !lossLimitSpokenRef.current) {
       lossLimitSpokenRef.current = true;
-      const msg = `${firstName}. Daily stop loss reached. You're down $${Math.abs(sessionPL).toFixed(0)} today. This is your hard limit. Close everything and log off the platform. You fought well — come back tomorrow.`;
+      const msg = `${firstName}. Daily stop loss reached. You're down €${Math.abs(sessionPL).toFixed(0)} today. This is your hard limit. Close everything and log off the platform. You fought well — come back tomorrow.`;
       setLossOverlay(msg);
       speakAsACE(msg, profile.voice_style || "marcus").catch(() => {});
     }
@@ -391,7 +391,7 @@ function DashboardPage() {
           </div>
           <span
             className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-            style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}
+            style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}
           >
             {plan}
           </span>
@@ -500,8 +500,8 @@ function DashboardPage() {
 
           {/* Row 2 — stat cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
-            <StatCard label="MAX RISK PER TRADE" value={`$${maxRisk}`} sub={`${riskPct}% of $${acct.toLocaleString()}`} />
-            <StatCard label="DAILY STOP LOSS" value={`$${dailyStop}`} sub={`${dailyPct}% of $${acct.toLocaleString()}`} />
+            <StatCard label="MAX RISK PER TRADE" value={`€${maxRisk}`} sub={`${riskPct}% of €${acct.toLocaleString()}`} />
+            <StatCard label="DAILY STOP LOSS" value={`€${dailyStop}`} sub={`${dailyPct}% of €${acct.toLocaleString()}`} />
             <StatCard
               label="TRADES TODAY"
               value={`${trades.length} / ${maxTrades}`}
@@ -510,7 +510,7 @@ function DashboardPage() {
             />
             <StatCard
               label="TODAY'S P&L"
-              value={`${sessionPL < 0 ? "-" : ""}$${Math.abs(sessionPL).toFixed(2)}`}
+              value={`${sessionPL < 0 ? "-" : ""}€${Math.abs(sessionPL).toFixed(2)}`}
               sub={trades.length ? `${trades.length} trade${trades.length === 1 ? "" : "s"} logged` : "No trades logged yet"}
               valueColor={sessionPL > 0 ? TEAL : sessionPL < 0 ? "#ef4444" : undefined}
             />
@@ -798,7 +798,7 @@ function DashboardPage() {
                   );
                 })}
               </div>
-              <Link to="/market-intel" className="block mt-3 text-[10px] hover:underline" style={{ color: "#00d4a0" }}>
+              <Link to="/market-intel" className="block mt-3 text-[10px] hover:underline" style={{ color: "#ef4444" }}>
                 Open full Market Intel →
               </Link>
             </div>
@@ -885,8 +885,8 @@ function DashboardPage() {
               if (profile.voice_enabled) {
                 const amt = Math.abs(t.pl || 0).toFixed(0);
                 const msg = (t.pl || 0) >= 0
-                  ? `Good trade ${firstName}. $${amt} banked. Stay level — one win doesn't change your process.`
-                  : `One loss. $${amt}. You managed the risk — that's what matters. Stay focused.`;
+                  ? `Good trade ${firstName}. €${amt} banked. Stay level — one win doesn't change your process.`
+                  : `One loss. €${amt}. You managed the risk — that's what matters. Stay focused.`;
                 speakAsACE(msg, profile.voice_style || "marcus").catch(() => {});
               }
               setTimeout(() => setJournalStatus(null), 3000);
@@ -977,7 +977,7 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; labe
       onClick={(e) => { if (onClick) { e.preventDefault(); onClick(); } }}
       className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
       style={{
-        background: active ? "rgba(0,212,160,0.08)" : "transparent",
+        background: active ? "rgba(239,68,68,0.08)" : "transparent",
         color: active ? TEAL : "#9ca3af",
       }}
     >
@@ -1109,7 +1109,7 @@ function TradeLogModal({ onClose, onSave, instruments }: { onClose: () => void; 
                 <button key={e} onClick={() => setEmotion(e)}
                   className="w-10 h-10 rounded-full text-lg flex items-center justify-center"
                   style={{
-                    background: emotion === e ? "rgba(0,212,160,0.15)" : "transparent",
+                    background: emotion === e ? "rgba(239,68,68,0.15)" : "transparent",
                     border: `1px solid ${emotion === e ? TEAL : "rgba(255,255,255,0.1)"}`,
                   }}>
                   {e}

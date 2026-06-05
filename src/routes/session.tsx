@@ -14,7 +14,7 @@ export const Route = createFileRoute("/session")({
   component: SessionPage,
 });
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
@@ -91,7 +91,7 @@ function SessionPage() {
                 <button key={m} onClick={() => setMood(m)}
                   className="text-xs px-3 py-1.5 rounded-full transition-colors"
                   style={{
-                    background: mood === m ? "rgba(0,212,160,0.15)" : "rgba(255,255,255,0.04)",
+                    background: mood === m ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.04)",
                     color: mood === m ? TEAL : "#9ca3af",
                     border: `1px solid ${mood === m ? TEAL + "55" : "rgba(255,255,255,0.08)"}`,
                     fontFamily: FONT_SANS,
@@ -164,7 +164,7 @@ function Sidebar({ plan, initials, firstName, active }: {
           <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
+          style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
       </div>
       <nav className="flex-1 px-2 space-y-0.5">
         {items.map((it) => {
@@ -173,7 +173,7 @@ function Sidebar({ plan, initials, firstName, active }: {
             <a key={it.label} href={it.to}
               className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
               style={{
-                background: isActive ? "rgba(0,212,160,0.08)" : "transparent",
+                background: isActive ? "rgba(239,68,68,0.08)" : "transparent",
                 color: isActive ? TEAL : "#9ca3af",
               }}>
               <it.icon size={16} style={{ color: isActive ? TEAL : "#6b7280" }} />

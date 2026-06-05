@@ -146,9 +146,9 @@ function FeedbackPage() {
                   onClick={() => setFilter(t.key)}
                   className="text-xs px-2.5 py-1 rounded transition-colors"
                   style={{
-                    background: filter === t.key ? "rgba(0,212,160,0.12)" : "transparent",
+                    background: filter === t.key ? "rgba(239,68,68,0.12)" : "transparent",
                     color: filter === t.key ? adminTheme.TEAL : "#9ca3af",
-                    border: `1px solid ${filter === t.key ? "rgba(0,212,160,0.3)" : adminTheme.BORDER}`,
+                    border: `1px solid ${filter === t.key ? "rgba(239,68,68,0.3)" : adminTheme.BORDER}`,
                   }}
                 >
                   {t.label}

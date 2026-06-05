@@ -17,7 +17,7 @@ export const Route = createFileRoute("/settings")({
   component: SettingsPage,
 });
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 const AMBER = "#f59e0b";
 const RED = "#ef4444";
 const GREEN = "#22c55e";
@@ -208,7 +208,7 @@ function SettingsPage() {
                 <button key={n.id} onClick={() => scrollTo(n.id)}
                   className="w-full flex items-center gap-2 px-2.5 py-2 rounded text-xs text-left transition-colors"
                   style={{
-                    background: active === n.id ? "rgba(0,212,160,0.08)" : "transparent",
+                    background: active === n.id ? "rgba(239,68,68,0.08)" : "transparent",
                     color: active === n.id ? TEAL : "#9ca3af",
                   }}>
                   <n.icon size={13} />
@@ -225,7 +225,7 @@ function SettingsPage() {
               <button key={n.id} onClick={() => scrollTo(n.id)}
                 className="text-[11px] px-3 py-1.5 rounded-full flex-shrink-0"
                 style={{
-                  background: active === n.id ? "rgba(0,212,160,0.12)" : "rgba(255,255,255,0.04)",
+                  background: active === n.id ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.04)",
                   color: active === n.id ? TEAL : "#9ca3af",
                 }}>
                 {n.label}
@@ -238,7 +238,7 @@ function SettingsPage() {
             <Section id="profile" title="Profile" refs={refs}>
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl"
-                  style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>{initials}</div>
+                  style={{ background: "rgba(239,68,68,0.15)", color: TEAL }}>{initials}</div>
                 <button className="text-xs hover:underline" style={{ color: "#9ca3af" }}>Change photo</button>
               </div>
               <Field label="FULL NAME">
@@ -280,7 +280,7 @@ function SettingsPage() {
               </span>}>
               <Field label="ACCOUNT SIZE">
                 <Select value={String(form.account_size)} onChange={(v) => set("account_size", Number(v))}
-                  options={["1000", "5000", "10000", "25000", "50000", "100000", "250000"].map((v) => v)} format={(v) => `$${Number(v).toLocaleString()}`} />
+                  options={["1000", "5000", "10000", "25000", "50000", "100000", "250000"].map((v) => v)} format={(v) => `€${Number(v).toLocaleString()}`} />
               </Field>
               <Field label="RISK PER TRADE">
                 <Pills value={String(form.risk_per_trade)} onChange={(v) => set("risk_per_trade", Number(v))}
@@ -349,7 +349,7 @@ function SettingsPage() {
             {/* ACE */}
             <Section id="ace" title="ACE Mentor" refs={refs}
               badge={<span className="text-[9px] px-1.5 py-0.5 rounded"
-                style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>AI</span>}>
+                style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>AI</span>}>
               <Field label="WHAT DO YOU WANT TO CALL YOUR MENTOR?">
                 <Input value={form.ace_name} onChange={(v) => set("ace_name", v)} placeholder="ACE" />
               </Field>
@@ -363,7 +363,7 @@ function SettingsPage() {
                     <button key={c.id} onClick={() => set("coaching_style", c.id)}
                       className="p-3 rounded-[10px] text-left transition-all"
                       style={{
-                        background: form.coaching_style === c.id ? "rgba(0,212,160,0.08)" : "#1c2230",
+                        background: form.coaching_style === c.id ? "rgba(239,68,68,0.08)" : "#1c2230",
                         border: `1px solid ${form.coaching_style === c.id ? TEAL : "rgba(255,255,255,0.08)"}`,
                       }}>
                       <div className="text-lg mb-1">{c.icon}</div>
@@ -401,7 +401,7 @@ function SettingsPage() {
                       <div key={v.name} onClick={() => set("voice_personality", v.name)}
                         className="p-3 rounded-[10px] cursor-pointer transition-all"
                         style={{
-                          background: form.voice_personality === v.name ? "rgba(0,212,160,0.08)" : "#1c2230",
+                          background: form.voice_personality === v.name ? "rgba(239,68,68,0.08)" : "#1c2230",
                           border: `1px solid ${form.voice_personality === v.name ? TEAL : "rgba(255,255,255,0.08)"}`,
                         }}>
                         <div className="flex items-center justify-between">
@@ -644,7 +644,7 @@ function Pills({ value, onChange, options, suffix = "" }: { value: string; onCha
           <button key={o} onClick={() => onChange(o)}
             className="text-xs px-3 py-1.5 rounded-full"
             style={{
-              background: active ? "rgba(0,212,160,0.12)" : "#1c2230",
+              background: active ? "rgba(239,68,68,0.12)" : "#1c2230",
               color: active ? TEAL : "#9ca3af",
               border: `1px solid ${active ? TEAL : "rgba(255,255,255,0.08)"}`,
             }}>
@@ -666,7 +666,7 @@ function MultiPills({ value, onChange, options }: { value: string[]; onChange: (
           <button key={o} onClick={() => toggle(o)}
             className="text-xs px-3 py-1.5 rounded-full"
             style={{
-              background: active ? "rgba(0,212,160,0.12)" : "#1c2230",
+              background: active ? "rgba(239,68,68,0.12)" : "#1c2230",
               color: active ? TEAL : "#9ca3af",
               border: `1px solid ${active ? TEAL : "rgba(255,255,255,0.08)"}`,
             }}>
@@ -690,7 +690,7 @@ function ChipInput({ value, onChange }: { value: string[]; onChange: (v: string[
       style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.1)" }}>
       {value.map((c) => (
         <span key={c} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(0,212,160,0.12)", color: TEAL }}>
+          style={{ background: "rgba(239,68,68,0.12)", color: TEAL }}>
           {c}
           <button onClick={() => onChange(value.filter((v) => v !== c))}><X size={11} /></button>
         </span>
@@ -732,7 +732,7 @@ function OptionCard({ label, active, onClick }: { label: string; active: boolean
   return (
     <button onClick={onClick} className="p-2.5 rounded-[10px] text-xs"
       style={{
-        background: active ? "rgba(0,212,160,0.08)" : "#1c2230",
+        background: active ? "rgba(239,68,68,0.08)" : "#1c2230",
         color: active ? TEAL : "#d1d5db",
         border: `1px solid ${active ? TEAL : "rgba(255,255,255,0.08)"}`,
         fontFamily: FONT_SANS,
@@ -761,7 +761,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
           <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
+          style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
       </div>
       <nav className="flex-1 px-2 space-y-0.5">
         {items.map((it) => {
@@ -769,7 +769,7 @@ function Sidebar({ plan, initials, firstName, onSignOut }: { plan: string; initi
           return (
             <a key={it.label} href={it.to}
               className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
-              style={{ background: isActive ? "rgba(0,212,160,0.08)" : "transparent", color: isActive ? TEAL : "#9ca3af" }}>
+              style={{ background: isActive ? "rgba(239,68,68,0.08)" : "transparent", color: isActive ? TEAL : "#9ca3af" }}>
               <it.icon size={16} style={{ color: isActive ? TEAL : "#6b7280" }} />
               <span style={{ fontFamily: FONT_SANS }}>{it.label}</span>
             </a>

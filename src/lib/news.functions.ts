@@ -86,7 +86,7 @@ async function fetchFromNewsAPI(symbol: string, apiKey: string): Promise<NewsArt
 
 function decodeEntities(s: string) {
   return s
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "€1")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")

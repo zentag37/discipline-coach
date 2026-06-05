@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { checkAdmin } from "@/lib/admin.functions";
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 const BG = "#0a0c0f";
 const PANEL = "#0d0f12";
 const BORDER = "rgba(255,255,255,0.06)";
@@ -82,7 +82,7 @@ export function AdminLayout({ children, title }: { children: ReactNode; title: s
                 to={n.to}
                 className="flex items-center gap-3 px-3 py-2 rounded text-sm transition-colors"
                 style={{
-                  background: active ? "rgba(0,212,160,0.08)" : "transparent",
+                  background: active ? "rgba(239,68,68,0.08)" : "transparent",
                   color: active ? TEAL : "#9ca3af",
                 }}
               >

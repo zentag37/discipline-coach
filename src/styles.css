@@ -53,9 +53,9 @@
   --muted: #1c2230;
   --muted-foreground: #8a94a3;
 
-  --primary: #00d4a0;
+  --primary: #ef4444;
   --primary-foreground: #0d0f12;
-  --accent: #00d4a0;
+  --accent: #ef4444;
   --warning: #f5a623;
   --danger: #ff5c5c;
 }
@@ -68,9 +68,9 @@
   --border: #232a36;
   --muted: #1c2230;
   --muted-foreground: #8a94a3;
-  --primary: #00d4a0;
+  --primary: #ef4444;
   --primary-foreground: #0d0f12;
-  --accent: #00d4a0;
+  --accent: #ef4444;
   --warning: #f5a623;
   --danger: #ff5c5c;
 }

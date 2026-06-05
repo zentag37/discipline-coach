@@ -21,7 +21,7 @@ export const Route = createFileRoute("/market-intel")({
   component: MarketIntelPage,
 });
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 const AMBER = "#f59e0b";
 const RED = "#ef4444";
 const GREEN = "#22c55e";
@@ -391,7 +391,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
               return (
                 <div key={p.label}
                   className="flex items-center justify-between px-2 py-1 rounded text-[11px]"
-                  style={{ background: isPP ? "rgba(0,212,160,0.1)" : "transparent" }}>
+                  style={{ background: isPP ? "rgba(239,68,68,0.1)" : "transparent" }}>
                   <span style={{ color, width: 28 }}>{p.label}</span>
                   <span style={{ color: isPP ? TEAL : "#d1d5db" }}>{fmt(p.price, ins.decimals)}</span>
                   <span className="text-[10px]" style={{ color: "#6b7280" }}>
@@ -568,7 +568,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
           <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>
+          style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>
           {plan}
         </span>
       </div>
@@ -579,7 +579,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
             <a key={it.label} href={it.to}
               className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
               style={{
-                background: isActive ? "rgba(0,212,160,0.08)" : "transparent",
+                background: isActive ? "rgba(239,68,68,0.08)" : "transparent",
                 color: isActive ? TEAL : "#9ca3af",
               }}>
               <it.icon size={16} style={{ color: isActive ? TEAL : "#6b7280" }} />

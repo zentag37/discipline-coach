@@ -17,8 +17,8 @@ function AdminSubs() {
   return (
     <AdminLayout title="Subscriptions">
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <StatCard label="MRR" value={data ? `$${data.summary.mrr}` : "—"} />
-        <StatCard label="ARR" value={data ? `$${data.summary.arr}` : "—"} />
+        <StatCard label="MRR" value={data ? `€${data.summary.mrr}` : "—"} />
+        <StatCard label="ARR" value={data ? `€${data.summary.arr}` : "—"} />
         <StatCard label="Active" value={data?.summary.activeCount ?? "—"} />
         <StatCard label="Cancelled this month" value={data?.summary.cancelledThisMonth ?? "—"} />
         <StatCard label="Failed payments" value={data?.summary.failedPayments ?? "—"} />
