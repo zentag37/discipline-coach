@@ -82,6 +82,11 @@ function FloatingOverlay() {
     (window as any).electronAPI?.expandWindow?.();
     setMinimized(false);
   }
+  function hideWindow() {
+    const api = (window as any).aceAPI ?? (window as any).electronAPI;
+    api?.hideWindow?.();
+  }
+  const isElectron = typeof window !== "undefined" && (window as any).electronAPI !== undefined;
 
   function onFabDown(e: React.PointerEvent) {
     if (!pos) return;
