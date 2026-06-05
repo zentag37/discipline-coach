@@ -71,7 +71,7 @@ export function buildTraderContext(profile: any, todayTrades: any[]) {
     tradesToday: todayTrades.length,
     todayPL,
     lastEmotion,
-    summary: `Trader: ${name}. Session: ${session}. Instruments: ${instruments}. Account: $${acct}. Risk/trade: ${riskPct}%. Trades today: ${todayTrades.length}/${maxTrades}. Today P&L: $${todayPL.toFixed(2)}.${lastEmotion ? ` Last emotion: ${lastEmotion}.` : ""}`,
+    summary: `Trader: ${name}. Session: ${session}. Instruments: ${instruments}. Account: €${acct}. Risk/trade: ${riskPct}%. Trades today: ${todayTrades.length}/${maxTrades}. Today P&L: €${todayPL.toFixed(2)}.${lastEmotion ? ` Last emotion: ${lastEmotion}.` : ""}`,
   };
 }
 

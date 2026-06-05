@@ -33,7 +33,7 @@ function AdminOverview() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <StatCard label="Total users" value={stats?.totalUsers ?? "—"} />
         <StatCard label="Active today" value={stats?.activeToday ?? "—"} />
-        <StatCard label="Monthly revenue" value={stats ? `$${stats.monthlyRevenue}` : "—"} />
+        <StatCard label="Monthly revenue" value={stats ? `€${stats.monthlyRevenue}` : "—"} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard label="Churn this month" value={stats?.churnThisMonth ?? "—"} />

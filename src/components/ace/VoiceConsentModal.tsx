@@ -1,6 +1,6 @@
 import { Volume2 } from "lucide-react";
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 
 export function VoiceConsentModal({
   onEnable,
@@ -25,7 +25,7 @@ export function VoiceConsentModal({
       >
         <div
           className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-          style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}
+          style={{ background: "rgba(239,68,68,0.15)", color: TEAL }}
         >
           <Volume2 size={22} />
         </div>

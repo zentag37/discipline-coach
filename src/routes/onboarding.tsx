@@ -569,12 +569,12 @@ function Step3({ p, set }: { p: Profile; set: <K extends keyof Profile>(k: K, v:
 /* ---------- Step 4 ---------- */
 
 const ACCOUNT_SIZES = [
-  { label: "Under $1k", mid: 500 },
-  { label: "$1k–$5k", mid: 3000 },
-  { label: "$5k–$25k", mid: 15000 },
-  { label: "$25k–$100k", mid: 62500 },
-  { label: "$100k–$500k", mid: 300000 },
-  { label: "$500k+", mid: 500000 },
+  { label: "Under €1k", mid: 500 },
+  { label: "€1k–€5k", mid: 3000 },
+  { label: "€5k–€25k", mid: 15000 },
+  { label: "€25k–€100k", mid: 62500 },
+  { label: "€100k–€500k", mid: 300000 },
+  { label: "€500k+", mid: 500000 },
 ];
 
 function pctOrCustom(v: string) {
@@ -671,7 +671,7 @@ function Step4({ p, set }: { p: Profile; set: <K extends keyof Profile>(k: K, v:
       {accountMid > 0 && riskPct > 0 && (
         <div
           className="rounded-md bg-surface-2 px-4 py-3.5 animate-fade-in"
-          style={{ borderLeft: "3px solid #00d4a0", border: "1px solid rgba(255,255,255,0.08)", borderLeftWidth: 3, borderLeftColor: "#00d4a0" }}
+          style={{ borderLeft: "3px solid #ef4444", border: "1px solid rgba(255,255,255,0.08)", borderLeftWidth: 3, borderLeftColor: "#ef4444" }}
         >
           <div className="font-mono text-[11px] uppercase tracking-wider text-primary mb-2">
             ACE will enforce these rules for you:
@@ -679,13 +679,13 @@ function Step4({ p, set }: { p: Profile; set: <K extends keyof Profile>(k: K, v:
           <div className="space-y-1.5 font-mono text-xs">
             <PreviewRow
               label="Max risk per trade"
-              value={`$${Math.round(accountMid * riskPct).toLocaleString()}`}
-              note={`(${p.risk_per_trade} of $${accountMid.toLocaleString()})`}
+              value={`€${Math.round(accountMid * riskPct).toLocaleString()}`}
+              note={`(${p.risk_per_trade} of €${accountMid.toLocaleString()})`}
             />
             <PreviewRow
               label="Daily stop loss"
-              value={`$${Math.round(accountMid * lossPct).toLocaleString()}`}
-              note={`(${p.daily_loss_limit} of $${accountMid.toLocaleString()})`}
+              value={`€${Math.round(accountMid * lossPct).toLocaleString()}`}
+              note={`(${p.daily_loss_limit} of €${accountMid.toLocaleString()})`}
             />
             <PreviewRow
               label="Max trades today"

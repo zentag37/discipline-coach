@@ -20,7 +20,7 @@ type Rss2JsonResp = {
   message?: string;
 };
 
-const TEAL = "#00d4a0";
+const TEAL = "#ef4444";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 

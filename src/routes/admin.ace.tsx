@@ -19,7 +19,7 @@ function AdminAce() {
         <StatCard label="ACE messages" value={data?.totalMessages ?? "—"} />
         <StatCard label="Weekly reviews" value={data?.totalReviews ?? "—"} />
         <StatCard label="Voice users" value={data?.voiceUsers ?? "—"} />
-        <StatCard label="Est. API cost (mo)" value={data ? `$${data.apiCostEstimate}` : "—"} />
+        <StatCard label="Est. API cost (mo)" value={data ? `€${data.apiCostEstimate}` : "—"} />
       </div>
       <Panel title="Top 10 ACE users">
         <table className="w-full text-sm">
