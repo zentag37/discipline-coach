@@ -124,6 +124,8 @@ function FloatingOverlay() {
           onPointerDown={onFabDown}
           onPointerMove={onFabMove}
           onPointerUp={onFabUp}
+          onPointerCancel={onFabUp}
+          onClick={onFabClick}
           className="fixed rounded-full grid place-items-center cursor-grab active:cursor-grabbing touch-none select-none shadow-lg"
           style={{
             left: pos.x,
