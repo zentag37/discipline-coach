@@ -23,7 +23,7 @@ type FeedbackItem = {
 const STATUS_COLORS: Record<string, string> = {
   new: "#3b82f6",
   in_progress: "#f59e0b",
-  resolved: "#ef4444",
+  resolved: "#10b981",
   archived: "#6b7280",
 };
 

@@ -24,7 +24,7 @@ export const Route = createFileRoute("/market-intel")({
 const TEAL = "#ef4444";
 const AMBER = "#f59e0b";
 const RED = "#ef4444";
-const GREEN = "#ef4444";
+const GREEN = "#22c55e";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
@@ -351,7 +351,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
           </div>
           {ins.price > 0 && (
             <span className="text-xs px-2 py-1 rounded"
-              style={{ background: up ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
+              style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
               {up ? "▲" : "▼"} {up ? "+" : ""}{ins.change.toFixed(2)}%
             </span>
           )}
@@ -387,7 +387,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
           <div className="space-y-0.5">
             {ins.pivots.map((p) => {
               const isPP = p.type === "PP";
-              const color = p.type === "R" ? "rgba(239,68,68,0.85)" : p.type === "S" ? "rgba(239,68,68,0.85)" : TEAL;
+              const color = p.type === "R" ? "rgba(34,197,94,0.85)" : p.type === "S" ? "rgba(239,68,68,0.85)" : TEAL;
               return (
                 <div key={p.label}
                   className="flex items-center justify-between px-2 py-1 rounded text-[11px]"
@@ -519,7 +519,7 @@ function LivePill({ live, error }: { live: boolean; error?: string }) {
   }
   return (
     <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10 flex items-center gap-1"
-      style={{ background: "rgba(239,68,68,0.12)", color: GREEN, border: "1px solid rgba(239,68,68,0.3)" }}>
+      style={{ background: "rgba(34,197,94,0.12)", color: GREEN, border: "1px solid rgba(34,197,94,0.3)" }}>
       <span className="relative flex h-1.5 w-1.5">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: GREEN }} />
         <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: GREEN }} />

@@ -19,7 +19,7 @@ const INITIAL: Notification[] = [
 function TypeIcon({ type }: { type: Notification["type"] }) {
   const common = { size: 16 };
   if (type === "warning") return <AlertTriangle {...common} style={{ color: "#f5a623" }} />;
-  if (type === "success") return <CheckCircle2 {...common} style={{ color: "#ef4444" }} />;
+  if (type === "success") return <CheckCircle2 {...common} style={{ color: "#22c55e" }} />;
   return <Info {...common} style={{ color: "#ef4444" }} />;
 }
 
