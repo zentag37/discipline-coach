@@ -100,6 +100,12 @@ function Hero() {
 
   useEffect(() => {
     setLoadingPlan(null);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("canceled") || params.has("success") || params.has("subscribed")) {
+        setLoadingPlan(null);
+      }
+    }
     const onShow = () => setLoadingPlan(null);
     const onVis = () => { if (document.visibilityState === "visible") setLoadingPlan(null); };
     window.addEventListener("pageshow", onShow);
