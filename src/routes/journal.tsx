@@ -320,7 +320,7 @@ function ExampleEntry() {
 
       <div className="flex flex-wrap items-center gap-2 mb-4 pr-20">
         <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>EURUSD</span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}>BUY</span>
+        <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(239,68,68,0.15)", color: "#ef4444" }}>BUY</span>
         <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(239,68,68,0.15)", color: TEAL }}>+€220</span>
         <span className="ml-auto text-[11px]" style={{ color: "#6b7280" }}>Fri 30 May · 10:42am</span>
       </div>
@@ -417,7 +417,7 @@ function TradeEntry({ t }: { t: any }) {
         <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>{t.instrument || "—"}</span>
         {t.direction && (
           <span className="text-[10px] px-1.5 py-0.5 rounded"
-            style={{ background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: t.direction === "BUY" ? "#22c55e" : "#ef4444" }}>
+            style={{ background: t.direction === "BUY" ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.15)", color: t.direction === "BUY" ? "#ef4444" : "#ef4444" }}>
             {t.direction}
           </span>
         )}
@@ -536,8 +536,8 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
           style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#22c55e" }} />
-            <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22c55e" }} />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#ef4444" }} />
+            <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#ef4444" }} />
           </span>
           <span style={{ color: "#9ca3af" }}>ACE is ready</span>
         </div>

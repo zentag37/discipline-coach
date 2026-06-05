@@ -20,7 +20,7 @@ export const Route = createFileRoute("/settings")({
 const TEAL = "#ef4444";
 const AMBER = "#f59e0b";
 const RED = "#ef4444";
-const GREEN = "#22c55e";
+const GREEN = "#ef4444";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
