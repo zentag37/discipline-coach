@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Minus, TrendingUp, TrendingDown, Bell, Activity } from "lucide-react";
+import { Minus, TrendingUp, TrendingDown, Bell, Activity, X } from "lucide-react";
 
 export const Route = createFileRoute("/floating")({
   head: () => ({
@@ -82,6 +82,11 @@ function FloatingOverlay() {
     (window as any).electronAPI?.expandWindow?.();
     setMinimized(false);
   }
+  function hideWindow() {
+    const api = (window as any).aceAPI ?? (window as any).electronAPI;
+    api?.hideWindow?.();
+  }
+  const isElectron = typeof window !== "undefined" && (window as any).electronAPI !== undefined;
 
   function onFabDown(e: React.PointerEvent) {
     if (!pos) return;
@@ -176,18 +181,36 @@ function FloatingOverlay() {
           <Logo size={18} />
           <span className="text-[12px] tracking-tight">TradeWithAce</span>
         </div>
-        <button
-          onClick={minimize}
-          className="grid place-items-center rounded hover:bg-white/10 transition"
-          style={{
-            width: 22, height: 22, color: "#9ca3af",
-            // @ts-expect-error electron drag region
-            WebkitAppRegion: "no-drag",
-          }}
-          aria-label="Minimize"
-        >
-          <Minus size={14} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={minimize}
+            className="grid place-items-center rounded hover:bg-white/10 transition"
+            style={{
+              width: 22, height: 22, color: "#9ca3af",
+              // @ts-expect-error electron drag region
+              WebkitAppRegion: "no-drag",
+            }}
+            aria-label="Minimize"
+          >
+            <Minus size={14} />
+          </button>
+          {isElectron && (
+            <button
+              onClick={hideWindow}
+              className="grid place-items-center rounded transition"
+              style={{
+                width: 22, height: 22,
+                color: "#ffffff",
+                background: "rgba(0,0,0,0.45)",
+                // @ts-expect-error electron drag region
+                WebkitAppRegion: "no-drag",
+              }}
+              aria-label="Hide window"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Status */}
