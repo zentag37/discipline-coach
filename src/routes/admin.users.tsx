@@ -113,7 +113,7 @@ function Avatar({ name }: { name: string }) {
   return (
     <div
       className="w-7 h-7 grid place-items-center rounded-full text-[11px] font-semibold"
-      style={{ background: "rgba(239,68,68,0.15)", color: adminTheme.TEAL }}
+      style={{ background: "rgba(0,212,160,0.15)", color: adminTheme.TEAL }}
     >
       {initials}
     </div>
@@ -132,7 +132,7 @@ function PlanPill({ plan }: { plan?: string }) {
 
 function StatusPill({ status }: { status?: string }) {
   const s = (status || "inactive").toLowerCase();
-  const color = s === "active" ? adminTheme.TEAL : s === "past_due" ? "#f59e0b" : s === "cancelled" ? "#ef4444" : "#6b7280";
+  const color = s === "active" ? adminTheme.TEAL : s === "past_due" ? "#f59e0b" : s === "cancelled" ? "#00d4a0" : "#6b7280";
   const label = s === "past_due" ? "Past due" : s.charAt(0).toUpperCase() + s.slice(1);
   return <span className="text-xs" style={{ color }}>{label}</span>;
 }
@@ -195,7 +195,7 @@ function UserDetailPanel({ userId, onClose }: { userId: string; onClose: () => v
                   {data.recentTrades.map((t: any) => (
                     <div key={t.id} className="text-xs flex justify-between p-2 rounded" style={{ background: "#0a0c0f" }}>
                       <span>{t.trade_date} · {t.instrument || "—"} {t.direction || ""}</span>
-                      <span style={{ color: Number(t.result_dollars) >= 0 ? adminTheme.TEAL : "#ef4444" }}>
+                      <span style={{ color: Number(t.result_dollars) >= 0 ? adminTheme.TEAL : "#00d4a0" }}>
                         {t.result_dollars != null ? `${Number(t.result_dollars) >= 0 ? "+" : ""}€${Number(t.result_dollars).toFixed(0)}` : "—"}
                       </span>
                     </div>

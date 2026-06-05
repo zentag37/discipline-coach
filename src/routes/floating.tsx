@@ -121,8 +121,8 @@ function FloatingOverlay() {
             width: FAB_SIZE,
             height: FAB_SIZE,
             background: "#0d0f12",
-            border: "1px solid rgba(239,68,68,0.5)",
-            boxShadow: "0 8px 24px rgba(239,68,68,0.25)",
+            border: "1px solid rgba(0,212,160,0.5)",
+            boxShadow: "0 8px 24px rgba(0,212,160,0.25)",
           }}
           aria-label="Expand TradeWithAce"
         >
@@ -178,10 +178,10 @@ function FloatingOverlay() {
       <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <div className="flex items-center gap-2">
           <span className="relative grid place-items-center" style={{ width: 8, height: 8 }}>
-            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "#ef4444", opacity: 0.4 }} />
-            <span className="relative rounded-full" style={{ width: 8, height: 8, background: "#ef4444" }} />
+            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "#00d4a0", opacity: 0.4 }} />
+            <span className="relative rounded-full" style={{ width: 8, height: 8, background: "#00d4a0" }} />
           </span>
-          <span className="text-[11px]" style={{ color: "#ef4444" }}>Active</span>
+          <span className="text-[11px]" style={{ color: "#00d4a0" }}>Active</span>
         </div>
         <span className="text-[10px] uppercase tracking-widest" style={{ color: "#6b7280" }}>Session · live</span>
       </div>
@@ -189,7 +189,7 @@ function FloatingOverlay() {
       {/* Live overview */}
       <section className="px-3 pt-3 pb-2">
         <div className="flex items-center gap-1.5 mb-2">
-          <Activity size={11} style={{ color: "#ef4444" }} />
+          <Activity size={11} style={{ color: "#00d4a0" }} />
           <h2 className="text-[10px] uppercase tracking-widest" style={{ color: "#9ca3af" }}>Live overview</h2>
         </div>
         <div className="space-y-1">
@@ -203,7 +203,7 @@ function FloatingOverlay() {
       <section className="px-3 pt-3 pb-3 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
-            <Bell size={11} style={{ color: "#ef4444" }} />
+            <Bell size={11} style={{ color: "#00d4a0" }} />
             <h2 className="text-[10px] uppercase tracking-widest" style={{ color: "#9ca3af" }}>ACE Alerts</h2>
           </div>
           <span className="text-[10px]" style={{ color: "#6b7280" }}>3 / 5 trades</span>
@@ -216,7 +216,7 @@ function FloatingOverlay() {
                 className="mt-1 rounded-full"
                 style={{
                   width: 5, height: 5, flexShrink: 0,
-                  background: a.tone === "ok" ? "#ef4444" : "#3b82f6",
+                  background: a.tone === "ok" ? "#00d4a0" : "#3b82f6",
                 }}
               />
               <span className="text-[11px] leading-snug" style={{ color: "#d1d5db" }}>{a.text}</span>
@@ -227,14 +227,14 @@ function FloatingOverlay() {
 
       <footer className="px-3 py-2 border-t flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <span className="text-[10px]" style={{ color: "#6b7280" }}>v1.0 · floating overlay</span>
-        <span className="text-[10px]" style={{ color: "#ef4444" }}>● online</span>
+        <span className="text-[10px]" style={{ color: "#00d4a0" }}>● online</span>
       </footer>
     </div>
   );
 }
 
 function QuoteRow({ q }: { q: Quote }) {
-  const color = q.up ? "#ef4444" : "#ef4444";
+  const color = q.up ? "#00d4a0" : "#00d4a0";
   const Icon = q.up ? TrendingUp : TrendingDown;
   return (
     <div
@@ -258,8 +258,8 @@ function Logo({ size = 18 }: { size?: number }) {
       className="grid place-items-center rounded"
       style={{
         width: size, height: size,
-        background: "rgba(239,68,68,0.15)",
-        color: "#ef4444",
+        background: "rgba(0,212,160,0.15)",
+        color: "#00d4a0",
         fontSize: size * 0.55,
         fontWeight: 600,
         fontFamily: "'IBM Plex Mono', monospace",

@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 
 async function signOutAndRedirect() {
   try { await supabase.auth.signOut(); } catch {}
@@ -24,7 +24,7 @@ export function AvatarMenu({ initials }: { initials: string }) {
       <DropdownMenuTrigger asChild>
         <button
           className="w-8 h-8 rounded-full flex items-center justify-center text-xs hover:opacity-90 transition-opacity"
-          style={{ background: "rgba(239,68,68,0.15)", color: TEAL }}
+          style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}
           aria-label="Account menu"
         >
           {initials}
@@ -42,7 +42,7 @@ export function AvatarMenu({ initials }: { initials: string }) {
           <SettingsIcon size={14} className="mr-2" /> Settings
         </DropdownMenuItem>
         <DropdownMenuSeparator style={{ background: "rgba(255,255,255,0.08)" }} />
-        <DropdownMenuItem onClick={signOutAndRedirect} className="cursor-pointer" style={{ color: "#ef4444" }}>
+        <DropdownMenuItem onClick={signOutAndRedirect} className="cursor-pointer" style={{ color: "#00d4a0" }}>
           <LogOut size={14} className="mr-2" /> Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

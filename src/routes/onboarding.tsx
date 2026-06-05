@@ -671,7 +671,7 @@ function Step4({ p, set }: { p: Profile; set: <K extends keyof Profile>(k: K, v:
       {accountMid > 0 && riskPct > 0 && (
         <div
           className="rounded-md bg-surface-2 px-4 py-3.5 animate-fade-in"
-          style={{ borderLeft: "3px solid #ef4444", border: "1px solid rgba(255,255,255,0.08)", borderLeftWidth: 3, borderLeftColor: "#ef4444" }}
+          style={{ borderLeft: "3px solid #00d4a0", border: "1px solid rgba(255,255,255,0.08)", borderLeftWidth: 3, borderLeftColor: "#00d4a0" }}
         >
           <div className="font-mono text-[11px] uppercase tracking-wider text-primary mb-2">
             ACE will enforce these rules for you:

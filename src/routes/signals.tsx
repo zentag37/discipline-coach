@@ -18,8 +18,8 @@ export const Route = createFileRoute("/signals")({
   component: SignalsPage,
 });
 
-const TEAL = "#ef4444";
-const RED = "#ef4444";
+const TEAL = "#00d4a0";
+const RED = "#00d4a0";
 const AMBER = "#f59e0b";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
@@ -274,7 +274,7 @@ function SignalCard({ s, riskDollars, riskPct, onFollow, onDismiss }: {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 mt-4 text-xs" style={{ fontFamily: FONT_SANS, color: "#d1d5db" }}>
         <Row label="Entry" value={fmt(s.entry, s.decimals)} />
-        <Row label="Stop loss" value={`${fmt(s.stopLoss, s.decimals)}  (${isBuy ? "-" : "+"}${slPip})`} valueColor="#ef4444" />
+        <Row label="Stop loss" value={`${fmt(s.stopLoss, s.decimals)}  (${isBuy ? "-" : "+"}${slPip})`} valueColor="#00d4a0" />
         <Row label="Target 1" value={`${fmt(s.target1, s.decimals)}  (${isBuy ? "+" : "-"}${t1Pip})  R:R 1:${s.rr}`} valueColor={TEAL} />
         <Row label="Target 2" value={`${fmt(s.target2, s.decimals)}  (${isBuy ? "+" : "-"}${t2Pip})`} valueColor={TEAL} />
       </div>
@@ -343,7 +343,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
           <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
+          style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>{plan}</span>
       </div>
       <nav className="flex-1 px-2 space-y-0.5">
         {items.map((it) => {
@@ -352,7 +352,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
             <a key={it.label} href={it.to}
               className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
               style={{
-                background: isActive ? "rgba(239,68,68,0.08)" : "transparent",
+                background: isActive ? "rgba(0,212,160,0.08)" : "transparent",
                 color: isActive ? TEAL : "#9ca3af",
               }}>
               <it.icon size={16} style={{ color: isActive ? TEAL : "#6b7280" }} />

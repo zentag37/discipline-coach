@@ -20,7 +20,7 @@ type Rss2JsonResp = {
   message?: string;
 };
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
@@ -195,8 +195,8 @@ export function FinnhubNewsFeed() {
         <div
           className="p-4 rounded text-[12px]"
           style={{
-            background: "rgba(239,68,68,0.08)",
-            border: "1px solid rgba(239,68,68,0.3)",
+            background: "rgba(0,212,160,0.08)",
+            border: "1px solid rgba(0,212,160,0.3)",
             color: "#fca5a5",
             fontFamily: FONT_SANS,
           }}

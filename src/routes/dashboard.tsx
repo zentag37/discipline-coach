@@ -47,7 +47,7 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
 });
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 
 type Profile = {
   full_name?: string | null;
@@ -391,7 +391,7 @@ function DashboardPage() {
           </div>
           <span
             className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-            style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}
+            style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}
           >
             {plan}
           </span>
@@ -469,8 +469,8 @@ function DashboardPage() {
             <div className="flex items-center gap-2">
               <span style={{ color: "#9ca3af" }}>{formatHeaderTime(displayNow)}</span>
               <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: session.open ? "#22c55e" : "#ef4444" }} />
-                <span style={{ color: session.open ? "#22c55e" : "#ef4444" }}>{session.label}</span>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: session.open ? "#22c55e" : "#00d4a0" }} />
+                <span style={{ color: session.open ? "#22c55e" : "#00d4a0" }}>{session.label}</span>
               </span>
             </div>
             <NotificationsBell />
@@ -512,7 +512,7 @@ function DashboardPage() {
               label="TODAY'S P&L"
               value={`${sessionPL < 0 ? "-" : ""}€${Math.abs(sessionPL).toFixed(2)}`}
               sub={trades.length ? `${trades.length} trade${trades.length === 1 ? "" : "s"} logged` : "No trades logged yet"}
-              valueColor={sessionPL > 0 ? TEAL : sessionPL < 0 ? "#ef4444" : undefined}
+              valueColor={sessionPL > 0 ? TEAL : sessionPL < 0 ? "#00d4a0" : undefined}
             />
           </div>
 
@@ -663,7 +663,7 @@ function DashboardPage() {
                         <span key={s.id} className="flex items-center gap-1" style={{ color: "#e6e8eb" }}>
                           <span>{s.direction === "BUY" ? "🟢" : "🔴"}</span>
                           <span className="font-medium">{s.instrument}</span>
-                          <span style={{ color: s.direction === "BUY" ? TEAL : "#ef4444" }}>{s.direction}</span>
+                          <span style={{ color: s.direction === "BUY" ? TEAL : "#00d4a0" }}>{s.direction}</span>
                         </span>
                       ))}
                     </div>
@@ -724,8 +724,8 @@ function DashboardPage() {
                                 <span
                                   className="px-1.5 py-0.5 rounded text-[10px]"
                                   style={{
-                                    background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
-                                    color: t.direction === "BUY" ? "#22c55e" : "#ef4444",
+                                    background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(0,212,160,0.15)",
+                                    color: t.direction === "BUY" ? "#22c55e" : "#00d4a0",
                                   }}
                                 >
                                   {t.direction}
@@ -733,7 +733,7 @@ function DashboardPage() {
                               </td>
                               <td>{t.entry_price}</td>
                               <td>{t.exit_price}</td>
-                              <td style={{ color: pl >= 0 ? TEAL : "#ef4444" }}>
+                              <td style={{ color: pl >= 0 ? TEAL : "#00d4a0" }}>
                                 {pl >= 0 ? "+" : "-"}${Math.abs(pl).toFixed(2)}
                               </td>
                               <td>{t.emotion}</td>
@@ -783,7 +783,7 @@ function DashboardPage() {
                             <span style={{ color: "#d1d5db" }}>
                               {q!.price.toLocaleString(undefined, { minimumFractionDigits: q!.decimals, maximumFractionDigits: q!.decimals })}
                             </span>
-                            <span className="flex items-center gap-0.5" style={{ color: up ? "#22c55e" : "#ef4444" }}>
+                            <span className="flex items-center gap-0.5" style={{ color: up ? "#22c55e" : "#00d4a0" }}>
                               {up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                               {up ? "+" : ""}{q!.change.toFixed(2)}%
                             </span>
@@ -798,7 +798,7 @@ function DashboardPage() {
                   );
                 })}
               </div>
-              <Link to="/market-intel" className="block mt-3 text-[10px] hover:underline" style={{ color: "#ef4444" }}>
+              <Link to="/market-intel" className="block mt-3 text-[10px] hover:underline" style={{ color: "#00d4a0" }}>
                 Open full Market Intel →
               </Link>
             </div>
@@ -910,18 +910,18 @@ function DashboardPage() {
       {lossOverlay && (
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center p-6 animate-fade-in"
-          style={{ background: "rgba(239,68,68,0.18)", backdropFilter: "blur(6px)" }}
+          style={{ background: "rgba(0,212,160,0.18)", backdropFilter: "blur(6px)" }}
         >
           <div
             className="max-w-lg w-full rounded-[14px] p-7 text-center"
             style={{
               background: "#141820",
-              border: "2px solid #ef4444",
-              boxShadow: "0 0 60px rgba(239,68,68,0.4)",
+              border: "2px solid #00d4a0",
+              boxShadow: "0 0 60px rgba(0,212,160,0.4)",
               fontFamily: "'IBM Plex Mono', monospace",
             }}
           >
-            <div className="text-[10px] tracking-widest mb-3" style={{ color: "#ef4444" }}>
+            <div className="text-[10px] tracking-widest mb-3" style={{ color: "#00d4a0" }}>
               DAILY STOP LOSS REACHED
             </div>
             <p className="text-sm leading-relaxed" style={{ color: "#e6e8eb", fontFamily: "Inter, sans-serif" }}>
@@ -930,7 +930,7 @@ function DashboardPage() {
             <button
               onClick={() => { stopVoice(); setLossOverlay(null); }}
               className="mt-5 text-xs px-4 py-2 rounded"
-              style={{ border: "1px solid #ef4444", color: "#ef4444" }}
+              style={{ border: "1px solid #00d4a0", color: "#00d4a0" }}
             >
               I understand — logging off
             </button>
@@ -977,7 +977,7 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; labe
       onClick={(e) => { if (onClick) { e.preventDefault(); onClick(); } }}
       className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
       style={{
-        background: active ? "rgba(239,68,68,0.08)" : "transparent",
+        background: active ? "rgba(0,212,160,0.08)" : "transparent",
         color: active ? TEAL : "#9ca3af",
       }}
     >
@@ -993,8 +993,8 @@ function StatCard({ label, value, sub, valueColor, flash }: { label: string; val
       className={`p-4 px-5 rounded-[10px] transition-all ${flash ? "animate-pulse" : ""}`}
       style={{
         background: "#141820",
-        border: `1px solid ${flash ? "#ef4444" : "rgba(255,255,255,0.08)"}`,
-        boxShadow: flash ? "0 0 0 1px #ef4444, 0 0 24px rgba(239,68,68,0.35)" : undefined,
+        border: `1px solid ${flash ? "#00d4a0" : "rgba(255,255,255,0.08)"}`,
+        boxShadow: flash ? "0 0 0 1px #00d4a0, 0 0 24px rgba(0,212,160,0.35)" : undefined,
       }}
     >
       <div className="text-[10px] tracking-widest" style={{ color: "#6b7280" }}>{label}</div>
@@ -1065,7 +1065,7 @@ function TradeLogModal({ onClose, onSave, instruments }: { onClose: () => void; 
             <div className="grid grid-cols-2 gap-2">
               {(["BUY", "SELL"] as const).map((d) => {
                 const active = direction === d;
-                const color = d === "BUY" ? "#22c55e" : "#ef4444";
+                const color = d === "BUY" ? "#22c55e" : "#00d4a0";
                 return (
                   <button
                     key={d}
@@ -1098,7 +1098,7 @@ function TradeLogModal({ onClose, onSave, instruments }: { onClose: () => void; 
           </div>
 
           {pl !== null && (
-            <div className="text-sm" style={{ color: pl >= 0 ? TEAL : "#ef4444" }}>
+            <div className="text-sm" style={{ color: pl >= 0 ? TEAL : "#00d4a0" }}>
               Result: {pl >= 0 ? "+" : "-"}${Math.abs(pl).toFixed(2)}
             </div>
           )}
@@ -1109,7 +1109,7 @@ function TradeLogModal({ onClose, onSave, instruments }: { onClose: () => void; 
                 <button key={e} onClick={() => setEmotion(e)}
                   className="w-10 h-10 rounded-full text-lg flex items-center justify-center"
                   style={{
-                    background: emotion === e ? "rgba(239,68,68,0.15)" : "transparent",
+                    background: emotion === e ? "rgba(0,212,160,0.15)" : "transparent",
                     border: `1px solid ${emotion === e ? TEAL : "rgba(255,255,255,0.1)"}`,
                   }}>
                   {e}

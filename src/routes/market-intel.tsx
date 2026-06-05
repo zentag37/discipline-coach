@@ -21,9 +21,9 @@ export const Route = createFileRoute("/market-intel")({
   component: MarketIntelPage,
 });
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 const AMBER = "#f59e0b";
-const RED = "#ef4444";
+const RED = "#00d4a0";
 const GREEN = "#22c55e";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
@@ -351,7 +351,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
           </div>
           {ins.price > 0 && (
             <span className="text-xs px-2 py-1 rounded"
-              style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: up ? GREEN : RED }}>
+              style={{ background: up ? "rgba(34,197,94,0.15)" : "rgba(0,212,160,0.15)", color: up ? GREEN : RED }}>
               {up ? "▲" : "▼"} {up ? "+" : ""}{ins.change.toFixed(2)}%
             </span>
           )}
@@ -387,11 +387,11 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
           <div className="space-y-0.5">
             {ins.pivots.map((p) => {
               const isPP = p.type === "PP";
-              const color = p.type === "R" ? "rgba(34,197,94,0.85)" : p.type === "S" ? "rgba(239,68,68,0.85)" : TEAL;
+              const color = p.type === "R" ? "rgba(34,197,94,0.85)" : p.type === "S" ? "rgba(0,212,160,0.85)" : TEAL;
               return (
                 <div key={p.label}
                   className="flex items-center justify-between px-2 py-1 rounded text-[11px]"
-                  style={{ background: isPP ? "rgba(239,68,68,0.1)" : "transparent" }}>
+                  style={{ background: isPP ? "rgba(0,212,160,0.1)" : "transparent" }}>
                   <span style={{ color, width: 28 }}>{p.label}</span>
                   <span style={{ color: isPP ? TEAL : "#d1d5db" }}>{fmt(p.price, ins.decimals)}</span>
                   <span className="text-[10px]" style={{ color: "#6b7280" }}>
@@ -413,7 +413,7 @@ function InstrumentCard({ ins }: { ins: Instrument }) {
             {ins.events.map((e) => (
               <span key={e.label} className="text-[10px] px-2 py-0.5 rounded-full"
                 style={{
-                  background: e.impact === "high" ? "rgba(239,68,68,0.12)" : "rgba(245,158,11,0.12)",
+                  background: e.impact === "high" ? "rgba(0,212,160,0.12)" : "rgba(245,158,11,0.12)",
                   color: e.impact === "high" ? RED : AMBER,
                   border: `1px solid ${e.impact === "high" ? RED + "40" : AMBER + "40"}`,
                 }}>
@@ -504,7 +504,7 @@ function LivePill({ live, error }: { live: boolean; error?: string }) {
     return (
       <span className="absolute top-3 right-3 text-[9px] tracking-widest px-1.5 py-0.5 rounded z-10"
         title={error}
-        style={{ background: "rgba(239,68,68,0.12)", color: RED, border: "1px solid rgba(239,68,68,0.3)" }}>
+        style={{ background: "rgba(0,212,160,0.12)", color: RED, border: "1px solid rgba(0,212,160,0.3)" }}>
         OFFLINE
       </span>
     );
@@ -568,7 +568,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
           <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>
+          style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>
           {plan}
         </span>
       </div>
@@ -579,7 +579,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
             <a key={it.label} href={it.to}
               className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
               style={{
-                background: isActive ? "rgba(239,68,68,0.08)" : "transparent",
+                background: isActive ? "rgba(0,212,160,0.08)" : "transparent",
                 color: isActive ? TEAL : "#9ca3af",
               }}>
               <it.icon size={16} style={{ color: isActive ? TEAL : "#6b7280" }} />
