@@ -85,7 +85,7 @@ function FloatingOverlay() {
 
   function onFabDown(e: React.PointerEvent) {
     if (!pos) return;
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {/*noop*/}
     dragRef.current = { sx: e.clientX, sy: e.clientY, ox: pos.x, oy: pos.y };
     movedRef.current = false;
   }
@@ -93,16 +93,26 @@ function FloatingOverlay() {
     if (!dragRef.current) return;
     const dx = e.clientX - dragRef.current.sx;
     const dy = e.clientY - dragRef.current.sy;
-    if (Math.abs(dx) + Math.abs(dy) > 3) movedRef.current = true;
-    setPos(clamp(dragRef.current.ox + dx, dragRef.current.oy + dy));
+    if (Math.abs(dx) + Math.abs(dy) > 4) movedRef.current = true;
+    if (movedRef.current) {
+      setPos(clamp(dragRef.current.ox + dx, dragRef.current.oy + dy));
+    }
   }
-  function onFabUp() {
+  function onFabUp(e: React.PointerEvent) {
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {/*noop*/}
+    const wasDragging = !!dragRef.current;
+    const moved = movedRef.current;
     dragRef.current = null;
-    if (!movedRef.current) {
+    if (!wasDragging) return;
+    if (!moved) {
       expand();
     } else if (pos) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(pos)); } catch {/*noop*/}
     }
+  }
+  function onFabClick() {
+    // Fallback for environments where pointerup doesn't fire (e.g. Electron tray-spawned focus)
+    if (!movedRef.current) expand();
   }
 
   if (minimized) {
