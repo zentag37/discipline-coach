@@ -126,19 +126,23 @@ function FloatingOverlay() {
           onPointerUp={onFabUp}
           onPointerCancel={onFabUp}
           onClick={onFabClick}
-          className="fixed rounded-full grid place-items-center cursor-grab active:cursor-grabbing touch-none select-none shadow-lg"
+          onMouseEnter={() => { try { (window as any).electronAPI?.fabHover?.(true); } catch {/*noop*/} }}
+          onMouseLeave={() => { try { (window as any).electronAPI?.fabHover?.(false); } catch {/*noop*/} }}
+          className="fixed rounded-full grid place-items-center cursor-pointer touch-none select-none shadow-lg"
           style={{
             left: pos.x,
             top: pos.y,
             width: FAB_SIZE,
             height: FAB_SIZE,
-            background: "#0d0f12",
-            border: "1px solid rgba(0,212,160,0.5)",
-            boxShadow: "0 8px 24px rgba(0,212,160,0.25)",
+            background: "#00d4a0",
+            border: "2px solid rgba(255,255,255,0.15)",
+            boxShadow: "0 8px 24px rgba(0,212,160,0.45)",
+            color: "#0d0f12",
+            fontSize: 24,
           }}
           aria-label="Expand TradeWithAce"
         >
-          <Logo size={22} />
+          📊
         </button>
       </>
     );
