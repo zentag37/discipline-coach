@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { checkAdmin } from "@/lib/admin.functions";
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 const BG = "#0a0c0f";
 const PANEL = "#0d0f12";
 const BORDER = "rgba(255,255,255,0.06)";
@@ -70,7 +70,7 @@ export function AdminLayout({ children, title }: { children: ReactNode; title: s
       >
         <div className="px-5 py-5 border-b" style={{ borderColor: BORDER }}>
           <div className="text-sm font-semibold tracking-wide">TradeWithAce</div>
-          <div className="text-[10px] mt-1 tracking-widest" style={{ color: "#ef4444" }}>ADMIN CONSOLE</div>
+          <div className="text-[10px] mt-1 tracking-widest" style={{ color: "#00d4a0" }}>ADMIN CONSOLE</div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5">
           {NAV.map((n) => {
@@ -82,7 +82,7 @@ export function AdminLayout({ children, title }: { children: ReactNode; title: s
                 to={n.to}
                 className="flex items-center gap-3 px-3 py-2 rounded text-sm transition-colors"
                 style={{
-                  background: active ? "rgba(239,68,68,0.08)" : "transparent",
+                  background: active ? "rgba(0,212,160,0.08)" : "transparent",
                   color: active ? TEAL : "#9ca3af",
                 }}
               >
@@ -108,7 +108,7 @@ export function AdminLayout({ children, title }: { children: ReactNode; title: s
             <h1 className="text-sm font-medium">{title}</h1>
             <span
               className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded"
-              style={{ background: "rgba(239,68,68,0.15)", color: "#ef4444" }}
+              style={{ background: "rgba(0,212,160,0.15)", color: "#00d4a0" }}
             >
               ADMIN
             </span>

@@ -20,7 +20,7 @@ function TypeIcon({ type }: { type: Notification["type"] }) {
   const common = { size: 16 };
   if (type === "warning") return <AlertTriangle {...common} style={{ color: "#f5a623" }} />;
   if (type === "success") return <CheckCircle2 {...common} style={{ color: "#22c55e" }} />;
-  return <Info {...common} style={{ color: "#ef4444" }} />;
+  return <Info {...common} style={{ color: "#00d4a0" }} />;
 }
 
 export function NotificationsBell() {
@@ -51,7 +51,7 @@ export function NotificationsBell() {
         {unread > 0 && (
           <span
             className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-semibold flex items-center justify-center"
-            style={{ background: "#ef4444", color: "#fff" }}
+            style={{ background: "#00d4a0", color: "#fff" }}
           >
             {unread}
           </span>
@@ -71,7 +71,7 @@ export function NotificationsBell() {
             <button
               onClick={() => setItems((arr) => arr.map((n) => ({ ...n, read: true })))}
               className="text-xs hover:underline"
-              style={{ color: "#ef4444" }}
+              style={{ color: "#00d4a0" }}
               disabled={unread === 0}
             >
               Mark all read
@@ -103,7 +103,7 @@ export function NotificationsBell() {
                     <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>{n.body}</p>
                   </div>
                   {!n.read && (
-                    <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: "#ef4444" }} />
+                    <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: "#00d4a0" }} />
                   )}
                 </li>
               ))}

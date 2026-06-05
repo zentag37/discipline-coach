@@ -290,7 +290,7 @@ function PlanCard({
   disabled: boolean;
 }) {
   const borderClass = featured
-    ? "border-2 border-primary shadow-[0_0_30px_-10px_rgba(239,68,68,0.4)]"
+    ? "border-2 border-primary shadow-[0_0_30px_-10px_rgba(0,212,160,0.4)]"
     : amber
     ? "border border-warning/60"
     : "border border-border";

@@ -45,8 +45,8 @@ function ForgotPage() {
         <div
           className="rounded-md px-3 py-3 text-sm"
           style={{
-            background: "rgba(239,68,68,0.08)",
-            border: "1px solid rgba(239,68,68,0.3)",
+            background: "rgba(0,212,160,0.08)",
+            border: "1px solid rgba(0,212,160,0.3)",
             color: "#5bead0",
           }}
         >

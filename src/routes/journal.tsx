@@ -19,7 +19,7 @@ export const Route = createFileRoute("/journal")({
   component: JournalPage,
 });
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 const FONT_MONO = "'IBM Plex Mono', monospace";
 const FONT_SANS = "Inter, sans-serif";
 
@@ -183,7 +183,7 @@ function JournalPage() {
                     <button key={f} onClick={() => setFilter(f)}
                       className="text-[11px] px-3 py-1 rounded-full transition-colors"
                       style={{
-                        background: filter === f ? "rgba(239,68,68,0.12)" : "transparent",
+                        background: filter === f ? "rgba(0,212,160,0.12)" : "transparent",
                         color: filter === f ? TEAL : "#9ca3af",
                         border: `1px solid ${filter === f ? TEAL + "60" : "rgba(255,255,255,0.1)"}`,
                       }}>
@@ -321,7 +321,7 @@ function ExampleEntry() {
       <div className="flex flex-wrap items-center gap-2 mb-4 pr-20">
         <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>EURUSD</span>
         <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}>BUY</span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(239,68,68,0.15)", color: TEAL }}>+€220</span>
+        <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}>+€220</span>
         <span className="ml-auto text-[11px]" style={{ color: "#6b7280" }}>Fri 30 May · 10:42am</span>
       </div>
 
@@ -381,9 +381,9 @@ function CalendarGrid({ month, today, byDay }: { month: Date; today: Date; byDay
           const positive = pnl !== undefined && pnl > 0;
           const negative = pnl !== undefined && pnl < 0;
           const bg = positive
-            ? "rgba(239,68,68,0.15)"
+            ? "rgba(0,212,160,0.15)"
             : negative
-            ? "rgba(239,68,68,0.15)"
+            ? "rgba(0,212,160,0.15)"
             : d ? "rgba(255,255,255,0.02)" : "transparent";
           return (
             <div key={i} className="aspect-square rounded p-1.5 text-[11px] flex flex-col"
@@ -394,7 +394,7 @@ function CalendarGrid({ month, today, byDay }: { month: Date; today: Date; byDay
               }}>
               <span>{d}</span>
               {pnl !== undefined && (
-                <span className="text-[9px] mt-auto" style={{ color: positive ? TEAL : "#ef4444" }}>
+                <span className="text-[9px] mt-auto" style={{ color: positive ? TEAL : "#00d4a0" }}>
                   {positive ? "+" : "-"}${Math.abs(Math.round(pnl))}
                 </span>
               )}
@@ -417,12 +417,12 @@ function TradeEntry({ t }: { t: any }) {
         <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.05)" }}>{t.instrument || "—"}</span>
         {t.direction && (
           <span className="text-[10px] px-1.5 py-0.5 rounded"
-            style={{ background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", color: t.direction === "BUY" ? "#22c55e" : "#ef4444" }}>
+            style={{ background: t.direction === "BUY" ? "rgba(34,197,94,0.15)" : "rgba(0,212,160,0.15)", color: t.direction === "BUY" ? "#22c55e" : "#00d4a0" }}>
             {t.direction}
           </span>
         )}
         <span className="text-[10px] px-1.5 py-0.5 rounded"
-          style={{ background: isWin ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.15)", color: isWin ? TEAL : "#ef4444" }}>
+          style={{ background: isWin ? "rgba(0,212,160,0.15)" : "rgba(0,212,160,0.15)", color: isWin ? TEAL : "#00d4a0" }}>
           {isWin ? "+" : pl < 0 ? "-" : ""}${Math.abs(pl).toFixed(2)}
         </span>
         <span className="ml-auto text-[11px]" style={{ color: "#6b7280" }}>
@@ -512,7 +512,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
           <span className="font-semibold tracking-tight" style={{ color: TEAL }}>TradeWithAce</span>
         </div>
         <span className="inline-block mt-3 text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(239,68,68,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>
+          style={{ background: "rgba(0,212,160,0.12)", color: TEAL, border: `1px solid ${TEAL}40` }}>
           {plan}
         </span>
       </div>
@@ -523,7 +523,7 @@ function Sidebar({ plan, initials, firstName, onSignOut, active }: {
             <a key={it.label} href={it.to}
               className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs transition-colors"
               style={{
-                background: isActive ? "rgba(239,68,68,0.08)" : "transparent",
+                background: isActive ? "rgba(0,212,160,0.08)" : "transparent",
                 color: isActive ? TEAL : "#9ca3af",
               }}>
               <it.icon size={16} style={{ color: isActive ? TEAL : "#6b7280" }} />

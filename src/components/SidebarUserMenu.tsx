@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 
 async function clearAndRedirect() {
   try { await supabase.auth.signOut(); } catch {}
@@ -26,7 +26,7 @@ export function SidebarUserMenu({ initials, firstName }: { initials: string; fir
           <button className="flex items-center gap-2 flex-1 min-w-0 rounded-md p-1 -m-1 hover:bg-white/5 transition-colors text-left">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs flex-shrink-0"
-              style={{ background: "rgba(239,68,68,0.15)", color: TEAL }}
+              style={{ background: "rgba(0,212,160,0.15)", color: TEAL }}
             >
               {initials}
             </div>
@@ -49,7 +49,7 @@ export function SidebarUserMenu({ initials, firstName }: { initials: string; fir
             <RefreshCcw size={14} className="mr-2" /> Switch account
           </DropdownMenuItem>
           <DropdownMenuSeparator style={{ background: "rgba(255,255,255,0.08)" }} />
-          <DropdownMenuItem onClick={clearAndRedirect} className="cursor-pointer" style={{ color: "#ef4444" }}>
+          <DropdownMenuItem onClick={clearAndRedirect} className="cursor-pointer" style={{ color: "#00d4a0" }}>
             <LogOut size={14} className="mr-2" /> Sign out
           </DropdownMenuItem>
         </DropdownMenuContent>

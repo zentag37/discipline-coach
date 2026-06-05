@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { X, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -161,7 +161,7 @@ export function AceChatDrawer({ open, onClose, firstName }: { open: boolean; onC
 
 function Avatar() {
   return (
-    <div className="grid place-items-center rounded-full flex-shrink-0" style={{ width: 26, height: 26, background: "rgba(239,68,68,0.15)", color: TEAL, fontSize: 12 }}>
+    <div className="grid place-items-center rounded-full flex-shrink-0" style={{ width: 26, height: 26, background: "rgba(0,212,160,0.15)", color: TEAL, fontSize: 12 }}>
       A
     </div>
   );

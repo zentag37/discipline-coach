@@ -9,7 +9,7 @@ export const Route = createFileRoute("/download")({
   component: DownloadPage,
 });
 
-const TEAL = "#ef4444";
+const TEAL = "#00d4a0";
 
 function DownloadPage() {
   const navigate = useNavigate();
