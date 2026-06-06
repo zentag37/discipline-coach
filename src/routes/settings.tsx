@@ -189,8 +189,13 @@ function SettingsPage() {
   }, [selectedBroker, brokerStep, igForm.apiKey, igForm.username, igForm.accountType]);
 
   async function connectIg() {
-    if (!igForm.apiKey || !igForm.username || !igForm.password) {
-      toast.error("All IG fields required");
+    if (!igForm.apiKey.trim() || !igForm.username.trim()) {
+      toast.error("API key and username are required");
+      setBrokerStep((s) => Math.min(s, 1));
+      return;
+    }
+    if (!igForm.password) {
+      toast.error("Re-enter your IG password to connect");
       return;
     }
     setIgConnecting(true);
