@@ -259,6 +259,29 @@ const BROKER_BADGES = [
   "OANDA", "XM", "AvaTrade", "FXCM", "Saxo", "CMC Markets",
 ];
 
+function BrokerBadge({ name }: { name: string }) {
+  const navigate = useNavigate();
+  const onClick = async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      navigate({ to: "/settings", hash: "broker" });
+    } else {
+      try { sessionStorage.setItem("postSignupMessage", "Connect your broker after signing up"); } catch {}
+      navigate({ to: "/register" });
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground/90 cursor-pointer transition-all duration-200 hover:border-primary/60 hover:text-primary hover:scale-105 hover:shadow-[0_0_12px_rgba(0,212,160,0.35)]"
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+      {name}
+    </button>
+  );
+}
+
 function LiveBrokerSync() {
   return (
     <section id="broker-sync">
@@ -303,13 +326,7 @@ function LiveBrokerSync() {
 
           <div className="mt-8 flex flex-wrap gap-2">
             {BROKER_BADGES.map((b) => (
-              <span
-                key={b}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground/90 hover:border-primary/50 hover:text-primary transition"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
-                {b}
-              </span>
+              <BrokerBadge key={b} name={b} />
             ))}
           </div>
         </div>
