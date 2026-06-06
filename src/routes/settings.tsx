@@ -445,193 +445,58 @@ function SettingsPage() {
                 Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
               </p>
               {!ig.connected ? (
-                (() => {
-                  const isIg = (selectedBroker ?? "IG").toLowerCase() === "ig";
-                  const steps = isIg
-                    ? [
-                        { title: "Get your IG API key", valid: () => igForm.apiKey.trim().length > 0 },
-                        { title: "Enter IG credentials", valid: () => igForm.username.trim().length > 0 && igForm.password.length > 0 },
-                        { title: "Choose account type", valid: () => igForm.accountType === "demo" || igForm.accountType === "live" },
-                      ]
-                    : [
-                        { title: `Open ${selectedBroker} on your computer`, valid: () => true },
-                        { title: "Install the ACE overlay", valid: () => true },
-                        { title: `Pin ACE on top of ${selectedBroker}`, valid: () => true },
-                      ];
-                  const currentValid = steps[brokerStep].valid();
-                  const allValid = steps.every((s) => s.valid());
-                  const last = brokerStep === steps.length - 1;
-                  const statusOf = (i: number): "done" | "in_progress" | "blocked" => {
-                    if (steps[i].valid()) return "done";
-                    if (i === brokerStep) return "in_progress";
-                    if (i < brokerStep) return "blocked";
-                    // future step: blocked if any earlier step is invalid
-                    for (let j = 0; j < i; j++) if (!steps[j].valid()) return "blocked";
-                    return "blocked";
-                  };
-                  const statusMeta = {
-                    done: { label: "Done", bg: "rgba(0,212,160,0.15)", fg: TEAL, border: TEAL, dot: "✓" },
-                    in_progress: { label: "In progress", bg: "rgba(245,200,66,0.12)", fg: "#f5c842", border: "#f5c842", dot: "●" },
-                    blocked: { label: "Blocked", bg: "rgba(239,68,68,0.1)", fg: "#ef6f6f", border: "rgba(239,111,111,0.4)", dot: "○" },
-                  } as const;
-                  const doneCount = steps.filter((s) => s.valid()).length;
-                  return (
-                    <div className="space-y-4">
-                      {/* Stepper header */}
-                      <div className="flex items-center gap-2">
-                        {steps.map((s, i) => {
-                          const st = statusOf(i);
-                          const meta = statusMeta[st];
-                          return (
-                            <div key={i} className="flex items-center gap-2 flex-1">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-medium"
-                                style={{ background: meta.bg, color: meta.fg, border: `1px solid ${meta.border}` }}>
-                                {st === "done" ? "✓" : i + 1}
-                              </div>
-                              {i < steps.length - 1 && (
-                                <div className="flex-1 h-px" style={{ background: steps[i].valid() ? TEAL : "rgba(255,255,255,0.08)" }} />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
-                          {doneCount}/{steps.length} complete · <strong>{steps[brokerStep].title}</strong>
-                        </div>
-                        <div className="flex items-center gap-2 text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                          <span style={{ color: TEAL }}>● Progress saved</span>
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); void connectIg(); }}>
+                  <Field label="IG API KEY">
+                    <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="e.g. abc123XYZ_-" />
+                  </Field>
+                  <Field label="IG USERNAME">
+                    <Input value={igForm.username} onChange={(v) => setIgForm((f) => ({ ...f, username: v }))} />
+                  </Field>
+                  <Field label="IG PASSWORD">
+                    <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} />
+                  </Field>
+                  <Field label="ACCOUNT TYPE">
+                    <div className="grid grid-cols-2 gap-2 max-w-xs">
+                      {(["demo", "live"] as const).map((type) => {
+                        const activeType = igForm.accountType === type;
+                        return (
                           <button
-                            onClick={() => {
-                              try { localStorage.removeItem("brokerSetupProgress"); } catch {/* noop */}
-                              setIgForm({ apiKey: "", username: "", password: "", accountType: "demo" });
-                              setBrokerStep(0);
-                              toast.success("Setup progress cleared");
-                            }}
-                            className="hover:text-foreground underline">
-                            Reset
+                            key={type}
+                            type="button"
+                            onClick={() => setIgForm((f) => ({ ...f, accountType: type }))}
+                            className="p-2.5 rounded-[10px] text-xs capitalize"
+                            style={{
+                              background: activeType ? "rgba(0,212,160,0.08)" : "#1c2230",
+                              color: activeType ? TEAL : "#d1d5db",
+                              border: `1px solid ${activeType ? TEAL : "rgba(255,255,255,0.08)"}`,
+                              fontFamily: FONT_SANS,
+                            }}>
+                            {type}
                           </button>
-                        </div>
-                      </div>
-
-                      {/* Per-step status checklist */}
-                      <ul className="space-y-1.5">
-                        {steps.map((s, i) => {
-                          const st = statusOf(i);
-                          const meta = statusMeta[st];
-                          const isCurrent = i === brokerStep;
-                          return (
-                            <li key={i}>
-                              <button
-                                type="button"
-                                onClick={() => setBrokerStep(i)}
-                                className="w-full flex items-center justify-between gap-3 px-2.5 py-1.5 rounded text-left transition-colors"
-                                style={{
-                                  background: isCurrent ? "rgba(255,255,255,0.03)" : "transparent",
-                                  border: `1px solid ${isCurrent ? "rgba(255,255,255,0.08)" : "transparent"}`,
-                                }}>
-                                <span className="flex items-center gap-2 text-[11px]" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>
-                                  <span style={{ color: "#6b7280" }}>{i + 1}.</span>
-                                  {s.title}
-                                </span>
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wide font-medium"
-                                  style={{ background: meta.bg, color: meta.fg, border: `1px solid ${meta.border}` }}>
-                                  <span>{meta.dot}</span>{meta.label}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-
-                      {isIg && (
-                        <p className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
-                          Note: your API key and username are saved locally so you can return later. Password is never stored — re-enter it on the final step.
-                        </p>
-                      )}
-
-                      {/* Step content */}
-                      {isIg ? (
-                        <div className="space-y-3">
-                          {brokerStep === 0 && (
-                            <>
-                              <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
-                                In IG: My IG → Settings → API keys → Generate. Paste it below.
-                              </p>
-                              <Field label="IG API KEY">
-                                <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="e.g. abc123XYZ_-" />
-                              </Field>
-                            </>
-                          )}
-                          {brokerStep === 1 && (
-                            <>
-                              <Field label="IG USERNAME">
-                                <Input value={igForm.username} onChange={(v) => setIgForm((f) => ({ ...f, username: v }))} />
-                              </Field>
-                              <Field label="IG PASSWORD">
-                                <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} />
-                              </Field>
-                            </>
-                          )}
-                          {brokerStep === 2 && (
-                            <>
-                              <Field label="ACCOUNT TYPE">
-                                <div className="grid grid-cols-2 gap-2 max-w-xs">
-                                  <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
-                                  <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
-                                </div>
-                              </Field>
-                              {!igForm.password && (
-                                <Field label="RE-ENTER IG PASSWORD">
-                                  <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} placeholder="Password is never stored — re-enter to connect" />
-                                </Field>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
-                          {brokerStep === 0 && `Launch your ${selectedBroker} platform and sign in as usual.`}
-                          {brokerStep === 1 && "Install ACE for Mac or Windows from the Download page."}
-                          {brokerStep === 2 && `Open ACE and toggle "Always on top" so it floats above ${selectedBroker}.`}
-                        </p>
-                      )}
-
-                      {/* Navigation */}
-                      <div className="flex items-center justify-between pt-2">
-                        <button
-                          onClick={() => setBrokerStep((s) => Math.max(0, s - 1))}
-                          disabled={brokerStep === 0}
-                          className="text-xs px-3 py-1.5 rounded disabled:opacity-30"
-                          style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}>
-                          Back
-                        </button>
-                        {!last ? (
-                          <button
-                            onClick={() => currentValid && setBrokerStep((s) => s + 1)}
-                            disabled={!currentValid}
-                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed"
-                            style={{ background: TEAL, color: "#0d0f12" }}>
-                            Next →
-                          </button>
-                        ) : isIg ? (
-                          <button
-                            onClick={connectIg}
-                            disabled={igConnecting || !igForm.apiKey.trim() || !igForm.username.trim() || !igForm.password}
-                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
-                            style={{ background: TEAL, color: "#0d0f12" }}>
-                            {igConnecting && <span className="inline-block w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />}
-                            {igConnecting ? "Connecting…" : "Connect IG Account"}
-                          </button>
-                        ) : (
-                          <span className="text-[11px]" style={{ color: TEAL, fontFamily: FONT_SANS }}>
-                            You're all set with {selectedBroker}.
-                          </span>
-                        )}
-                      </div>
+                        );
+                      })}
                     </div>
-                  );
-                })()
+                  </Field>
+                  {igMessage && (
+                    <div className="p-3 rounded text-xs"
+                      style={{
+                        background: igMessage.type === "success" ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)",
+                        border: `1px solid ${igMessage.type === "success" ? `${GREEN}66` : "rgba(239,68,68,0.45)"}`,
+                        color: igMessage.type === "success" ? GREEN : "#fca5a5",
+                        fontFamily: FONT_SANS,
+                      }}>
+                      {igMessage.text}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={igConnecting}
+                    className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    {igConnecting && <span className="inline-block w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />}
+                    {igConnecting ? "Connecting…" : "Connect IG Account"}
+                  </button>
+                </form>
               ) : (
                 <div className="space-y-3">
                   <div className="p-3 rounded text-xs" style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.06)", color: "#d1d5db", fontFamily: FONT_SANS }}>
