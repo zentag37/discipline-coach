@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell, AlertTriangle, Info, CheckCircle2 } from "lucide-react";
+import { subscribeNotifications } from "@/lib/notification-bus";
 
 type Notification = {
   id: number;
@@ -38,6 +39,12 @@ export function NotificationsBell() {
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
+
+  useEffect(() => {
+    return subscribeNotifications((n) => {
+      setItems((arr) => [n, ...arr].slice(0, 30));
+    });
+  }, []);
 
   return (
     <div className="relative" ref={ref}>
