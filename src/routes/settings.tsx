@@ -136,6 +136,7 @@ function SettingsPage() {
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
   const [igMessage, setIgMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [igUnsupported, setIgUnsupported] = useState(false);
   const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
@@ -177,6 +178,7 @@ function SettingsPage() {
       return;
     }
     setIgMessage(null);
+    setIgUnsupported(false);
     setIgConnecting(true);
     try {
       const r = await connectIGAccountFn({ data: payload });
@@ -189,12 +191,15 @@ function SettingsPage() {
     } catch (e: any) {
       const raw = String(e?.message || "IG connection failed");
       let text = raw;
+      let unsupported = false;
       if (/stockbroking-not-supported/i.test(raw)) {
         text = "Your IG account type doesn't support API access. The IG Web API works with CFD/spread bet accounts only. Your floating window still works automatically.";
+        unsupported = true;
       } else if (/invalid-details/i.test(raw)) {
         text = "Incorrect username or password. Use your IG API username (may differ from your login email).";
       }
-      setIgMessage({ type: "error", text });
+      setIgUnsupported(unsupported);
+      setIgMessage(unsupported ? null : { type: "error", text });
       toast.error(text);
     } finally {
       setIgConnecting(false);
@@ -482,6 +487,17 @@ function SettingsPage() {
                         );
                       })}
                     </div>
+                    {igUnsupported && (
+                      <div className="mt-2 p-3 rounded text-xs"
+                        style={{
+                          background: "rgba(239,68,68,0.1)",
+                          border: "1px solid rgba(239,68,68,0.45)",
+                          color: "#fca5a5",
+                          fontFamily: FONT_SANS,
+                        }}>
+                        Your IG account type doesn't support API access. The IG Web API works with CFD/spread bet accounts only. Your floating window still works automatically.
+                      </div>
+                    )}
                   </Field>
                   {igMessage && (
                     <div className="p-3 rounded text-xs"
