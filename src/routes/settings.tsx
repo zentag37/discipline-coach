@@ -135,6 +135,7 @@ function SettingsPage() {
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
+  const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -142,6 +143,20 @@ function SettingsPage() {
       try { setIg(await runGetIgStatus()); } catch {/* noop */}
     })();
   }, [fetchSubInfo, runGetIgStatus]);
+
+  useEffect(() => {
+    try {
+      const b = sessionStorage.getItem("selectedBroker");
+      if (b) {
+        setSelectedBroker(b);
+        sessionStorage.removeItem("selectedBroker");
+        setActive("broker");
+        requestAnimationFrame(() => {
+          document.getElementById("broker")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+    } catch {/* noop */}
+  }, []);
 
   async function connectIg() {
     if (!igForm.apiKey || !igForm.username || !igForm.password) {
@@ -391,6 +406,22 @@ function SettingsPage() {
                 style={{ background: ig.connected ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)", color: ig.connected ? GREEN : "#9ca3af", border: `1px solid ${ig.connected ? GREEN : "rgba(255,255,255,0.1)"}` }}>
                 {ig.connected ? `Connected · IG ${ig.accountType?.toUpperCase()}${ig.accountId ? ` · ${ig.accountId}` : ""}` : "Disconnected"}
               </span>}>
+              {selectedBroker && (
+                <div className="p-3 rounded text-[11px] flex items-start justify-between gap-3"
+                  style={{
+                    background: selectedBroker.toLowerCase() === "ig" ? "rgba(0,212,160,0.08)" : "rgba(245,158,11,0.08)",
+                    border: `1px solid ${selectedBroker.toLowerCase() === "ig" ? `${TEAL}55` : "rgba(245,158,11,0.4)"}`,
+                    color: "#e6e8eb", fontFamily: FONT_SANS,
+                  }}>
+                  <div>
+                    <div className="font-medium mb-0.5">Selected broker: {selectedBroker}</div>
+                    {selectedBroker.toLowerCase() === "ig"
+                      ? <span style={{ color: "#9ca3af" }}>Fill in your IG API credentials below to connect.</span>
+                      : <span style={{ color: "#9ca3af" }}>Native {selectedBroker} integration is coming soon. In the meantime, ACE works as an always-on-top overlay on your {selectedBroker} platform, or connect an IG account below.</span>}
+                  </div>
+                  <button onClick={() => setSelectedBroker(null)} className="text-[10px] opacity-60 hover:opacity-100">✕</button>
+                </div>
+              )}
               <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
                 Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
               </p>
