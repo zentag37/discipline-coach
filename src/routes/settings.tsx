@@ -487,6 +487,17 @@ function SettingsPage() {
                         );
                       })}
                     </div>
+                    {igUnsupported && (
+                      <div className="mt-2 p-3 rounded text-xs"
+                        style={{
+                          background: "rgba(239,68,68,0.1)",
+                          border: "1px solid rgba(239,68,68,0.45)",
+                          color: "#fca5a5",
+                          fontFamily: FONT_SANS,
+                        }}>
+                        Your IG account type doesn't support API access. The IG Web API works with CFD/spread bet accounts only. Your floating window still works automatically.
+                      </div>
+                    )}
                   </Field>
                   {igMessage && (
                     <div className="p-3 rounded text-xs"
