@@ -305,15 +305,21 @@ function SettingsPage() {
           style={{ background: "#141820", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <h1 className="text-sm font-medium" style={{ fontFamily: FONT_SANS }}>Settings</h1>
           <button
-            disabled={!dirty}
-            onClick={save}
-            className="text-xs px-4 py-1.5 rounded font-medium transition-all"
+            disabled={!dirty || saving}
+            onClick={() => { void save(); }}
+            className="text-xs px-4 py-1.5 rounded font-medium transition-all inline-flex items-center gap-2"
             style={{
-              background: dirty ? TEAL : "rgba(255,255,255,0.05)",
-              color: dirty ? "#0d0f12" : "#6b7280",
-              cursor: dirty ? "pointer" : "not-allowed",
+              background: dirty && !saving ? TEAL : "rgba(255,255,255,0.05)",
+              color: dirty && !saving ? "#0d0f12" : "#6b7280",
+              cursor: dirty && !saving ? "pointer" : "not-allowed",
             }}>
-            Save changes
+            {saving && (
+              <span
+                className="inline-block w-3 h-3 rounded-full animate-spin"
+                style={{ border: "2px solid rgba(0,0,0,0.25)", borderTopColor: "#0d0f12" }}
+              />
+            )}
+            {saving ? "Saving…" : "Save changes"}
           </button>
         </header>
 
