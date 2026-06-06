@@ -26,6 +26,7 @@ import { marked } from "marked";
 import { getLiveQuotes } from "@/lib/market.functions";
 import { getAceSignals } from "@/lib/signals.functions";
 import { aceMessage, aceJournal } from "@/lib/ace.functions";
+import { getIgAccounts, getIgPositions } from "@/lib/ig.functions";
 import { AceChatDrawer } from "@/components/ace/AceChatDrawer";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { speakAsACE, stopVoice, subscribeVoice } from "@/lib/ace-voice";
@@ -33,6 +34,7 @@ import { VoiceConsentModal } from "@/components/ace/VoiceConsentModal";
 import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
+import { pushNotification } from "@/lib/notification-bus";
 
 
 marked.setOptions({ breaks: true, gfm: true });
