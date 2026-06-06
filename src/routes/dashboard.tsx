@@ -1073,6 +1073,15 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; labe
   );
 }
 
+function LiveStat({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
+  return (
+    <div>
+      <div className="text-[10px] tracking-widest mb-1" style={{ color: "#6b7280" }}>{label}</div>
+      <div className="text-lg" style={{ color: valueColor ?? "#e6e8eb", fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
+    </div>
+  );
+}
+
 function StatCard({ label, value, sub, valueColor, flash }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean }) {
   return (
     <div
