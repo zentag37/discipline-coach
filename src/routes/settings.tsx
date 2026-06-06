@@ -135,6 +135,7 @@ function SettingsPage() {
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
+  const [brokerStep, setBrokerStep] = useState(0);
   const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
@@ -149,6 +150,7 @@ function SettingsPage() {
       const b = sessionStorage.getItem("selectedBroker");
       if (b) {
         setSelectedBroker(b);
+        setBrokerStep(0);
         sessionStorage.removeItem("selectedBroker");
         setActive("broker");
         requestAnimationFrame(() => {
@@ -426,30 +428,122 @@ function SettingsPage() {
                 Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
               </p>
               {!ig.connected ? (
-                <>
-                  <Field label="IG API KEY">
-                    <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="From My IG → Settings → API keys" />
-                  </Field>
-                  <Field label="IG USERNAME">
-                    <Input value={igForm.username} onChange={(v) => setIgForm((f) => ({ ...f, username: v }))} />
-                  </Field>
-                  <Field label="IG PASSWORD">
-                    <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} />
-                  </Field>
-                  <Field label="ACCOUNT TYPE">
-                    <div className="grid grid-cols-2 gap-2 max-w-xs">
-                      <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
-                      <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
+                (() => {
+                  const isIg = (selectedBroker ?? "IG").toLowerCase() === "ig";
+                  const steps = isIg
+                    ? [
+                        { title: "Get your IG API key", valid: () => igForm.apiKey.trim().length > 0 },
+                        { title: "Enter IG credentials", valid: () => igForm.username.trim().length > 0 && igForm.password.length > 0 },
+                        { title: "Choose account type", valid: () => igForm.accountType === "demo" || igForm.accountType === "live" },
+                      ]
+                    : [
+                        { title: `Open ${selectedBroker} on your computer`, valid: () => true },
+                        { title: "Install the ACE overlay", valid: () => true },
+                        { title: `Pin ACE on top of ${selectedBroker}`, valid: () => true },
+                      ];
+                  const currentValid = steps[brokerStep].valid();
+                  const allValid = steps.every((s) => s.valid());
+                  const last = brokerStep === steps.length - 1;
+                  return (
+                    <div className="space-y-4">
+                      {/* Stepper header */}
+                      <div className="flex items-center gap-2">
+                        {steps.map((s, i) => {
+                          const done = i < brokerStep || (i === brokerStep && s.valid() && !last);
+                          const active = i === brokerStep;
+                          return (
+                            <div key={i} className="flex items-center gap-2 flex-1">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-medium"
+                                style={{
+                                  background: done ? TEAL : active ? "rgba(0,212,160,0.15)" : "rgba(255,255,255,0.05)",
+                                  color: done ? "#0d0f12" : active ? TEAL : "#6b7280",
+                                  border: `1px solid ${done || active ? TEAL : "rgba(255,255,255,0.1)"}`,
+                                }}>{done ? "✓" : i + 1}</div>
+                              {i < steps.length - 1 && (
+                                <div className="flex-1 h-px" style={{ background: i < brokerStep ? TEAL : "rgba(255,255,255,0.08)" }} />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
+                        Step {brokerStep + 1} of {steps.length}: <strong>{steps[brokerStep].title}</strong>
+                      </div>
+
+                      {/* Step content */}
+                      {isIg ? (
+                        <div className="space-y-3">
+                          {brokerStep === 0 && (
+                            <>
+                              <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                                In IG: My IG → Settings → API keys → Generate. Paste it below.
+                              </p>
+                              <Field label="IG API KEY">
+                                <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="e.g. abc123XYZ_-" />
+                              </Field>
+                            </>
+                          )}
+                          {brokerStep === 1 && (
+                            <>
+                              <Field label="IG USERNAME">
+                                <Input value={igForm.username} onChange={(v) => setIgForm((f) => ({ ...f, username: v }))} />
+                              </Field>
+                              <Field label="IG PASSWORD">
+                                <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} />
+                              </Field>
+                            </>
+                          )}
+                          {brokerStep === 2 && (
+                            <Field label="ACCOUNT TYPE">
+                              <div className="grid grid-cols-2 gap-2 max-w-xs">
+                                <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
+                                <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
+                              </div>
+                            </Field>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                          {brokerStep === 0 && `Launch your ${selectedBroker} platform and sign in as usual.`}
+                          {brokerStep === 1 && "Install ACE for Mac or Windows from the Download page."}
+                          {brokerStep === 2 && `Open ACE and toggle "Always on top" so it floats above ${selectedBroker}.`}
+                        </p>
+                      )}
+
+                      {/* Navigation */}
+                      <div className="flex items-center justify-between pt-2">
+                        <button
+                          onClick={() => setBrokerStep((s) => Math.max(0, s - 1))}
+                          disabled={brokerStep === 0}
+                          className="text-xs px-3 py-1.5 rounded disabled:opacity-30"
+                          style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#9ca3af" }}>
+                          Back
+                        </button>
+                        {!last ? (
+                          <button
+                            onClick={() => currentValid && setBrokerStep((s) => s + 1)}
+                            disabled={!currentValid}
+                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                            style={{ background: TEAL, color: "#0d0f12" }}>
+                            Next →
+                          </button>
+                        ) : isIg ? (
+                          <button
+                            onClick={connectIg}
+                            disabled={igConnecting || !allValid}
+                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                            style={{ background: TEAL, color: "#0d0f12" }}>
+                            {igConnecting ? "Connecting…" : "Connect IG Account"}
+                          </button>
+                        ) : (
+                          <span className="text-[11px]" style={{ color: TEAL, fontFamily: FONT_SANS }}>
+                            You're all set with {selectedBroker}.
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </Field>
-                  <button
-                    onClick={connectIg}
-                    disabled={igConnecting}
-                    className="text-xs px-4 py-2 rounded font-medium disabled:opacity-50"
-                    style={{ background: TEAL, color: "#0d0f12" }}>
-                    {igConnecting ? "Connecting…" : "Connect IG Account"}
-                  </button>
-                </>
+                  );
+                })()
               ) : (
                 <div className="space-y-3">
                   <div className="p-3 rounded text-xs" style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.06)", color: "#d1d5db", fontFamily: FONT_SANS }}>
