@@ -145,12 +145,26 @@ function SettingsPage() {
     })();
   }, [fetchSubInfo, runGetIgStatus]);
 
+  // Load saved broker stepper progress (selectedBroker, step, apiKey, username, accountType — never password)
   useEffect(() => {
     try {
-      const b = sessionStorage.getItem("selectedBroker");
-      if (b) {
-        setSelectedBroker(b);
-        setBrokerStep(0);
+      const justClicked = sessionStorage.getItem("selectedBroker");
+      const saved = JSON.parse(localStorage.getItem("brokerSetupProgress") || "null");
+      const broker = justClicked ?? saved?.selectedBroker ?? null;
+      if (broker) {
+        setSelectedBroker(broker);
+        const sameBroker = saved && saved.selectedBroker?.toLowerCase() === broker.toLowerCase();
+        setBrokerStep(justClicked && !sameBroker ? 0 : (saved?.brokerStep ?? 0));
+        if (sameBroker) {
+          setIgForm((f) => ({
+            ...f,
+            apiKey: saved.apiKey ?? "",
+            username: saved.username ?? "",
+            accountType: (saved.accountType as "demo" | "live") ?? f.accountType,
+          }));
+        }
+      }
+      if (justClicked) {
         sessionStorage.removeItem("selectedBroker");
         setActive("broker");
         requestAnimationFrame(() => {
@@ -159,6 +173,20 @@ function SettingsPage() {
       }
     } catch {/* noop */}
   }, []);
+
+  // Persist progress whenever it changes (password intentionally excluded)
+  useEffect(() => {
+    if (!selectedBroker) return;
+    try {
+      localStorage.setItem("brokerSetupProgress", JSON.stringify({
+        selectedBroker,
+        brokerStep,
+        apiKey: igForm.apiKey,
+        username: igForm.username,
+        accountType: igForm.accountType,
+      }));
+    } catch {/* noop */}
+  }, [selectedBroker, brokerStep, igForm.apiKey, igForm.username, igForm.accountType]);
 
   async function connectIg() {
     if (!igForm.apiKey || !igForm.username || !igForm.password) {
@@ -170,6 +198,9 @@ function SettingsPage() {
       const r = await runSaveIg({ data: igForm });
       setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
       setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
+      try { localStorage.removeItem("brokerSetupProgress"); } catch {/* noop */}
+      setSelectedBroker(null);
+      setBrokerStep(0);
       toast.success(`Connected to IG ${r.accountType} account`);
     } catch (e: any) {
       toast.error(e?.message || "IG connection failed");
@@ -466,9 +497,29 @@ function SettingsPage() {
                           );
                         })}
                       </div>
-                      <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
-                        Step {brokerStep + 1} of {steps.length}: <strong>{steps[brokerStep].title}</strong>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
+                          Step {brokerStep + 1} of {steps.length}: <strong>{steps[brokerStep].title}</strong>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                          <span style={{ color: TEAL }}>● Progress saved</span>
+                          <button
+                            onClick={() => {
+                              try { localStorage.removeItem("brokerSetupProgress"); } catch {/* noop */}
+                              setIgForm({ apiKey: "", username: "", password: "", accountType: "demo" });
+                              setBrokerStep(0);
+                              toast.success("Setup progress cleared");
+                            }}
+                            className="hover:text-foreground underline">
+                            Reset
+                          </button>
+                        </div>
                       </div>
+                      {isIg && (
+                        <p className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                          Note: your API key and username are saved locally so you can return later. Password is never stored — re-enter it on the final step.
+                        </p>
+                      )}
 
                       {/* Step content */}
                       {isIg ? (
