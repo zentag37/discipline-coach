@@ -872,24 +872,34 @@ function Footer() {
             Stay disciplined. Stay consistent.
           </p>
         </div>
-        <nav className="flex items-center gap-6 font-mono text-xs text-muted-foreground">
+        <nav className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs text-muted-foreground">
           <a href="#problem" className="hover:text-foreground transition">problem</a>
           <a href="#features" className="hover:text-foreground transition">features</a>
           <a href="/pricing" className="hover:text-foreground transition">pricing</a>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 hover:text-foreground transition"
-          >
-            <Github className="h-3.5 w-3.5" />
-            github
+          <a href="/privacy" className="hover:text-foreground transition">privacy</a>
+          <a href="/terms" className="hover:text-foreground transition">terms</a>
+          <a href="mailto:hello@tradewithace.com" className="inline-flex items-center gap-1.5 hover:text-foreground transition">
+            <Mail className="h-3.5 w-3.5" />
+            contact
           </a>
+          <span className="flex items-center gap-3 pl-2 border-l border-border">
+            <a href="#" aria-label="Twitter / X" className="hover:text-foreground transition">
+              <Twitter className="h-4 w-4" />
+            </a>
+            <a href="#" aria-label="Instagram" className="hover:text-foreground transition">
+              <Instagram className="h-4 w-4" />
+            </a>
+            <a href="#" aria-label="TikTok" className="hover:text-foreground transition">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                <path d="M19.6 6.3a5.4 5.4 0 0 1-3.4-1.2 5.4 5.4 0 0 1-2-3.6h-3.4v13a2.5 2.5 0 1 1-1.8-2.4V8.6a5.9 5.9 0 1 0 5.2 5.9V9.4a8.8 8.8 0 0 0 5.4 1.8z"/>
+              </svg>
+            </a>
+          </span>
         </nav>
       </Container>
       <div className="border-t border-border">
         <Container className="py-4 font-mono text-[11px] text-muted-foreground flex justify-between">
-          <span>© 2026 floatline</span>
+          <span>© 2026 TradeWithAce</span>
           <span>v1.0.0</span>
         </Container>
       </div>
