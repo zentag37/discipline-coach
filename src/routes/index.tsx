@@ -30,10 +30,12 @@ import {
   Calculator,
   Quote,
   Minimize2,
-  Github,
   Apple,
   Monitor,
   Circle,
+  Twitter,
+  Instagram,
+  Mail,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
