@@ -489,7 +489,8 @@ function SettingsPage() {
                     </div>
                   )}
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={() => { void connectIgAccount(); }}
                     disabled={igConnecting}
                     className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
                     style={{ background: TEAL, color: "#0d0f12" }}>
@@ -500,7 +501,7 @@ function SettingsPage() {
               ) : (
                 <div className="space-y-3">
                   <div className="p-3 rounded text-xs" style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.06)", color: "#d1d5db", fontFamily: FONT_SANS }}>
-                    Connected to IG <strong>{ig.accountType?.toUpperCase()}</strong> account {ig.accountId ? <code>{ig.accountId}</code> : null}.
+                    <span style={{ color: GREEN }}>Connected ✓</span> IG <strong>{ig.accountType?.toUpperCase()}</strong> account {ig.accountId ? <code>{ig.accountId}</code> : null}.
                   </div>
                   <button
                     onClick={disconnectIgAccount}
