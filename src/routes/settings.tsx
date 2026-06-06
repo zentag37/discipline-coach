@@ -178,6 +178,7 @@ function SettingsPage() {
       return;
     }
     setIgMessage(null);
+    setIgUnsupported(false);
     setIgConnecting(true);
     try {
       const r = await connectIGAccountFn({ data: payload });
