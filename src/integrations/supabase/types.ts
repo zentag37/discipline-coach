@@ -505,8 +505,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      ig_decrypt: { Args: { _cipher: string; _key: string }; Returns: string }
-      ig_encrypt: { Args: { _key: string; _plain: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
