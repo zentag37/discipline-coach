@@ -715,6 +715,53 @@ function DashboardPage() {
             </div>
           )}
 
+          {/* Live Account (IG) */}
+          <div className="animate-fade-in">
+            {igLossBreached && (
+              <div className="mb-3 p-3 rounded-[10px] flex items-center gap-3 text-sm"
+                style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.4)", color: "#fecaca", fontFamily: "Inter, sans-serif" }}>
+                <span className="text-xs tracking-widest px-2 py-0.5 rounded" style={{ background: "#dc2626", color: "#fff" }}>STOP</span>
+                Daily loss limit hit — live P&L {igCurrency}{igPnl.toFixed(2)} exceeds your €{dailyStop} cap. Stand down for today.
+              </div>
+            )}
+            <div className="p-5 rounded-[10px]"
+              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-[10px] tracking-widest" style={{ color: TEAL }}>LIVE ACCOUNT · IG</div>
+                {igConnected ? (
+                  <span className="text-[9px] tracking-widest px-1.5 py-0.5 rounded"
+                    style={{ background: "rgba(34,197,94,0.12)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }}>
+                    CONNECTED
+                  </span>
+                ) : (
+                  <Link to="/settings" className="text-[10px] hover:underline" style={{ color: TEAL }}>
+                    Connect in Settings →
+                  </Link>
+                )}
+              </div>
+              {!igConnected ? (
+                <p className="text-xs" style={{ color: "#9ca3af", fontFamily: "Inter, sans-serif" }}>
+                  Link your IG trading account to see live balance, P&L and open positions here.
+                </p>
+              ) : (igAccount as any)?.error ? (
+                <p className="text-xs" style={{ color: "#f59e0b", fontFamily: "Inter, sans-serif" }}>
+                  Could not fetch: {(igAccount as any).error}
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <LiveStat label="BALANCE" value={`${igCurrency}${igBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+                  <LiveStat
+                    label="TODAY'S P&L"
+                    value={`${igPnl >= 0 ? "+" : "-"}${igCurrency}${Math.abs(igPnl).toFixed(2)}`}
+                    valueColor={igPnl > 0 ? "#22c55e" : igPnl < 0 ? "#ef4444" : undefined}
+                  />
+                  <LiveStat label="OPEN POSITIONS" value={String(openPositions)} />
+                  <LiveStat label="USED MARGIN" value={`${igCurrency}${igMargin.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Row 4 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in">
             <div
