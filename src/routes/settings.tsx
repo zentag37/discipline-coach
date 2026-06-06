@@ -445,7 +445,7 @@ function SettingsPage() {
                 Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
               </p>
               {!ig.connected ? (
-                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); void connectIg(); }}>
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); void connectIgAccount(); }}>
                   <Field label="IG API KEY">
                     <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="e.g. abc123XYZ_-" />
                   </Field>
