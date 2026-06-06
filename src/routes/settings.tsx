@@ -189,8 +189,13 @@ function SettingsPage() {
   }, [selectedBroker, brokerStep, igForm.apiKey, igForm.username, igForm.accountType]);
 
   async function connectIg() {
-    if (!igForm.apiKey || !igForm.username || !igForm.password) {
-      toast.error("All IG fields required");
+    if (!igForm.apiKey.trim() || !igForm.username.trim()) {
+      toast.error("API key and username are required");
+      setBrokerStep((s) => Math.min(s, 1));
+      return;
+    }
+    if (!igForm.password) {
+      toast.error("Re-enter your IG password to connect");
       return;
     }
     setIgConnecting(true);
@@ -588,12 +593,19 @@ function SettingsPage() {
                             </>
                           )}
                           {brokerStep === 2 && (
-                            <Field label="ACCOUNT TYPE">
-                              <div className="grid grid-cols-2 gap-2 max-w-xs">
-                                <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
-                                <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
-                              </div>
-                            </Field>
+                            <>
+                              <Field label="ACCOUNT TYPE">
+                                <div className="grid grid-cols-2 gap-2 max-w-xs">
+                                  <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
+                                  <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
+                                </div>
+                              </Field>
+                              {!igForm.password && (
+                                <Field label="RE-ENTER IG PASSWORD">
+                                  <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} placeholder="Password is never stored — re-enter to connect" />
+                                </Field>
+                              )}
+                            </>
                           )}
                         </div>
                       ) : (
@@ -624,9 +636,10 @@ function SettingsPage() {
                         ) : isIg ? (
                           <button
                             onClick={connectIg}
-                            disabled={igConnecting || !allValid}
-                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                            disabled={igConnecting || !igForm.apiKey.trim() || !igForm.username.trim() || !igForm.password}
+                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
                             style={{ background: TEAL, color: "#0d0f12" }}>
+                            {igConnecting && <span className="inline-block w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />}
                             {igConnecting ? "Connecting…" : "Connect IG Account"}
                           </button>
                         ) : (
