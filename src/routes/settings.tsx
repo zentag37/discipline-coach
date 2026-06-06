@@ -11,7 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
 import { normalizePlan, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
-import { saveIgCredentials, getIgStatus, disconnectIg } from "@/lib/ig.functions";
+import { connectIGAccount, getIgStatus, disconnectIg } from "@/lib/ig.functions";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — TradeWithAce" }] }),
@@ -129,7 +129,7 @@ function SettingsPage() {
   const [confirmCancel, setConfirmCancel] = useState(false);
 
   // IG broker integration
-  const runSaveIg = useServerFn(saveIgCredentials);
+  const connectIGAccountFn = useServerFn(connectIGAccount);
   const runGetIgStatus = useServerFn(getIgStatus);
   const runDisconnectIg = useServerFn(disconnectIg);
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
@@ -163,7 +163,7 @@ function SettingsPage() {
     } catch {/* noop */}
   }, []);
 
-  async function connectIg() {
+  async function connectIgAccount() {
     const payload = {
       apiKey: igForm.apiKey.trim(),
       username: igForm.username.trim(),
@@ -179,7 +179,7 @@ function SettingsPage() {
     setIgMessage(null);
     setIgConnecting(true);
     try {
-      const r = await runSaveIg({ data: payload });
+      const r = await connectIGAccountFn({ data: payload });
       setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
       setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
       setSelectedBroker(null);
