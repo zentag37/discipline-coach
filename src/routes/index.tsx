@@ -254,6 +254,70 @@ function SupportedPlatforms() {
   );
 }
 
+const BROKER_BADGES = [
+  "IG", "Pepperstone", "eToro", "Plus500", "TradingView",
+  "OANDA", "XM", "AvaTrade", "FXCM", "Saxo", "CMC Markets",
+];
+
+function LiveBrokerSync() {
+  return (
+    <section id="broker-sync">
+      <Container className="py-20 md:py-24">
+        <div className="rounded-lg border border-border bg-surface p-8 md:p-12">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+            <div className="max-w-xl">
+              <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
+                / live broker sync
+              </div>
+              <h2 className="mt-3 flex items-center gap-3 font-mono text-3xl md:text-4xl font-medium tracking-tight">
+                Connects to your broker
+                <span className="relative inline-flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-primary">Live</span>
+              </h2>
+              <p className="mt-3 font-mono text-sm text-muted-foreground">
+                Works with the platforms you already use.
+              </p>
+              <p className="mt-5 text-base text-foreground/90 leading-relaxed">
+                ACE pulls your live balance, open positions and P&amp;L directly from your broker.
+                When your daily loss limit is hit, ACE warns you automatically — no willpower needed.
+              </p>
+            </div>
+            <div className="grid h-fit grid-cols-2 gap-2 md:grid-cols-3 md:min-w-[320px]">
+              {[
+                { label: "Live balance" },
+                { label: "Open P&L" },
+                { label: "Auto stop" },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-wider text-primary"
+                >
+                  {s.label}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-2">
+            {BROKER_BADGES.map((b) => (
+              <span
+                key={b}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground/90 hover:border-primary/50 hover:text-primary transition"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+                {b}
+              </span>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 function Nav() {
   const navigate = useNavigate();
   return (
