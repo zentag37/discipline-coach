@@ -385,6 +385,55 @@ function SettingsPage() {
               </Field>
             </Section>
 
+            {/* Trading Account (IG) */}
+            <Section id="broker" title="Trading Account" refs={refs}
+              badge={<span className="text-[9px] px-1.5 py-0.5 rounded"
+                style={{ background: ig.connected ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)", color: ig.connected ? GREEN : "#9ca3af", border: `1px solid ${ig.connected ? GREEN : "rgba(255,255,255,0.1)"}` }}>
+                {ig.connected ? `Connected · IG ${ig.accountType?.toUpperCase()}${ig.accountId ? ` · ${ig.accountId}` : ""}` : "Disconnected"}
+              </span>}>
+              <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
+              </p>
+              {!ig.connected ? (
+                <>
+                  <Field label="IG API KEY">
+                    <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="From My IG → Settings → API keys" />
+                  </Field>
+                  <Field label="IG USERNAME">
+                    <Input value={igForm.username} onChange={(v) => setIgForm((f) => ({ ...f, username: v }))} />
+                  </Field>
+                  <Field label="IG PASSWORD">
+                    <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} />
+                  </Field>
+                  <Field label="ACCOUNT TYPE">
+                    <div className="grid grid-cols-2 gap-2 max-w-xs">
+                      <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
+                      <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
+                    </div>
+                  </Field>
+                  <button
+                    onClick={connectIg}
+                    disabled={igConnecting}
+                    className="text-xs px-4 py-2 rounded font-medium disabled:opacity-50"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    {igConnecting ? "Connecting…" : "Connect IG Account"}
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-3">
+                  <div className="p-3 rounded text-xs" style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.06)", color: "#d1d5db", fontFamily: FONT_SANS }}>
+                    Connected to IG <strong>{ig.accountType?.toUpperCase()}</strong> account {ig.accountId ? <code>{ig.accountId}</code> : null}.
+                  </div>
+                  <button
+                    onClick={disconnectIgAccount}
+                    className="text-xs px-3 py-1.5 rounded"
+                    style={{ border: `1px solid ${RED}`, color: RED }}>
+                    Disconnect
+                  </button>
+                </div>
+              )}
+            </Section>
+
             {/* ACE */}
             <Section id="ace" title="ACE Mentor" refs={refs}
               badge={<span className="text-[9px] px-1.5 py-0.5 rounded"
