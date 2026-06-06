@@ -150,6 +150,7 @@ function SettingsPage() {
       const b = sessionStorage.getItem("selectedBroker");
       if (b) {
         setSelectedBroker(b);
+        setBrokerStep(0);
         sessionStorage.removeItem("selectedBroker");
         setActive("broker");
         requestAnimationFrame(() => {
