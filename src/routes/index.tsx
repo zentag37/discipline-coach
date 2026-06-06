@@ -303,13 +303,7 @@ function LiveBrokerSync() {
 
           <div className="mt-8 flex flex-wrap gap-2">
             {BROKER_BADGES.map((b) => (
-              <span
-                key={b}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 font-mono text-xs text-foreground/90 hover:border-primary/50 hover:text-primary transition"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
-                {b}
-              </span>
+              <BrokerBadge key={b} name={b} />
             ))}
           </div>
         </div>
