@@ -128,11 +128,48 @@ function SettingsPage() {
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
 
+  // IG broker integration
+  const runSaveIg = useServerFn(saveIgCredentials);
+  const runGetIgStatus = useServerFn(getIgStatus);
+  const runDisconnectIg = useServerFn(disconnectIg);
+  const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
+  const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
+  const [igConnecting, setIgConnecting] = useState(false);
+
   useEffect(() => {
     (async () => {
       try { setSubInfo(await fetchSubInfo()); } catch {/* noop */}
+      try { setIg(await runGetIgStatus()); } catch {/* noop */}
     })();
-  }, [fetchSubInfo]);
+  }, [fetchSubInfo, runGetIgStatus]);
+
+  async function connectIg() {
+    if (!igForm.apiKey || !igForm.username || !igForm.password) {
+      toast.error("All IG fields required");
+      return;
+    }
+    setIgConnecting(true);
+    try {
+      const r = await runSaveIg({ data: igForm });
+      setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
+      setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
+      toast.success(`Connected to IG ${r.accountType} account`);
+    } catch (e: any) {
+      toast.error(e?.message || "IG connection failed");
+    } finally {
+      setIgConnecting(false);
+    }
+  }
+
+  async function disconnectIgAccount() {
+    try {
+      await runDisconnectIg();
+      setIg({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
+      toast.success("Disconnected");
+    } catch (e: any) {
+      toast.error(e?.message || "Could not disconnect");
+    }
+  }
 
   async function handleCancel() {
     setCancelling(true);
