@@ -245,12 +245,45 @@ function SettingsPage() {
   }
 
   async function save() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { error } = await supabase.from("profiles").upsert({ id: user.id, ...form, onboarded: true });
-    if (error) { toast.error("Could not save"); return; }
-    setDirty(false);
-    toast.success("Saved ✓");
+    if (saving) return;
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("Not signed in"); return; }
+      const patch: Record<string, any> = {
+        full_name: form.full_name ?? null,
+        country: form.country ?? null,
+        timezone: form.timezone ?? null,
+        experience: form.experience ?? null,
+        account_size: form.account_size != null ? String(form.account_size) : null,
+        risk_per_trade: form.risk_per_trade != null ? Number(form.risk_per_trade) : null,
+        daily_loss_limit: form.daily_loss_limit != null ? Number(form.daily_loss_limit) : null,
+        max_trades: form.max_trades_per_day != null ? Number(form.max_trades_per_day) : null,
+        broker: form.broker ?? null,
+        platform: form.platform ?? null,
+        session: Array.isArray(form.session) ? form.session.join(",") : form.session ?? null,
+        assets: Array.isArray(form.assets) ? form.assets : [],
+        instruments: Array.isArray(form.instruments) ? form.instruments.join(",") : form.instruments ?? null,
+        style: form.trading_style ?? null,
+        voice_enabled: !!form.voice_enabled,
+        voice_style: form.voice_personality ?? null,
+        language: form.language ?? null,
+      };
+      const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
+      if (error) {
+        console.error("[settings] save failed", error);
+        toast.error(error.message || "Could not save settings");
+        return;
+      }
+      setProfile((p: any) => ({ ...p, ...patch }));
+      setDirty(false);
+      toast.success("Settings saved");
+    } catch (e: any) {
+      console.error("[settings] save exception", e);
+      toast.error(e?.message || "Could not save settings");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function signOut() {
