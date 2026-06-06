@@ -198,6 +198,9 @@ function SettingsPage() {
       const r = await runSaveIg({ data: igForm });
       setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
       setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
+      try { localStorage.removeItem("brokerSetupProgress"); } catch {/* noop */}
+      setSelectedBroker(null);
+      setBrokerStep(0);
       toast.success(`Connected to IG ${r.accountType} account`);
     } catch (e: any) {
       toast.error(e?.message || "IG connection failed");
