@@ -262,11 +262,12 @@ const BROKER_BADGES = [
 function BrokerBadge({ name }: { name: string }) {
   const navigate = useNavigate();
   const onClick = async () => {
+    try { sessionStorage.setItem("selectedBroker", name); } catch {}
     const { data } = await supabase.auth.getSession();
     if (data.session) {
       navigate({ to: "/settings", hash: "broker" });
     } else {
-      try { sessionStorage.setItem("postSignupMessage", "Connect your broker after signing up"); } catch {}
+      try { sessionStorage.setItem("postSignupMessage", `Connect your ${name} account after signing up`); } catch {}
       navigate({ to: "/register" });
     }
   };
