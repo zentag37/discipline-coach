@@ -102,6 +102,8 @@ function Index() {
       <Divider />
       <Features />
       <Divider />
+      <LiveBrokerSync />
+      <Divider />
       <SupportedPlatforms />
       <Divider />
       <Quotes />
