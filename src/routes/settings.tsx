@@ -135,7 +135,7 @@ function SettingsPage() {
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
-  const [brokerStep, setBrokerStep] = useState(0);
+  const [igMessage, setIgMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
@@ -145,24 +145,13 @@ function SettingsPage() {
     })();
   }, [fetchSubInfo, runGetIgStatus]);
 
-  // Load saved broker stepper progress (selectedBroker, step, apiKey, username, accountType — never password)
+  // Keep broker navigation focused on this settings section.
   useEffect(() => {
     try {
       const justClicked = sessionStorage.getItem("selectedBroker");
-      const saved = JSON.parse(localStorage.getItem("brokerSetupProgress") || "null");
-      const broker = justClicked ?? saved?.selectedBroker ?? null;
+      const broker = justClicked ?? null;
       if (broker) {
         setSelectedBroker(broker);
-        const sameBroker = saved && saved.selectedBroker?.toLowerCase() === broker.toLowerCase();
-        setBrokerStep(justClicked && !sameBroker ? 0 : (saved?.brokerStep ?? 0));
-        if (sameBroker) {
-          setIgForm((f) => ({
-            ...f,
-            apiKey: saved.apiKey ?? "",
-            username: saved.username ?? "",
-            accountType: (saved.accountType as "demo" | "live") ?? f.accountType,
-          }));
-        }
       }
       if (justClicked) {
         sessionStorage.removeItem("selectedBroker");
@@ -174,41 +163,33 @@ function SettingsPage() {
     } catch {/* noop */}
   }, []);
 
-  // Persist progress whenever it changes (password intentionally excluded)
-  useEffect(() => {
-    if (!selectedBroker) return;
-    try {
-      localStorage.setItem("brokerSetupProgress", JSON.stringify({
-        selectedBroker,
-        brokerStep,
-        apiKey: igForm.apiKey,
-        username: igForm.username,
-        accountType: igForm.accountType,
-      }));
-    } catch {/* noop */}
-  }, [selectedBroker, brokerStep, igForm.apiKey, igForm.username, igForm.accountType]);
-
   async function connectIg() {
-    if (!igForm.apiKey.trim() || !igForm.username.trim()) {
-      toast.error("API key and username are required");
-      setBrokerStep((s) => Math.min(s, 1));
+    const payload = {
+      apiKey: igForm.apiKey.trim(),
+      username: igForm.username.trim(),
+      password: igForm.password,
+      accountType: igForm.accountType,
+    };
+    if (!payload.apiKey || !payload.username || !payload.password || !payload.accountType) {
+      const text = "Fill in all IG connection fields before connecting.";
+      setIgMessage({ type: "error", text });
+      toast.error(text);
       return;
     }
-    if (!igForm.password) {
-      toast.error("Re-enter your IG password to connect");
-      return;
-    }
+    setIgMessage(null);
     setIgConnecting(true);
     try {
-      const r = await runSaveIg({ data: igForm });
+      const r = await runSaveIg({ data: payload });
       setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
       setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
-      try { localStorage.removeItem("brokerSetupProgress"); } catch {/* noop */}
       setSelectedBroker(null);
-      setBrokerStep(0);
-      toast.success(`Connected to IG ${r.accountType} account`);
+      const text = `Connected to IG ${r.accountType.toUpperCase()}${r.accountId ? ` · ${r.accountId}` : ""}`;
+      setIgMessage({ type: "success", text });
+      toast.success(text);
     } catch (e: any) {
-      toast.error(e?.message || "IG connection failed");
+      const text = e?.message || "IG connection failed";
+      setIgMessage({ type: "error", text });
+      toast.error(text);
     } finally {
       setIgConnecting(false);
     }
