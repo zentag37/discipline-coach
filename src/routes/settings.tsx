@@ -136,6 +136,7 @@ function SettingsPage() {
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
   const [igMessage, setIgMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [igUnsupported, setIgUnsupported] = useState(false);
   const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
