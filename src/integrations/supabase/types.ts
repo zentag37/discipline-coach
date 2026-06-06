@@ -213,6 +213,13 @@ export type Database = {
           experience: string | null
           full_name: string | null
           id: string
+          ig_account_id: string | null
+          ig_account_type: string | null
+          ig_api_key_enc: string | null
+          ig_connected: boolean
+          ig_last_connected_at: string | null
+          ig_password_enc: string | null
+          ig_username_enc: string | null
           instruments: string | null
           language: string | null
           max_trades: number | null
@@ -243,6 +250,13 @@ export type Database = {
           experience?: string | null
           full_name?: string | null
           id: string
+          ig_account_id?: string | null
+          ig_account_type?: string | null
+          ig_api_key_enc?: string | null
+          ig_connected?: boolean
+          ig_last_connected_at?: string | null
+          ig_password_enc?: string | null
+          ig_username_enc?: string | null
           instruments?: string | null
           language?: string | null
           max_trades?: number | null
@@ -273,6 +287,13 @@ export type Database = {
           experience?: string | null
           full_name?: string | null
           id?: string
+          ig_account_id?: string | null
+          ig_account_type?: string | null
+          ig_api_key_enc?: string | null
+          ig_connected?: boolean
+          ig_last_connected_at?: string | null
+          ig_password_enc?: string | null
+          ig_username_enc?: string | null
           instruments?: string | null
           language?: string | null
           max_trades?: number | null
