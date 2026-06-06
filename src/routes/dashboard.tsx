@@ -316,6 +316,43 @@ function DashboardPage() {
   });
   const activeSignals = signalsData?.signals || [];
 
+  // IG Live Account
+  const fetchIgAccounts = useServerFn(getIgAccounts);
+  const fetchIgPositions = useServerFn(getIgPositions);
+  const { data: igAccount } = useQuery({
+    queryKey: ["ig-accounts"],
+    queryFn: () => fetchIgAccounts(),
+    refetchInterval: 30_000,
+    enabled: !!userId,
+  });
+  const { data: igPositions } = useQuery({
+    queryKey: ["ig-positions"],
+    queryFn: () => fetchIgPositions(),
+    refetchInterval: 30_000,
+    enabled: !!userId,
+  });
+  const igConnected = igAccount?.connected === true && !("error" in (igAccount ?? {}) && (igAccount as any).error);
+  const igPnl = igConnected && "profitLoss" in (igAccount ?? {}) ? Number((igAccount as any).profitLoss) || 0 : 0;
+  const igBalance = igConnected && "balance" in (igAccount ?? {}) ? Number((igAccount as any).balance) || 0 : 0;
+  const igMargin = igConnected && "usedMargin" in (igAccount ?? {}) ? Number((igAccount as any).usedMargin) || 0 : 0;
+  const igCurrency = igConnected && "currency" in (igAccount ?? {}) ? String((igAccount as any).currency || "") : "";
+  const openPositions = igConnected ? igPositions?.positions?.length ?? 0 : 0;
+
+  // Daily loss alert based on live IG P&L
+  const dailyLossHitRef = useRef(false);
+  const igLossBreached = igConnected && dailyStop > 0 && igPnl <= -dailyStop;
+  useEffect(() => {
+    if (!igLossBreached) { dailyLossHitRef.current = false; return; }
+    if (dailyLossHitRef.current) return;
+    dailyLossHitRef.current = true;
+    pushNotification({
+      type: "warning",
+      title: "Daily stop loss hit",
+      body: `Live P&L ${igCurrency}${igPnl.toFixed(2)} exceeds your €${dailyStop} daily limit. Stand down.`,
+    });
+  }, [igLossBreached, igCurrency, igPnl, dailyStop]);
+
+
   const displayNow = now ?? new Date(0);
   const session = getSessionStatus(displayNow);
   const opensIn = !session.open ? nextLondonOpen(displayNow) : null;
