@@ -588,12 +588,19 @@ function SettingsPage() {
                             </>
                           )}
                           {brokerStep === 2 && (
-                            <Field label="ACCOUNT TYPE">
-                              <div className="grid grid-cols-2 gap-2 max-w-xs">
-                                <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
-                                <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
-                              </div>
-                            </Field>
+                            <>
+                              <Field label="ACCOUNT TYPE">
+                                <div className="grid grid-cols-2 gap-2 max-w-xs">
+                                  <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
+                                  <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
+                                </div>
+                              </Field>
+                              {!igForm.password && (
+                                <Field label="RE-ENTER IG PASSWORD">
+                                  <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} placeholder="Password is never stored — re-enter to connect" />
+                                </Field>
+                              )}
+                            </>
                           )}
                         </div>
                       ) : (
