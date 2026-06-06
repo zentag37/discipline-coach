@@ -266,7 +266,8 @@ function BrokerBadge({ name }: { name: string }) {
     if (data.session) {
       navigate({ to: "/settings", hash: "broker" });
     } else {
-      navigate({ to: "/register", search: { msg: "broker" } as any });
+      try { sessionStorage.setItem("postSignupMessage", "Connect your broker after signing up"); } catch {}
+      navigate({ to: "/register" });
     }
   };
   return (
