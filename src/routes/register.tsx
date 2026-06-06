@@ -47,6 +47,10 @@ function RegisterPage() {
 
   useEffect(() => {
     if (search.plan) sessionStorage.setItem("pendingPlan", search.plan);
+    try {
+      const m = sessionStorage.getItem("postSignupMessage");
+      if (m) setErr(m);
+    } catch {}
   }, [search.plan]);
 
   useEffect(() => {
