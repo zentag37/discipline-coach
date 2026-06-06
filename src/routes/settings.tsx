@@ -497,9 +497,29 @@ function SettingsPage() {
                           );
                         })}
                       </div>
-                      <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
-                        Step {brokerStep + 1} of {steps.length}: <strong>{steps[brokerStep].title}</strong>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
+                          Step {brokerStep + 1} of {steps.length}: <strong>{steps[brokerStep].title}</strong>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                          <span style={{ color: TEAL }}>● Progress saved</span>
+                          <button
+                            onClick={() => {
+                              try { localStorage.removeItem("brokerSetupProgress"); } catch {/* noop */}
+                              setIgForm({ apiKey: "", username: "", password: "", accountType: "demo" });
+                              setBrokerStep(0);
+                              toast.success("Setup progress cleared");
+                            }}
+                            className="hover:text-foreground underline">
+                            Reset
+                          </button>
+                        </div>
                       </div>
+                      {isIg && (
+                        <p className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
+                          Note: your API key and username are saved locally so you can return later. Password is never stored — re-enter it on the final step.
+                        </p>
+                      )}
 
                       {/* Step content */}
                       {isIg ? (
