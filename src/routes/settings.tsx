@@ -187,7 +187,13 @@ function SettingsPage() {
       setIgMessage({ type: "success", text });
       toast.success(text);
     } catch (e: any) {
-      const text = e?.message || "IG connection failed";
+      const raw = String(e?.message || "IG connection failed");
+      let text = raw;
+      if (/stockbroking-not-supported/i.test(raw)) {
+        text = "Your IG account type doesn't support API access. The IG Web API works with CFD/spread bet accounts only. Your floating window still works automatically.";
+      } else if (/invalid-details/i.test(raw)) {
+        text = "Incorrect username or password. Use your IG API username (may differ from your login email).";
+      }
       setIgMessage({ type: "error", text });
       toast.error(text);
     } finally {
