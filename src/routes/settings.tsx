@@ -631,9 +631,10 @@ function SettingsPage() {
                         ) : isIg ? (
                           <button
                             onClick={connectIg}
-                            disabled={igConnecting || !allValid}
-                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                            disabled={igConnecting || !igForm.apiKey.trim() || !igForm.username.trim() || !igForm.password}
+                            className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
                             style={{ background: TEAL, color: "#0d0f12" }}>
+                            {igConnecting && <span className="inline-block w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />}
                             {igConnecting ? "Connecting…" : "Connect IG Account"}
                           </button>
                         ) : (
