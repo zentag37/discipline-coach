@@ -11,7 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
 import { normalizePlan, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
-import { saveIgCredentials, getIgStatus, disconnectIg } from "@/lib/ig.functions";
+import { connectIGAccount, getIgStatus, disconnectIg } from "@/lib/ig.functions";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — TradeWithAce" }] }),
@@ -129,7 +129,7 @@ function SettingsPage() {
   const [confirmCancel, setConfirmCancel] = useState(false);
 
   // IG broker integration
-  const runSaveIg = useServerFn(saveIgCredentials);
+  const connectIGAccountFn = useServerFn(connectIGAccount);
   const runGetIgStatus = useServerFn(getIgStatus);
   const runDisconnectIg = useServerFn(disconnectIg);
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
@@ -163,7 +163,7 @@ function SettingsPage() {
     } catch {/* noop */}
   }, []);
 
-  async function connectIg() {
+  async function connectIgAccount() {
     const payload = {
       apiKey: igForm.apiKey.trim(),
       username: igForm.username.trim(),
@@ -179,7 +179,7 @@ function SettingsPage() {
     setIgMessage(null);
     setIgConnecting(true);
     try {
-      const r = await runSaveIg({ data: payload });
+      const r = await connectIGAccountFn({ data: payload });
       setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
       setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
       setSelectedBroker(null);
@@ -445,7 +445,7 @@ function SettingsPage() {
                 Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
               </p>
               {!ig.connected ? (
-                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); void connectIg(); }}>
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); void connectIgAccount(); }}>
                   <Field label="IG API KEY">
                     <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="e.g. abc123XYZ_-" />
                   </Field>
@@ -489,7 +489,8 @@ function SettingsPage() {
                     </div>
                   )}
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={() => { void connectIgAccount(); }}
                     disabled={igConnecting}
                     className="text-xs px-4 py-2 rounded font-medium disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
                     style={{ background: TEAL, color: "#0d0f12" }}>
@@ -500,7 +501,7 @@ function SettingsPage() {
               ) : (
                 <div className="space-y-3">
                   <div className="p-3 rounded text-xs" style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.06)", color: "#d1d5db", fontFamily: FONT_SANS }}>
-                    Connected to IG <strong>{ig.accountType?.toUpperCase()}</strong> account {ig.accountId ? <code>{ig.accountId}</code> : null}.
+                    <span style={{ color: GREEN }}>Connected ✓</span> IG <strong>{ig.accountType?.toUpperCase()}</strong> account {ig.accountId ? <code>{ig.accountId}</code> : null}.
                   </div>
                   <button
                     onClick={disconnectIgAccount}
