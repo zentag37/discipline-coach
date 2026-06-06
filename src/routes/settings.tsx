@@ -135,6 +135,7 @@ function SettingsPage() {
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
+  const [brokerStep, setBrokerStep] = useState(0);
   const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
