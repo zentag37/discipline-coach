@@ -145,12 +145,26 @@ function SettingsPage() {
     })();
   }, [fetchSubInfo, runGetIgStatus]);
 
+  // Load saved broker stepper progress (selectedBroker, step, apiKey, username, accountType — never password)
   useEffect(() => {
     try {
-      const b = sessionStorage.getItem("selectedBroker");
-      if (b) {
-        setSelectedBroker(b);
-        setBrokerStep(0);
+      const justClicked = sessionStorage.getItem("selectedBroker");
+      const saved = JSON.parse(localStorage.getItem("brokerSetupProgress") || "null");
+      const broker = justClicked ?? saved?.selectedBroker ?? null;
+      if (broker) {
+        setSelectedBroker(broker);
+        const sameBroker = saved && saved.selectedBroker?.toLowerCase() === broker.toLowerCase();
+        setBrokerStep(justClicked && !sameBroker ? 0 : (saved?.brokerStep ?? 0));
+        if (sameBroker) {
+          setIgForm((f) => ({
+            ...f,
+            apiKey: saved.apiKey ?? "",
+            username: saved.username ?? "",
+            accountType: (saved.accountType as "demo" | "live") ?? f.accountType,
+          }));
+        }
+      }
+      if (justClicked) {
         sessionStorage.removeItem("selectedBroker");
         setActive("broker");
         requestAnimationFrame(() => {
@@ -159,6 +173,20 @@ function SettingsPage() {
       }
     } catch {/* noop */}
   }, []);
+
+  // Persist progress whenever it changes (password intentionally excluded)
+  useEffect(() => {
+    if (!selectedBroker) return;
+    try {
+      localStorage.setItem("brokerSetupProgress", JSON.stringify({
+        selectedBroker,
+        brokerStep,
+        apiKey: igForm.apiKey,
+        username: igForm.username,
+        accountType: igForm.accountType,
+      }));
+    } catch {/* noop */}
+  }, [selectedBroker, brokerStep, igForm.apiKey, igForm.username, igForm.accountType]);
 
   async function connectIg() {
     if (!igForm.apiKey || !igForm.username || !igForm.password) {
