@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings as SettingsIcon,
-  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square, Radio,
+  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square, Radio, Plug,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
 import { normalizePlan, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { saveIgCredentials, getIgStatus, disconnectIg } from "@/lib/ig.functions";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — TradeWithAce" }] }),
@@ -28,6 +29,7 @@ const NAV = [
   { id: "profile", label: "Profile", icon: User },
   { id: "risk", label: "Risk Rules", icon: Shield },
   { id: "trading", label: "Trading Setup", icon: BarChart3 },
+  { id: "broker", label: "Trading Account", icon: Plug },
   { id: "ace", label: "ACE Mentor", icon: Bot },
   { id: "voice", label: "Voice Assistant", icon: Mic },
   { id: "notifications", label: "Notifications", icon: BellRing },
@@ -126,11 +128,48 @@ function SettingsPage() {
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
 
+  // IG broker integration
+  const runSaveIg = useServerFn(saveIgCredentials);
+  const runGetIgStatus = useServerFn(getIgStatus);
+  const runDisconnectIg = useServerFn(disconnectIg);
+  const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
+  const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
+  const [igConnecting, setIgConnecting] = useState(false);
+
   useEffect(() => {
     (async () => {
       try { setSubInfo(await fetchSubInfo()); } catch {/* noop */}
+      try { setIg(await runGetIgStatus()); } catch {/* noop */}
     })();
-  }, [fetchSubInfo]);
+  }, [fetchSubInfo, runGetIgStatus]);
+
+  async function connectIg() {
+    if (!igForm.apiKey || !igForm.username || !igForm.password) {
+      toast.error("All IG fields required");
+      return;
+    }
+    setIgConnecting(true);
+    try {
+      const r = await runSaveIg({ data: igForm });
+      setIg({ connected: true, accountType: r.accountType, accountId: r.accountId, lastConnectedAt: new Date().toISOString() });
+      setIgForm({ apiKey: "", username: "", password: "", accountType: igForm.accountType });
+      toast.success(`Connected to IG ${r.accountType} account`);
+    } catch (e: any) {
+      toast.error(e?.message || "IG connection failed");
+    } finally {
+      setIgConnecting(false);
+    }
+  }
+
+  async function disconnectIgAccount() {
+    try {
+      await runDisconnectIg();
+      setIg({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
+      toast.success("Disconnected");
+    } catch (e: any) {
+      toast.error(e?.message || "Could not disconnect");
+    }
+  }
 
   async function handleCancel() {
     setCancelling(true);
@@ -344,6 +383,55 @@ function SettingsPage() {
                 <Pills value={form.trading_style} onChange={(v) => set("trading_style", v)}
                   options={["Scalper", "Day trader", "Swing trader", "Position trader"]} />
               </Field>
+            </Section>
+
+            {/* Trading Account (IG) */}
+            <Section id="broker" title="Trading Account" refs={refs}
+              badge={<span className="text-[9px] px-1.5 py-0.5 rounded"
+                style={{ background: ig.connected ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)", color: ig.connected ? GREEN : "#9ca3af", border: `1px solid ${ig.connected ? GREEN : "rgba(255,255,255,0.1)"}` }}>
+                {ig.connected ? `Connected · IG ${ig.accountType?.toUpperCase()}${ig.accountId ? ` · ${ig.accountId}` : ""}` : "Disconnected"}
+              </span>}>
+              <p className="text-[11px]" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                Connect your IG trading account so ACE can pull live balance, P&L and open positions. Credentials are encrypted and only used server-side.
+              </p>
+              {!ig.connected ? (
+                <>
+                  <Field label="IG API KEY">
+                    <Input value={igForm.apiKey} onChange={(v) => setIgForm((f) => ({ ...f, apiKey: v }))} placeholder="From My IG → Settings → API keys" />
+                  </Field>
+                  <Field label="IG USERNAME">
+                    <Input value={igForm.username} onChange={(v) => setIgForm((f) => ({ ...f, username: v }))} />
+                  </Field>
+                  <Field label="IG PASSWORD">
+                    <Input type="password" value={igForm.password} onChange={(v) => setIgForm((f) => ({ ...f, password: v }))} />
+                  </Field>
+                  <Field label="ACCOUNT TYPE">
+                    <div className="grid grid-cols-2 gap-2 max-w-xs">
+                      <OptionCard label="Demo" active={igForm.accountType === "demo"} onClick={() => setIgForm((f) => ({ ...f, accountType: "demo" }))} />
+                      <OptionCard label="Live" active={igForm.accountType === "live"} onClick={() => setIgForm((f) => ({ ...f, accountType: "live" }))} />
+                    </div>
+                  </Field>
+                  <button
+                    onClick={connectIg}
+                    disabled={igConnecting}
+                    className="text-xs px-4 py-2 rounded font-medium disabled:opacity-50"
+                    style={{ background: TEAL, color: "#0d0f12" }}>
+                    {igConnecting ? "Connecting…" : "Connect IG Account"}
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-3">
+                  <div className="p-3 rounded text-xs" style={{ background: "#1c2230", border: "1px solid rgba(255,255,255,0.06)", color: "#d1d5db", fontFamily: FONT_SANS }}>
+                    Connected to IG <strong>{ig.accountType?.toUpperCase()}</strong> account {ig.accountId ? <code>{ig.accountId}</code> : null}.
+                  </div>
+                  <button
+                    onClick={disconnectIgAccount}
+                    className="text-xs px-3 py-1.5 rounded"
+                    style={{ border: `1px solid ${RED}`, color: RED }}>
+                    Disconnect
+                  </button>
+                </div>
+              )}
             </Section>
 
             {/* ACE */}
