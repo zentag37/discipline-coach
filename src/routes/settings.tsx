@@ -475,23 +475,35 @@ function SettingsPage() {
                   const currentValid = steps[brokerStep].valid();
                   const allValid = steps.every((s) => s.valid());
                   const last = brokerStep === steps.length - 1;
+                  const statusOf = (i: number): "done" | "in_progress" | "blocked" => {
+                    if (steps[i].valid()) return "done";
+                    if (i === brokerStep) return "in_progress";
+                    if (i < brokerStep) return "blocked";
+                    // future step: blocked if any earlier step is invalid
+                    for (let j = 0; j < i; j++) if (!steps[j].valid()) return "blocked";
+                    return "blocked";
+                  };
+                  const statusMeta = {
+                    done: { label: "Done", bg: "rgba(0,212,160,0.15)", fg: TEAL, border: TEAL, dot: "✓" },
+                    in_progress: { label: "In progress", bg: "rgba(245,200,66,0.12)", fg: "#f5c842", border: "#f5c842", dot: "●" },
+                    blocked: { label: "Blocked", bg: "rgba(239,68,68,0.1)", fg: "#ef6f6f", border: "rgba(239,111,111,0.4)", dot: "○" },
+                  } as const;
+                  const doneCount = steps.filter((s) => s.valid()).length;
                   return (
                     <div className="space-y-4">
                       {/* Stepper header */}
                       <div className="flex items-center gap-2">
                         {steps.map((s, i) => {
-                          const done = i < brokerStep || (i === brokerStep && s.valid() && !last);
-                          const active = i === brokerStep;
+                          const st = statusOf(i);
+                          const meta = statusMeta[st];
                           return (
                             <div key={i} className="flex items-center gap-2 flex-1">
                               <div className="flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-medium"
-                                style={{
-                                  background: done ? TEAL : active ? "rgba(0,212,160,0.15)" : "rgba(255,255,255,0.05)",
-                                  color: done ? "#0d0f12" : active ? TEAL : "#6b7280",
-                                  border: `1px solid ${done || active ? TEAL : "rgba(255,255,255,0.1)"}`,
-                                }}>{done ? "✓" : i + 1}</div>
+                                style={{ background: meta.bg, color: meta.fg, border: `1px solid ${meta.border}` }}>
+                                {st === "done" ? "✓" : i + 1}
+                              </div>
                               {i < steps.length - 1 && (
-                                <div className="flex-1 h-px" style={{ background: i < brokerStep ? TEAL : "rgba(255,255,255,0.08)" }} />
+                                <div className="flex-1 h-px" style={{ background: steps[i].valid() ? TEAL : "rgba(255,255,255,0.08)" }} />
                               )}
                             </div>
                           );
@@ -499,7 +511,7 @@ function SettingsPage() {
                       </div>
                       <div className="flex items-center justify-between gap-2">
                         <div className="text-xs" style={{ color: "#e6e8eb", fontFamily: FONT_SANS }}>
-                          Step {brokerStep + 1} of {steps.length}: <strong>{steps[brokerStep].title}</strong>
+                          {doneCount}/{steps.length} complete · <strong>{steps[brokerStep].title}</strong>
                         </div>
                         <div className="flex items-center gap-2 text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
                           <span style={{ color: TEAL }}>● Progress saved</span>
@@ -515,6 +527,37 @@ function SettingsPage() {
                           </button>
                         </div>
                       </div>
+
+                      {/* Per-step status checklist */}
+                      <ul className="space-y-1.5">
+                        {steps.map((s, i) => {
+                          const st = statusOf(i);
+                          const meta = statusMeta[st];
+                          const isCurrent = i === brokerStep;
+                          return (
+                            <li key={i}>
+                              <button
+                                type="button"
+                                onClick={() => setBrokerStep(i)}
+                                className="w-full flex items-center justify-between gap-3 px-2.5 py-1.5 rounded text-left transition-colors"
+                                style={{
+                                  background: isCurrent ? "rgba(255,255,255,0.03)" : "transparent",
+                                  border: `1px solid ${isCurrent ? "rgba(255,255,255,0.08)" : "transparent"}`,
+                                }}>
+                                <span className="flex items-center gap-2 text-[11px]" style={{ color: "#d1d5db", fontFamily: FONT_SANS }}>
+                                  <span style={{ color: "#6b7280" }}>{i + 1}.</span>
+                                  {s.title}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wide font-medium"
+                                  style={{ background: meta.bg, color: meta.fg, border: `1px solid ${meta.border}` }}>
+                                  <span>{meta.dot}</span>{meta.label}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+
                       {isIg && (
                         <p className="text-[10px]" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
                           Note: your API key and username are saved locally so you can return later. Password is never stored — re-enter it on the final step.
