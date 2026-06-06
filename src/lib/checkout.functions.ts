@@ -5,9 +5,9 @@ import Stripe from "stripe";
 import { z } from "zod";
 
 export const PLAN_PRICE_IDS = {
-  solo: "price_1TcqrCAX0VXOEOzwJBNS76yA",
-  pro: "price_1TcqrwAX0VXOEOzwwWIjgdxD",
-  elite: "price_1TcqsSAX0VXOEOzwRBK7CtRb",
+  solo: "price_1TfK1zASqjESPaeaWt65nbVn",
+  pro: "price_1TfK1zASqjESPaeaK0ehl6kR",
+  elite: "price_1TfK1zASqjESPaea8v00vrhD",
 } as const;
 
 export type PlanKey = keyof typeof PLAN_PRICE_IDS;

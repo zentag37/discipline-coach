@@ -3,9 +3,9 @@ import Stripe from "stripe";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const PRICE_TO_PLAN: Record<string, "solo" | "pro" | "elite"> = {
-  price_1TcqrCAX0VXOEOzwJBNS76yA: "solo",
-  price_1TcqrwAX0VXOEOzwwWIjgdxD: "pro",
-  price_1TcqsSAX0VXOEOzwRBK7CtRb: "elite",
+  price_1TfK1zASqjESPaeaWt65nbVn: "solo",
+  price_1TfK1zASqjESPaeaK0ehl6kR: "pro",
+  price_1TfK1zASqjESPaea8v00vrhD: "elite",
 };
 
 export const Route = createFileRoute("/api/public/stripe-webhook")({
