@@ -322,6 +322,17 @@ function PlanCard({
 
       <div className={`font-mono text-[11px] uppercase tracking-[0.2em] ${accent}`}>{name}</div>
 
+      {(plan === "pro" || plan === "elite") && (
+        <div className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-primary">
+          <span className="relative inline-flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+          </span>
+          Broker sync included
+        </div>
+      )}
+
+
       <div className="mt-4 flex items-baseline gap-1">
         <span className="font-mono text-5xl font-medium">€{price}</span>
         <span className="font-mono text-sm text-muted-foreground">/mo</span>
