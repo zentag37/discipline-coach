@@ -135,6 +135,7 @@ function SettingsPage() {
   const [ig, setIg] = useState<{ connected: boolean; accountType: "demo" | "live" | null; accountId: string | null; lastConnectedAt: string | null }>({ connected: false, accountType: null, accountId: null, lastConnectedAt: null });
   const [igForm, setIgForm] = useState({ apiKey: "", username: "", password: "", accountType: "demo" as "demo" | "live" });
   const [igConnecting, setIgConnecting] = useState(false);
+  const [selectedBroker, setSelectedBroker] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -142,6 +143,20 @@ function SettingsPage() {
       try { setIg(await runGetIgStatus()); } catch {/* noop */}
     })();
   }, [fetchSubInfo, runGetIgStatus]);
+
+  useEffect(() => {
+    try {
+      const b = sessionStorage.getItem("selectedBroker");
+      if (b) {
+        setSelectedBroker(b);
+        sessionStorage.removeItem("selectedBroker");
+        setActive("broker");
+        requestAnimationFrame(() => {
+          document.getElementById("broker")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+    } catch {/* noop */}
+  }, []);
 
   async function connectIg() {
     if (!igForm.apiKey || !igForm.username || !igForm.password) {
