@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard, CalendarDays, BookOpen, Globe, Download, Settings as SettingsIcon,
-  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square, Radio,
+  Bell, User, Shield, BarChart3, Bot, Mic, BellRing, CreditCard, Lock, Check, X, Plus, Play, Square, Radio, Plug,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getSubscriptionInfo, cancelSubscription } from "@/lib/subscription.functions";
 import { normalizePlan, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
+import { saveIgCredentials, getIgStatus, disconnectIg } from "@/lib/ig.functions";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — TradeWithAce" }] }),
@@ -28,6 +29,7 @@ const NAV = [
   { id: "profile", label: "Profile", icon: User },
   { id: "risk", label: "Risk Rules", icon: Shield },
   { id: "trading", label: "Trading Setup", icon: BarChart3 },
+  { id: "broker", label: "Trading Account", icon: Plug },
   { id: "ace", label: "ACE Mentor", icon: Bot },
   { id: "voice", label: "Voice Assistant", icon: Mic },
   { id: "notifications", label: "Notifications", icon: BellRing },
