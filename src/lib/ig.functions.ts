@@ -9,7 +9,7 @@ const CredsSchema = z.object({
   accountType: z.enum(["demo", "live"]),
 });
 
-export const saveIgCredentials = createServerFn({ method: "POST" })
+export const connectIGAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => CredsSchema.parse(data))
   .handler(async ({ data, context }) => {
@@ -37,6 +37,8 @@ export const saveIgCredentials = createServerFn({ method: "POST" })
     void getToken;
     return { connected: true, accountId: tok.accountId, accountType: data.accountType };
   });
+
+export const saveIgCredentials = connectIGAccount;
 
 export const getIgStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
