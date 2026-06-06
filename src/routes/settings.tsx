@@ -42,7 +42,6 @@ function SettingsPage() {
   const [profile, setProfile] = useState<any>({});
   const [form, setForm] = useState<any>(null);
   const [dirty, setDirty] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [active, setActive] = useState("profile");
   const refs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -245,45 +244,12 @@ function SettingsPage() {
   }
 
   async function save() {
-    if (saving) return;
-    setSaving(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error("Not signed in"); return; }
-      const patch: Record<string, any> = {
-        full_name: form.full_name ?? null,
-        country: form.country ?? null,
-        timezone: form.timezone ?? null,
-        experience: form.experience ?? null,
-        account_size: form.account_size != null ? String(form.account_size) : null,
-        risk_per_trade: form.risk_per_trade != null ? Number(form.risk_per_trade) : null,
-        daily_loss_limit: form.daily_loss_limit != null ? Number(form.daily_loss_limit) : null,
-        max_trades: form.max_trades_per_day != null ? Number(form.max_trades_per_day) : null,
-        broker: form.broker ?? null,
-        platform: form.platform ?? null,
-        session: Array.isArray(form.session) ? form.session.join(",") : form.session ?? null,
-        assets: Array.isArray(form.assets) ? form.assets : [],
-        instruments: Array.isArray(form.instruments) ? form.instruments.join(",") : form.instruments ?? null,
-        style: form.trading_style ?? null,
-        voice_enabled: !!form.voice_enabled,
-        voice_style: form.voice_personality ?? null,
-        language: form.language ?? null,
-      };
-      const { error } = await supabase.from("profiles").update(patch as never).eq("id", user.id);
-      if (error) {
-        console.error("[settings] save failed", error);
-        toast.error(error.message || "Could not save settings");
-        return;
-      }
-      setProfile((p: any) => ({ ...p, ...patch }));
-      setDirty(false);
-      toast.success("Settings saved");
-    } catch (e: any) {
-      console.error("[settings] save exception", e);
-      toast.error(e?.message || "Could not save settings");
-    } finally {
-      setSaving(false);
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from("profiles").upsert({ id: user.id, ...form, onboarded: true });
+    if (error) { toast.error("Could not save"); return; }
+    setDirty(false);
+    toast.success("Saved ✓");
   }
 
   async function signOut() {
@@ -305,21 +271,15 @@ function SettingsPage() {
           style={{ background: "#141820", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
           <h1 className="text-sm font-medium" style={{ fontFamily: FONT_SANS }}>Settings</h1>
           <button
-            disabled={!dirty || saving}
-            onClick={() => { void save(); }}
-            className="text-xs px-4 py-1.5 rounded font-medium transition-all inline-flex items-center gap-2"
+            disabled={!dirty}
+            onClick={save}
+            className="text-xs px-4 py-1.5 rounded font-medium transition-all"
             style={{
-              background: dirty && !saving ? TEAL : "rgba(255,255,255,0.05)",
-              color: dirty && !saving ? "#0d0f12" : "#6b7280",
-              cursor: dirty && !saving ? "pointer" : "not-allowed",
+              background: dirty ? TEAL : "rgba(255,255,255,0.05)",
+              color: dirty ? "#0d0f12" : "#6b7280",
+              cursor: dirty ? "pointer" : "not-allowed",
             }}>
-            {saving && (
-              <span
-                className="inline-block w-3 h-3 rounded-full animate-spin"
-                style={{ border: "2px solid rgba(0,0,0,0.25)", borderTopColor: "#0d0f12" }}
-              />
-            )}
-            {saving ? "Saving…" : "Save changes"}
+            Save changes
           </button>
         </header>
 
