@@ -18,6 +18,7 @@ import {
   VolumeX,
   Lock,
   Radio,
+  HelpCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -444,6 +445,7 @@ function DashboardPage() {
           <NavItem icon={<Radio size={16} />} label="Signals" onClick={() => navigate({ to: "/signals" })} />
           <NavItem icon={<Download size={16} />} label="Download App" onClick={() => navigate({ to: "/download" })} />
           <NavItem icon={<Settings size={16} />} label="Settings" onClick={() => navigate({ to: "/settings" })} />
+          <NavItem icon={<HelpCircle size={16} />} label="Help & Support" onClick={() => navigate({ to: "/help" })} />
         </nav>
 
         <div className="p-3 space-y-3">
