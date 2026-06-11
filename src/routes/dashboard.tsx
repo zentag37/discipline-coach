@@ -381,6 +381,22 @@ function DashboardPage() {
 
   useEffect(() => { publishHealth(overallHealth); }, [overallHealth]);
 
+  // Publish session snapshot for the floating cockpit widget.
+  useEffect(() => {
+    try {
+      localStorage.setItem("tw-ace-session-snapshot", JSON.stringify({
+        tradesUsed: trades.length,
+        maxTrades,
+        sessionPL: livePL,
+        dailyStop,
+        maxRisk,
+        sessionLabel: session.label,
+        sessionOpen: session.open,
+        currency: igConnected && igCurrency ? igCurrency : "€",
+      }));
+    } catch {/* noop */}
+  }, [trades.length, maxTrades, livePL, dailyStop, maxRisk, session.label, session.open, igConnected, igCurrency]);
+
   // Trigger 3: trade limit reached
   useEffect(() => {
     if (!profile.voice_enabled || !userId) return;
