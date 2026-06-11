@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Minus, TrendingUp, TrendingDown, Bell, Activity, X } from "lucide-react";
+import { colorFor, readHealth, type RuleStatus } from "@/lib/trading-status";
 
 export const Route = createFileRoute("/floating")({
   head: () => ({
@@ -42,8 +43,20 @@ function sendToElectron(type: string, payload?: unknown) {
 function FloatingOverlay() {
   const [minimized, setMinimized] = useState(false);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [health, setHealth] = useState<RuleStatus>("green");
   const dragRef = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
   const movedRef = useRef(false);
+
+  useEffect(() => {
+    setHealth(readHealth());
+    const t = setInterval(() => setHealth(readHealth()), 3000);
+    const onStorage = () => setHealth(readHealth());
+    if (typeof window !== "undefined") window.addEventListener("storage", onStorage);
+    return () => {
+      clearInterval(t);
+      if (typeof window !== "undefined") window.removeEventListener("storage", onStorage);
+    };
+  }, []);
 
   const clamp = (x: number, y: number) => {
     if (typeof window === "undefined") return { x, y };
@@ -139,9 +152,9 @@ function FloatingOverlay() {
             top: pos.y,
             width: FAB_SIZE,
             height: FAB_SIZE,
-            background: "#00d4a0",
+            background: colorFor(health),
             border: "2px solid rgba(255,255,255,0.15)",
-            boxShadow: "0 8px 24px rgba(0,212,160,0.45)",
+            boxShadow: `0 8px 24px ${colorFor(health)}73`,
             color: "#0d0f12",
             fontSize: 24,
           }}
@@ -217,10 +230,12 @@ function FloatingOverlay() {
       <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <div className="flex items-center gap-2">
           <span className="relative grid place-items-center" style={{ width: 8, height: 8 }}>
-            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "#00d4a0", opacity: 0.4 }} />
-            <span className="relative rounded-full" style={{ width: 8, height: 8, background: "#00d4a0" }} />
+            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: colorFor(health), opacity: 0.4 }} />
+            <span className="relative rounded-full" style={{ width: 8, height: 8, background: colorFor(health) }} />
           </span>
-          <span className="text-[11px]" style={{ color: "#00d4a0" }}>Active</span>
+          <span className="text-[11px]" style={{ color: colorFor(health) }}>
+            {health === "green" ? "All good" : health === "amber" ? "Caution" : "Stop trading"}
+          </span>
         </div>
         <span className="text-[10px] uppercase tracking-widest" style={{ color: "#6b7280" }}>Session · live</span>
       </div>

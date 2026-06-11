@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { colorFor, readHealth, type RuleStatus } from "@/lib/trading-status";
 
 export const Route = createFileRoute("/session")({
   head: () => ({ meta: [{ title: "Today's Session — TradeWithAce" }] }),
@@ -24,6 +25,15 @@ function SessionPage() {
   const [intent, setIntent] = useState("");
   const [mood, setMood] = useState<string | null>(null);
   const [committed, setCommitted] = useState(false);
+  const [health, setHealth] = useState<RuleStatus>("green");
+
+  useEffect(() => {
+    setHealth(readHealth());
+    const t = setInterval(() => setHealth(readHealth()), 4000);
+    const onStorage = () => setHealth(readHealth());
+    window.addEventListener("storage", onStorage);
+    return () => { clearInterval(t); window.removeEventListener("storage", onStorage); };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +81,33 @@ function SessionPage() {
             <p className="text-xs" style={{ color: "#6b7280", fontFamily: FONT_SANS }}>
               Lock in your intent before you take a single trade.
             </p>
+          </div>
+
+          {/* Session health */}
+          <div
+            className="p-4 rounded-[12px] flex items-center gap-3"
+            style={{
+              background: "#141820",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderLeft: `3px solid ${colorFor(health)}`,
+            }}
+          >
+            <span className="relative grid place-items-center" style={{ width: 10, height: 10 }}>
+              <span className="absolute inset-0 rounded-full animate-ping" style={{ background: colorFor(health), opacity: 0.4 }} />
+              <span className="relative rounded-full" style={{ width: 10, height: 10, background: colorFor(health) }} />
+            </span>
+            <div className="flex-1">
+              <div className="text-[10px] tracking-widest" style={{ color: colorFor(health), fontFamily: FONT_SANS }}>
+                SESSION HEALTH · {health.toUpperCase()}
+              </div>
+              <div className="text-xs mt-0.5" style={{ color: "#9ca3af", fontFamily: FONT_SANS }}>
+                {health === "green"
+                  ? "All rules being followed. Good to trade."
+                  : health === "amber"
+                  ? "Approaching limits — proceed with caution."
+                  : "Stop trading. A rule has been broken or a limit hit."}
+              </div>
+            </div>
           </div>
 
           {/* Intent */}

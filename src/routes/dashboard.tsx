@@ -36,6 +36,11 @@ import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
 import { pushNotification } from "@/lib/notification-bus";
+import {
+  STATUS_GREEN, STATUS_AMBER, STATUS_RED,
+  colorFor, tradesStatus, pnlStatus, checklistStatus, sessionHealth,
+  publishHealth, type RuleStatus,
+} from "@/lib/trading-status";
 
 
 marked.setOptions({ breaks: true, gfm: true });
@@ -363,6 +368,19 @@ function DashboardPage() {
 
   const sessionPL = trades.reduce((a, t) => a + (Number(t.result_dollars) || 0), 0);
 
+  // Traffic-light rule statuses
+  const livePL = igConnected ? igPnl : sessionPL;
+  const sTrades = tradesStatus(trades.length, maxTrades);
+  const sPnl = pnlStatus(livePL, dailyStop);
+  const sCheck = checklistStatus(checks.filter(Boolean).length, 5);
+  const sLoss: RuleStatus = igLossBreached || (dailyStop > 0 && livePL <= -dailyStop)
+    ? "red"
+    : sPnl;
+  const sOutsideHours: RuleStatus = session.open ? "green" : "amber";
+  const overallHealth = sessionHealth([sTrades, sPnl, sLoss, sOutsideHours]);
+
+  useEffect(() => { publishHealth(overallHealth); }, [overallHealth]);
+
   // Trigger 3: trade limit reached
   useEffect(() => {
     if (!profile.voice_enabled || !userId) return;
@@ -542,18 +560,25 @@ function DashboardPage() {
           {/* Row 2 — stat cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
             <StatCard label="MAX RISK PER TRADE" value={`€${maxRisk}`} sub={`${riskPct}% of €${acct.toLocaleString()}`} />
-            <StatCard label="DAILY STOP LOSS" value={`€${dailyStop}`} sub={`${dailyPct}% of €${acct.toLocaleString()}`} />
+            <StatCard
+              label="DAILY STOP LOSS"
+              value={`€${dailyStop}`}
+              sub={`${dailyPct}% of €${acct.toLocaleString()}`}
+              statusColor={colorFor(sLoss)}
+            />
             <StatCard
               label="TRADES TODAY"
               value={`${trades.length} / ${maxTrades}`}
               sub={`${Math.max(0, maxTrades - trades.length)} remaining`}
               flash={tradeLimitFlash}
+              statusColor={colorFor(sTrades)}
             />
             <StatCard
               label="TODAY'S P&L"
               value={`${sessionPL < 0 ? "-" : ""}€${Math.abs(sessionPL).toFixed(2)}`}
               sub={trades.length ? `${trades.length} trade${trades.length === 1 ? "" : "s"} logged` : "No trades logged yet"}
-              valueColor={sessionPL > 0 ? TEAL : sessionPL < 0 ? "#00d4a0" : undefined}
+              valueColor={sessionPL > 0 ? STATUS_GREEN : sessionPL < 0 ? STATUS_RED : undefined}
+              statusColor={colorFor(sPnl)}
             />
           </div>
 
@@ -562,11 +587,21 @@ function DashboardPage() {
             {/* ACE card */}
             <div
               className="lg:col-span-3 p-5 rounded-[10px] relative overflow-hidden"
-              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}
+              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${colorFor(overallHealth)}` }}
             >
               <div style={{ filter: aceUnlocked ? "none" : "blur(6px)", pointerEvents: aceUnlocked ? "auto" : "none" }}>
-                <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
-                  ACE · AI MENTOR
+                <div className="text-[10px] tracking-widest mb-2 flex items-center gap-2" style={{ color: TEAL }}>
+                  <span>ACE · AI MENTOR</span>
+                  <span
+                    className="px-1.5 py-0.5 rounded-full text-[9px] tracking-widest"
+                    style={{
+                      background: `${colorFor(overallHealth)}22`,
+                      color: colorFor(overallHealth),
+                      border: `1px solid ${colorFor(overallHealth)}55`,
+                    }}
+                  >
+                    {overallHealth === "green" ? "GOOD TO TRADE" : overallHealth === "amber" ? "PROCEED W/ CAUTION" : "STAND DOWN"}
+                  </span>
                 </div>
                 <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
                   {aceLoading && !aceMsg ? (
@@ -637,11 +672,15 @@ function DashboardPage() {
               className="lg:col-span-2 p-5 rounded-[10px] transition-colors"
               style={{
                 background: "#141820",
-                border: `1px solid ${allChecked ? TEAL : "rgba(255,255,255,0.08)"}`,
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderLeft: `3px solid ${colorFor(sCheck)}`,
               }}
             >
-              <div className="text-[10px] tracking-widest mb-3" style={{ color: "#9ca3af" }}>
-                PRE-TRADE CHECKLIST
+              <div className="text-[10px] tracking-widest mb-3 flex items-center justify-between" style={{ color: "#9ca3af" }}>
+                <span>PRE-TRADE CHECKLIST</span>
+                <span style={{ color: colorFor(sCheck) }}>
+                  {sCheck === "green" ? "READY" : sCheck === "amber" ? "IN PROGRESS" : "NOT STARTED"}
+                </span>
               </div>
               <div className="space-y-2">
                 {[
@@ -655,26 +694,26 @@ function DashboardPage() {
                     key={i}
                     onClick={() => setChecks((c) => c.map((v, idx) => (idx === i ? !v : v)))}
                     className="w-full flex items-center gap-2.5 text-left text-xs py-1"
-                    style={{ fontFamily: "Inter, sans-serif", color: "#d1d5db" }}
+                    style={{ fontFamily: "Inter, sans-serif", color: checks[i] ? STATUS_GREEN : "#d1d5db" }}
                   >
                     <span
                       className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0"
                       style={{
-                        background: checks[i] ? TEAL : "transparent",
-                        border: `1px solid ${checks[i] ? TEAL : "rgba(255,255,255,0.2)"}`,
+                        background: checks[i] ? STATUS_GREEN : "transparent",
+                        border: `1px solid ${checks[i] ? STATUS_GREEN : "rgba(255,255,255,0.2)"}`,
                       }}
                     >
                       {checks[i] && <Check size={11} color="#0d0f12" strokeWidth={3} />}
                     </span>
-                    <span style={{ opacity: checks[i] ? 0.6 : 1, textDecoration: checks[i] ? "line-through" : "none" }}>{label}</span>
+                    <span style={{ opacity: checks[i] ? 0.85 : 1, textDecoration: checks[i] ? "line-through" : "none" }}>{label}</span>
                   </button>
                 ))}
               </div>
               <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                <div className="h-full transition-all duration-300" style={{ width: `${(checkedCount / 5) * 100}%`, background: TEAL }} />
+                <div className="h-full transition-all duration-300" style={{ width: `${(checkedCount / 5) * 100}%`, background: colorFor(sCheck) }} />
               </div>
               {allChecked && (
-                <div className="mt-3 text-xs text-center" style={{ color: TEAL }}>
+                <div className="mt-3 text-xs text-center" style={{ color: STATUS_GREEN }}>
                   Ready to trade.
                 </div>
               )}
@@ -1084,14 +1123,16 @@ function LiveStat({ label, value, valueColor }: { label: string; value: string; 
   );
 }
 
-function StatCard({ label, value, sub, valueColor, flash }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean }) {
+function StatCard({ label, value, sub, valueColor, flash, statusColor }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean; statusColor?: string }) {
+  const borderColor = statusColor ?? (flash ? "#00d4a0" : "rgba(255,255,255,0.08)");
   return (
     <div
       className={`p-4 px-5 rounded-[10px] transition-all ${flash ? "animate-pulse" : ""}`}
       style={{
         background: "#141820",
-        border: `1px solid ${flash ? "#00d4a0" : "rgba(255,255,255,0.08)"}`,
-        boxShadow: flash ? "0 0 0 1px #00d4a0, 0 0 24px rgba(0,212,160,0.35)" : undefined,
+        border: `1px solid rgba(255,255,255,0.08)`,
+        borderLeft: `3px solid ${borderColor}`,
+        boxShadow: flash ? `0 0 0 1px ${borderColor}, 0 0 24px ${borderColor}55` : undefined,
       }}
     >
       <div className="text-[10px] tracking-widest" style={{ color: "#6b7280" }}>{label}</div>
