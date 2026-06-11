@@ -368,6 +368,19 @@ function DashboardPage() {
 
   const sessionPL = trades.reduce((a, t) => a + (Number(t.result_dollars) || 0), 0);
 
+  // Traffic-light rule statuses
+  const livePL = igConnected ? igPnl : sessionPL;
+  const sTrades = tradesStatus(trades.length, maxTrades);
+  const sPnl = pnlStatus(livePL, dailyStop);
+  const sCheck = checklistStatus(checks.filter(Boolean).length, 5);
+  const sLoss: RuleStatus = igLossBreached || (dailyStop > 0 && livePL <= -dailyStop)
+    ? "red"
+    : sPnl;
+  const sOutsideHours: RuleStatus = session.open ? "green" : "amber";
+  const overallHealth = sessionHealth([sTrades, sPnl, sLoss, sOutsideHours]);
+
+  useEffect(() => { publishHealth(overallHealth); }, [overallHealth]);
+
   // Trigger 3: trade limit reached
   useEffect(() => {
     if (!profile.voice_enabled || !userId) return;
