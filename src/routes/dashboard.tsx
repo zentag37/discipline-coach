@@ -571,7 +571,28 @@ function DashboardPage() {
               label="TODAY'S P&L"
               value={`${sessionPL < 0 ? "-" : ""}€${Math.abs(sessionPL).toFixed(2)}`}
               sub={trades.length ? `${trades.length} trade${trades.length === 1 ? "" : "s"} logged` : "No trades logged yet"}
-              valueColor={sessionPL > 0 ? TEAL : sessionPL < 0 ? "#00d4a0" : undefined}
+          {/* Row 2 — stat cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
+            <StatCard label="MAX RISK PER TRADE" value={`€${maxRisk}`} sub={`${riskPct}% of €${acct.toLocaleString()}`} />
+            <StatCard
+              label="DAILY STOP LOSS"
+              value={`€${dailyStop}`}
+              sub={`${dailyPct}% of €${acct.toLocaleString()}`}
+              statusColor={colorFor(sLoss)}
+            />
+            <StatCard
+              label="TRADES TODAY"
+              value={`${trades.length} / ${maxTrades}`}
+              sub={`${Math.max(0, maxTrades - trades.length)} remaining`}
+              flash={tradeLimitFlash}
+              statusColor={colorFor(sTrades)}
+            />
+            <StatCard
+              label="TODAY'S P&L"
+              value={`${sessionPL < 0 ? "-" : ""}€${Math.abs(sessionPL).toFixed(2)}`}
+              sub={trades.length ? `${trades.length} trade${trades.length === 1 ? "" : "s"} logged` : "No trades logged yet"}
+              valueColor={sessionPL > 0 ? STATUS_GREEN : sessionPL < 0 ? STATUS_RED : undefined}
+              statusColor={colorFor(sPnl)}
             />
           </div>
 
@@ -580,11 +601,21 @@ function DashboardPage() {
             {/* ACE card */}
             <div
               className="lg:col-span-3 p-5 rounded-[10px] relative overflow-hidden"
-              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${TEAL}` }}
+              style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${colorFor(overallHealth)}` }}
             >
               <div style={{ filter: aceUnlocked ? "none" : "blur(6px)", pointerEvents: aceUnlocked ? "auto" : "none" }}>
-                <div className="text-[10px] tracking-widest mb-2" style={{ color: TEAL }}>
-                  ACE · AI MENTOR
+                <div className="text-[10px] tracking-widest mb-2 flex items-center gap-2" style={{ color: TEAL }}>
+                  <span>ACE · AI MENTOR</span>
+                  <span
+                    className="px-1.5 py-0.5 rounded-full text-[9px] tracking-widest"
+                    style={{
+                      background: `${colorFor(overallHealth)}22`,
+                      color: colorFor(overallHealth),
+                      border: `1px solid ${colorFor(overallHealth)}55`,
+                    }}
+                  >
+                    {overallHealth === "green" ? "GOOD TO TRADE" : overallHealth === "amber" ? "PROCEED W/ CAUTION" : "STAND DOWN"}
+                  </span>
                 </div>
                 <p className="text-sm leading-relaxed min-h-[60px]" style={{ color: "#d1d5db", fontFamily: "Inter, sans-serif" }}>
                   {aceLoading && !aceMsg ? (
