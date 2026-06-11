@@ -399,11 +399,18 @@ function Nav() {
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="grid h-6 w-6 place-items-center rounded-sm border border-primary/40 bg-primary/10">
-        <div className="h-2 w-2 rounded-[1px] bg-primary" />
+    <div className="flex items-center gap-2.5">
+      <div
+        className="grid h-7 w-7 place-items-center rounded-[3px] font-display text-[11px] font-bold tracking-tight"
+        style={{
+          background: "linear-gradient(135deg, #c9a84c 0%, #8a6f2a 100%)",
+          color: "#0d1117",
+          boxShadow: "0 0 0 1px rgba(201,168,76,0.35), 0 4px 12px rgba(201,168,76,0.18)",
+        }}
+      >
+        ACE
       </div>
-      <span className="font-mono text-sm tracking-tight">TradeWithAce</span>
+      <span className="font-display text-sm font-semibold tracking-tight text-foreground">TradeWithAce</span>
     </div>
   );
 }
@@ -412,15 +419,15 @@ function Hero() {
   const isMac = typeof navigator !== "undefined" && /mac/i.test(navigator.platform || navigator.userAgent || "");
   const heroHref = isMac ? DOWNLOAD_MAC : DOWNLOAD_WIN;
   return (
-    <section className="relative">
+    <section className="relative grain">
       <Container className="grid gap-12 py-20 md:py-28 lg:grid-cols-2 lg:gap-10">
 
         <div className="flex flex-col justify-center">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            v1.0 · free · open source
+          <div className="inline-flex w-fit items-center gap-2 rounded-sm border border-primary/40 bg-surface px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
+            <span className="h-1.5 w-1.5 rounded-sm bg-primary animate-pulse" />
+            briefing · v1.0 · live
           </div>
-          <h1 className="mt-6 font-mono text-4xl md:text-6xl font-medium leading-[1.05] tracking-tight">
+          <h1 className="mt-6 font-display text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight text-foreground">
             Trade with discipline.
             <br />
             <span className="text-primary">Every session.</span>
@@ -432,14 +439,15 @@ function Hero() {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="/download"
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-mono font-medium text-primary-foreground hover:opacity-90 transition cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-[3px] bg-primary px-5 py-3 text-sm font-display font-semibold text-primary-foreground hover:bg-accent transition cursor-pointer"
+              style={{ boxShadow: "0 0 0 1px rgba(232,213,163,0.4), 0 6px 20px rgba(201,168,76,0.25)" }}
             >
               <Download className="h-4 w-4" />
               Download
             </a>
             <a
               href="#features"
-              className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-sm font-mono text-foreground hover:bg-surface transition"
+              className="inline-flex items-center gap-2 rounded-[3px] border border-border px-5 py-3 text-sm font-display font-medium text-foreground hover:border-primary/50 hover:text-accent transition"
             >
               <PlayCircle className="h-4 w-4" />
               See how it works
@@ -463,12 +471,15 @@ function Hero() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <div className="font-mono text-xl text-foreground">{value}</div>
-      <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
+    <div
+      className="border-l-2 border-primary/70 pl-3"
+    >
+      <div className="font-mono text-2xl font-semibold text-primary">{value}</div>
+      <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
     </div>
   );
 }
+
 
 const FAB_SIZE = 56;
 const FAB_STORAGE_KEY = "tw-ace-fab-pos";
