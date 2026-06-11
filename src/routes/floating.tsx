@@ -152,9 +152,9 @@ function FloatingOverlay() {
             top: pos.y,
             width: FAB_SIZE,
             height: FAB_SIZE,
-            background: "#00d4a0",
+            background: colorFor(health),
             border: "2px solid rgba(255,255,255,0.15)",
-            boxShadow: "0 8px 24px rgba(0,212,160,0.45)",
+            boxShadow: `0 8px 24px ${colorFor(health)}73`,
             color: "#0d0f12",
             fontSize: 24,
           }}
