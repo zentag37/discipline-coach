@@ -43,8 +43,20 @@ function sendToElectron(type: string, payload?: unknown) {
 function FloatingOverlay() {
   const [minimized, setMinimized] = useState(false);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [health, setHealth] = useState<RuleStatus>("green");
   const dragRef = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
   const movedRef = useRef(false);
+
+  useEffect(() => {
+    setHealth(readHealth());
+    const t = setInterval(() => setHealth(readHealth()), 3000);
+    const onStorage = () => setHealth(readHealth());
+    if (typeof window !== "undefined") window.addEventListener("storage", onStorage);
+    return () => {
+      clearInterval(t);
+      if (typeof window !== "undefined") window.removeEventListener("storage", onStorage);
+    };
+  }, []);
 
   const clamp = (x: number, y: number) => {
     if (typeof window === "undefined") return { x, y };
