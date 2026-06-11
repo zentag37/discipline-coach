@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { colorFor, readHealth, type RuleStatus } from "@/lib/trading-status";
 
 export const Route = createFileRoute("/session")({
   head: () => ({ meta: [{ title: "Today's Session — TradeWithAce" }] }),
