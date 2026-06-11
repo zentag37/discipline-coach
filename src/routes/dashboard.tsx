@@ -1119,14 +1119,16 @@ function LiveStat({ label, value, valueColor }: { label: string; value: string; 
   );
 }
 
-function StatCard({ label, value, sub, valueColor, flash }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean }) {
+function StatCard({ label, value, sub, valueColor, flash, statusColor }: { label: string; value: string; sub: string; valueColor?: string; flash?: boolean; statusColor?: string }) {
+  const borderColor = statusColor ?? (flash ? "#00d4a0" : "rgba(255,255,255,0.08)");
   return (
     <div
       className={`p-4 px-5 rounded-[10px] transition-all ${flash ? "animate-pulse" : ""}`}
       style={{
         background: "#141820",
-        border: `1px solid ${flash ? "#00d4a0" : "rgba(255,255,255,0.08)"}`,
-        boxShadow: flash ? "0 0 0 1px #00d4a0, 0 0 24px rgba(0,212,160,0.35)" : undefined,
+        border: `1px solid rgba(255,255,255,0.08)`,
+        borderLeft: `3px solid ${borderColor}`,
+        boxShadow: flash ? `0 0 0 1px ${borderColor}, 0 0 24px ${borderColor}55` : undefined,
       }}
     >
       <div className="text-[10px] tracking-widest" style={{ color: "#6b7280" }}>{label}</div>
