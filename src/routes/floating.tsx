@@ -230,10 +230,12 @@ function FloatingOverlay() {
       <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
         <div className="flex items-center gap-2">
           <span className="relative grid place-items-center" style={{ width: 8, height: 8 }}>
-            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "#00d4a0", opacity: 0.4 }} />
-            <span className="relative rounded-full" style={{ width: 8, height: 8, background: "#00d4a0" }} />
+            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: colorFor(health), opacity: 0.4 }} />
+            <span className="relative rounded-full" style={{ width: 8, height: 8, background: colorFor(health) }} />
           </span>
-          <span className="text-[11px]" style={{ color: "#00d4a0" }}>Active</span>
+          <span className="text-[11px]" style={{ color: colorFor(health) }}>
+            {health === "green" ? "All good" : health === "amber" ? "Caution" : "Stop trading"}
+          </span>
         </div>
         <span className="text-[10px] uppercase tracking-widest" style={{ color: "#6b7280" }}>Session · live</span>
       </div>
