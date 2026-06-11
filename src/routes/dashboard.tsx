@@ -672,11 +672,15 @@ function DashboardPage() {
               className="lg:col-span-2 p-5 rounded-[10px] transition-colors"
               style={{
                 background: "#141820",
-                border: `1px solid ${allChecked ? TEAL : "rgba(255,255,255,0.08)"}`,
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderLeft: `3px solid ${colorFor(sCheck)}`,
               }}
             >
-              <div className="text-[10px] tracking-widest mb-3" style={{ color: "#9ca3af" }}>
-                PRE-TRADE CHECKLIST
+              <div className="text-[10px] tracking-widest mb-3 flex items-center justify-between" style={{ color: "#9ca3af" }}>
+                <span>PRE-TRADE CHECKLIST</span>
+                <span style={{ color: colorFor(sCheck) }}>
+                  {sCheck === "green" ? "READY" : sCheck === "amber" ? "IN PROGRESS" : "NOT STARTED"}
+                </span>
               </div>
               <div className="space-y-2">
                 {[
@@ -690,26 +694,26 @@ function DashboardPage() {
                     key={i}
                     onClick={() => setChecks((c) => c.map((v, idx) => (idx === i ? !v : v)))}
                     className="w-full flex items-center gap-2.5 text-left text-xs py-1"
-                    style={{ fontFamily: "Inter, sans-serif", color: "#d1d5db" }}
+                    style={{ fontFamily: "Inter, sans-serif", color: checks[i] ? STATUS_GREEN : "#d1d5db" }}
                   >
                     <span
                       className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0"
                       style={{
-                        background: checks[i] ? TEAL : "transparent",
-                        border: `1px solid ${checks[i] ? TEAL : "rgba(255,255,255,0.2)"}`,
+                        background: checks[i] ? STATUS_GREEN : "transparent",
+                        border: `1px solid ${checks[i] ? STATUS_GREEN : "rgba(255,255,255,0.2)"}`,
                       }}
                     >
                       {checks[i] && <Check size={11} color="#0d0f12" strokeWidth={3} />}
                     </span>
-                    <span style={{ opacity: checks[i] ? 0.6 : 1, textDecoration: checks[i] ? "line-through" : "none" }}>{label}</span>
+                    <span style={{ opacity: checks[i] ? 0.85 : 1, textDecoration: checks[i] ? "line-through" : "none" }}>{label}</span>
                   </button>
                 ))}
               </div>
               <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                <div className="h-full transition-all duration-300" style={{ width: `${(checkedCount / 5) * 100}%`, background: TEAL }} />
+                <div className="h-full transition-all duration-300" style={{ width: `${(checkedCount / 5) * 100}%`, background: colorFor(sCheck) }} />
               </div>
               {allChecked && (
-                <div className="mt-3 text-xs text-center" style={{ color: TEAL }}>
+                <div className="mt-3 text-xs text-center" style={{ color: STATUS_GREEN }}>
                   Ready to trade.
                 </div>
               )}
