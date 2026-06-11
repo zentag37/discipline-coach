@@ -25,6 +25,15 @@ function SessionPage() {
   const [intent, setIntent] = useState("");
   const [mood, setMood] = useState<string | null>(null);
   const [committed, setCommitted] = useState(false);
+  const [health, setHealth] = useState<RuleStatus>("green");
+
+  useEffect(() => {
+    setHealth(readHealth());
+    const t = setInterval(() => setHealth(readHealth()), 4000);
+    const onStorage = () => setHealth(readHealth());
+    window.addEventListener("storage", onStorage);
+    return () => { clearInterval(t); window.removeEventListener("storage", onStorage); };
+  }, []);
 
   useEffect(() => {
     (async () => {
