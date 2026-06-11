@@ -95,6 +95,7 @@ const QUOTES = [
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
+      <TickerBar />
       <Nav />
       <Hero />
       <Divider />
@@ -113,6 +114,41 @@ function Index() {
       <DownloadSection />
       <Divider />
       <Footer />
+    </div>
+  );
+}
+
+function TickerBar() {
+  const items = [
+    { sym: "EURUSD", px: "1.1612", dir: "up" },
+    { sym: "GOLD",   px: "3,245",  dir: "up" },
+    { sym: "NAS100", px: "19,847", dir: "down" },
+    { sym: "GBPUSD", px: "1.2934", dir: "up" },
+    { sym: "BTCUSD", px: "67,420", dir: "up" },
+    { sym: "USDJPY", px: "156.21", dir: "down" },
+    { sym: "SPX500", px: "5,812",  dir: "up" },
+  ];
+  const row = (key: string) => (
+    <div key={key} className="flex shrink-0 items-center gap-6 px-6 font-mono text-[11px] tracking-wider">
+      {items.map((i, idx) => (
+        <span key={`${key}-${idx}`} className="flex items-center gap-2">
+          <span className="text-muted-foreground">{i.sym}</span>
+          <span className="text-accent">{i.px}</span>
+          <span style={{ color: i.dir === "up" ? "#3fb950" : "#f85149" }}>
+            {i.dir === "up" ? "▲" : "▼"}
+          </span>
+          <span className="text-border">|</span>
+        </span>
+      ))}
+    </div>
+  );
+  return (
+    <div className="overflow-hidden border-b border-[color:var(--border)] bg-[#0a0e14]"
+      style={{ boxShadow: "inset 0 -1px 0 rgba(201,168,76,0.15)" }}>
+      <div className="ticker-track flex w-max py-1.5">
+        {row("a")}
+        {row("b")}
+      </div>
     </div>
   );
 }
