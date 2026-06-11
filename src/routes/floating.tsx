@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Minus, TrendingUp, TrendingDown, Bell, Activity, X } from "lucide-react";
+import { colorFor, readHealth, type RuleStatus } from "@/lib/trading-status";
 
 export const Route = createFileRoute("/floating")({
   head: () => ({
