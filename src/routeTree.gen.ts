@@ -20,6 +20,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as MarketIntelRouteImport } from './routes/market-intel'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FloatingRouteImport } from './routes/floating'
 import { Route as DownloadRouteImport } from './routes/download'
@@ -90,6 +91,11 @@ const LoginRoute = LoginRouteImport.update({
 const JournalRoute = JournalRouteImport.update({
   id: '/journal',
   path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/download': typeof DownloadRoute
   '/floating': typeof FloatingRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
   '/market-intel': typeof MarketIntelRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/floating': typeof FloatingRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
   '/market-intel': typeof MarketIntelRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/download': typeof DownloadRoute
   '/floating': typeof FloatingRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
   '/journal': typeof JournalRoute
   '/login': typeof LoginRoute
   '/market-intel': typeof MarketIntelRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/floating'
     | '/forgot-password'
+    | '/help'
     | '/journal'
     | '/login'
     | '/market-intel'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/floating'
     | '/forgot-password'
+    | '/help'
     | '/journal'
     | '/login'
     | '/market-intel'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/download'
     | '/floating'
     | '/forgot-password'
+    | '/help'
     | '/journal'
     | '/login'
     | '/market-intel'
@@ -357,6 +369,7 @@ export interface RootRouteChildren {
   DownloadRoute: typeof DownloadRoute
   FloatingRoute: typeof FloatingRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HelpRoute: typeof HelpRoute
   JournalRoute: typeof JournalRoute
   LoginRoute: typeof LoginRoute
   MarketIntelRoute: typeof MarketIntelRoute
@@ -449,6 +462,13 @@ declare module '@tanstack/react-router' {
       path: '/journal'
       fullPath: '/journal'
       preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -596,6 +616,7 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadRoute: DownloadRoute,
   FloatingRoute: FloatingRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HelpRoute: HelpRoute,
   JournalRoute: JournalRoute,
   LoginRoute: LoginRoute,
   MarketIntelRoute: MarketIntelRoute,
@@ -613,13 +634,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
