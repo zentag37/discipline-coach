@@ -36,6 +36,11 @@ import { hasAceAccess, planLabel } from "@/lib/plan";
 import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { AvatarMenu } from "@/components/AvatarMenu";
 import { pushNotification } from "@/lib/notification-bus";
+import {
+  STATUS_GREEN, STATUS_AMBER, STATUS_RED,
+  colorFor, tradesStatus, pnlStatus, checklistStatus, sessionHealth,
+  publishHealth, type RuleStatus,
+} from "@/lib/trading-status";
 
 
 marked.setOptions({ breaks: true, gfm: true });
